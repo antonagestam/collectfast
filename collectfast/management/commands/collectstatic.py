@@ -10,7 +10,11 @@ class Command(collectstatic.Command):
     def delete_file(self, path, prefixed_path, source_storage):
         """
         Checks if the target file should be deleted if it already exists
+
         """
+
+        self.log("Woot the what!")
+
         if self.storage.exists(prefixed_path):
             try:
                 # attempt the S3 hash first
@@ -18,7 +22,9 @@ class Command(collectstatic.Command):
                     self.log(u"Skipping '%s' (not modified based on MD5 SUM)" % path)
                     return False
             except:
+                self.log(u"S3 says IDK")
                 pass
+
             try:
                 # When was the target file modified last time?
                 target_last_modified = \
