@@ -2,6 +2,8 @@
 Collectfast
 ===========
 
+The fast `collectstatic` for Django-apps with S3 as storage backend.
+
 Custom management command that compares the MD5 sum and etag from S3 and if the
 two are the same skips file copy. This makes running collect static MUCH faster
 if you are using git as a source control system which updates timestamps.
