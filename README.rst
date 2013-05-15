@@ -19,8 +19,7 @@ and:
 Cred
 ----
 
-Written by millarm_ on djangosnippets_
+Original idea from djangosnippets_
 
 
 .. _djangosnippets: http://djangosnippets.org/snippets/2889/
-.. _millarm: http://djangosnippets.org/users/millarm/
