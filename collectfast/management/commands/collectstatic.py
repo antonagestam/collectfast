@@ -13,16 +13,15 @@ class Command(collectstatic.Command):
 
         """
 
-        self.log("Woot the what!")
-
         if self.storage.exists(prefixed_path):
             try:
                 # attempt the S3 hash first
                 if self.storage._wrapped.entries.get(prefixed_path).etag == '"%s"' % hashlib.md5(source_storage.open(path).read()).hexdigest():
                     self.log(u"Skipping '%s' (not modified based on MD5 SUM)" % path)
                     return False
+                else:
+                    self.log(u"S3 didn't say skip :>")
             except:
-                self.log(u"S3 says IDK")
                 pass
 
             try:

@@ -8,5 +8,6 @@ setup(name='Collectfast',
                   'etag from S3 and if the two are the same skips file copy.',
       author='Anton Agestam',
       author_email='msn@antonagestam.se',
-      packages=['collectfast', 'collectfast.commands'],
+      packages=['collectfast', 'collectfast.management',
+                'collectfast.management.commands'],
 )
