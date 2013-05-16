@@ -10,13 +10,15 @@ if you are using git as a source control system which updates timestamps.
 Installation
 ------------
 
-Make sure you have this in your settings file:
+Install the app using pip:
+
+    pip install -e git+https://github.com/antonagestam/collectfast.git@0.1.1#egg=collectfast
+
+Make sure you have this in your settings file and add `'collectfast'` to
+your `INSTALLED_APPS`:
 
     STATICFILES_STORAGE = "storages.backends.s3boto.S3BotoStorage"
     AWS_PRELOAD_METADATA = True
-
-And add `'collectfast'` to your `INSTALLED_APPS`:
-
     INSTALLED_APPS = (
         …
         'collectfast',
