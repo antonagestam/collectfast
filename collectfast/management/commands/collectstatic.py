@@ -24,10 +24,14 @@ class Command(collectstatic.Command):
 
         if not self.ignore_etag:
             try:
+                # Get ETag from storage
                 storage_etag = self.storage.bucket.lookup(prefixed_path).etag
+
+                # Create md5 checksum from local file
                 file_contents = source_storage.open(path).read()
                 local_etag = '"%s"' % hashlib.md5(file_contents).hexdigest()
 
+                # Compare checksums and skip copying if matching
                 if storage_etag == local_etag:
                     self.log(u"Skipping '%s'" % path, level=1)
                     return False
