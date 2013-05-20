@@ -95,10 +95,9 @@ class Command(collectstatic.Command):
                 if storage_lookup.etag == local_etag:
                     self.log(u"Skipping '%s' due to ETag" % path, level=1)
                     return False
-            except Exception, e:
+            except:
                 # Ignore errors, let default Command handle it
-                raise e
-                #pass
+                pass
 
             # Invalidate cached versions of lookup if copy is done
             self.destroy_lookup(prefixed_path)
