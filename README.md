@@ -12,7 +12,7 @@ Installation
 
 Install the app using pip:
 
-    pip install -e git+https://github.com/antonagestam/collectfast.git@0.1.1#egg=collectfast
+    pip install -e git+https://github.com/antonagestam/collectfast.git@0.1.4#egg=collectfast
 
 Make sure you have this in your settings file and add `'collectfast'` to
 your `INSTALLED_APPS`:
