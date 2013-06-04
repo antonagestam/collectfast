@@ -1,2 +1,2 @@
-include AUTHORS CHANGES README INSTALL LICENCE
+include README.md
 recursive-include collectfast *.py *.html *.js
