@@ -15,5 +15,5 @@ setup(
     url='https://github.com/FundedByMe/collectfast/',
     license='Creative Commons Attribution-ShareAlike 3.0 Unported License',
     include_package_data=True,
-    install_requires=['Django<=1.4', 'python-dateutil<=2.1', 'pytz<=2013b',],
+    install_requires=['Django>=1.4', 'python-dateutil>=2.1', 'pytz>=2013b',],
 )
