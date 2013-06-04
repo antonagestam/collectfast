@@ -73,7 +73,7 @@ class Command(collectstatic.Command):
 
         """
 
-        if not self.ignore_etag:
+        if not self.ignore_etag and not self.dry_run:
             try:
                 storage_lookup = self.get_lookup(prefixed_path)
                 local_file = source_storage.open(prefixed_path)
