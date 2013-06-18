@@ -8,8 +8,6 @@ import datetime
 from django.contrib.staticfiles.management.commands import collectstatic
 from django.core.cache import cache
 
-from dateutil import parser
-import pytz
 
 class Command(collectstatic.Command):
     option_list = collectstatic.Command.option_list + (
@@ -55,16 +53,9 @@ class Command(collectstatic.Command):
         return self.lookups[path]
 
     def destroy_lookup(self, path):
-        del self.lookups[path]
+        if path in self.lookups:
+            del self.lookups[path]
         cache.delete(self.get_cache_key(path))
-
-    def get_last_modified(self, path):
-        return parser.parse(self.get_lookup(path).last_modified)
-
-    def get_local_modified(self, path, storage):
-        date = storage.modified_time(path)
-        utc = pytz.UTC
-        return utc.localize(date)
 
     def copy_file(self, path, prefixed_path, source_storage):
         """
@@ -77,15 +68,6 @@ class Command(collectstatic.Command):
             try:
                 storage_lookup = self.get_lookup(prefixed_path)
                 local_file = source_storage.open(prefixed_path)
-                storage_modified = self.get_last_modified(prefixed_path)
-                local_modified = self.get_local_modified(prefixed_path,
-                                                         source_storage)
-
-                # Compare last_modified dates
-                if local_modified > storage_modified:
-                    self.log(u"Skipping '%s' due to last_modified" % path,
-                             level=1)
-                    return False
 
                 # Create md5 checksum from local file
                 file_contents = local_file.read()
@@ -93,8 +75,10 @@ class Command(collectstatic.Command):
 
                 # Compare checksums and skip copying if matching
                 if storage_lookup.etag == local_etag:
-                    self.log(u"Skipping '%s' due to ETag" % path, level=1)
+                    self.log(u"Skipping '%s' based on matching ETags" % path, level=1)
                     return False
+                else:
+                    self.log(u"ETag didn't match", level=1)
             except:
                 # Ignore errors, let default Command handle it
                 pass
