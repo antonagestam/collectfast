@@ -11,7 +11,7 @@ from django.core.cache import cache
 
 class Command(collectstatic.Command):
     option_list = collectstatic.Command.option_list + (
-        make_option('--ignore_etag',
+        make_option('--ignore-etag',
             action="store_true", dest="ignore_etag", default=False,
             help="Upload the file even though the ETags match."),
     )
