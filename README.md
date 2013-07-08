@@ -29,7 +29,7 @@ Usage
 
 Collectfast overrides Django's builtin `collectstatic` command so just run
 `python manage.py collectstatic` as normal. You can disable collectfast
-by using the `--ignore_etag` option.
+by using the `--ignore-etag` option.
 
 Cred
 ----
