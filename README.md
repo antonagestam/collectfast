@@ -12,7 +12,7 @@ Installation
 
 Install the app using pip:
 
-    pip install Collectfast==0.1.9
+    pip install Collectfast
 
 Make sure you have this in your settings file and add `'collectfast'` to
 your `INSTALLED_APPS`:
