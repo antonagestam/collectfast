@@ -1,6 +1,8 @@
 Collectfast
 ===========
 
+[![Downloads](https://pypip.in/v/Collectfast/badge.png)](https://pypi.python.org/pypi/Collectfast)
+
 The fast `collectstatic` for Django-apps with S3 as storage backend.
 
 Custom management command that compares the MD5 sum and etag from S3 and if the
