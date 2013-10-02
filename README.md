@@ -26,6 +26,18 @@ your `INSTALLED_APPS`:
         'collectfast',
     )
 
+Settings
+--------
+
+The original Django `collectstatic` command will not copy the file if the target 
+file modification time is later than the source file. This happens all the time when
+we are using s3. And if you think about cases of rolling back source code, this
+logic does not make any sense. Here we ignore the modification time completely but
+provide you a flag. If you really want it, you can set the following flag to true in
+your `settings.py` file:
+
+    COLLECTSTATIC_KEEP_NEWER = True
+
 Usage
 -----
 

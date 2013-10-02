@@ -6,6 +6,7 @@ from optparse import make_option
 import datetime
 
 from django.contrib.staticfiles.management.commands import collectstatic
+from django.conf import settings
 from django.core.cache import cache
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError
@@ -93,6 +94,14 @@ class Command(collectstatic.Command):
 
         return super(Command, self).copy_file(path, prefixed_path,
                                               source_storage)
+
+    def delete_file(self, path, prefixed_path, source_storage):
+        if getattr(settings, "COLLECTSTATIC_KEEP_NEWER", False):
+            return super(Command, self).delete_file(path, prefixed_path, source_storage)
+
+        self.log("Ignore modify time and deleting '%s'" % path)
+        self.storage.delete(prefixed_path)
+        return True
 
     def handle_noargs(self, **options):
         self.set_options(**options)
