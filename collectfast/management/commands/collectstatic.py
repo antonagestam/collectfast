@@ -94,6 +94,15 @@ class Command(collectstatic.Command):
         return super(Command, self).copy_file(path, prefixed_path,
                                               source_storage)
 
+    def delete_file(self, path, prefixed_path, source_storage):
+        """Override delete_file to skip modified time and exists lookups"""
+        if self.dry_run:
+            self.log(u"Pretending to delete '%s'" % path)
+        else:
+            self.log(u"Deleting '%s'" % path)
+            self.storage.delete(prefixed_path)
+        return True
+
     def handle_noargs(self, **options):
         self.set_options(**options)
         # Warn before doing anything more.
