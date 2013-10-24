@@ -5,7 +5,7 @@ from setuptools import find_packages
 
 setup(
     name='Collectfast',
-    version='0.1.11',
+    version='0.1.12',
     description='Custom management command that compares the MD5 sum and '
                 'etag from S3 and if the two are the same skips file copy.',
     long_description=open('README.md').read(),
