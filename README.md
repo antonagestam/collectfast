@@ -3,11 +3,13 @@ Collectfast
 
 [![Downloads](https://pypip.in/v/Collectfast/badge.png)](https://pypi.python.org/pypi/Collectfast)
 
-The fast `collectstatic` for Django-apps with S3 as storage backend.
+The fast `collectstatic` for Django projects with S3 as storage backend.
 
-Custom management command that compares the MD5 sum and etag from S3 and if the
-two are the same skips file copy. This makes running collect static MUCH faster
-if you are using git as a source control system which updates timestamps.
+Running Django's `collectstatic` command can become really slow as more and more files are 
+added to a project, especially if heavy libraries such as jQuery UI are included in the source.
+This is a custom management command that compares the md5 sum of files with S3 and completely
+ignores `modified_time`. The results of the hash lookups are cached locally using your default
+Django cache. This can make deploying much faster!
 
 Installation
 ------------
@@ -16,8 +18,7 @@ Install the app using pip:
 
     $ pip install Collectfast
 
-Make sure you have this in your settings file and add `'collectfast'` to
-your `INSTALLED_APPS`:
+Make sure you have this in your settings file and add `'collectfast'` to your `INSTALLED_APPS`:
 
 ```python
 STATICFILES_STORAGE = "storages.backends.s3boto.S3BotoStorage"
