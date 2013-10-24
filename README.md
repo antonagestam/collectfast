@@ -14,17 +14,19 @@ Installation
 
 Install the app using pip:
 
-    pip install Collectfast
+    $ pip install Collectfast
 
 Make sure you have this in your settings file and add `'collectfast'` to
 your `INSTALLED_APPS`:
 
-    STATICFILES_STORAGE = "storages.backends.s3boto.S3BotoStorage"
-    AWS_PRELOAD_METADATA = True
-    INSTALLED_APPS = (
-        …
-        'collectfast',
-    )
+```python
+STATICFILES_STORAGE = "storages.backends.s3boto.S3BotoStorage"
+AWS_PRELOAD_METADATA = True
+INSTALLED_APPS = (
+    # …
+    'collectfast',
+)
+```
 
 Usage
 -----
