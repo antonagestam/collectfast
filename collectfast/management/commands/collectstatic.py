@@ -17,8 +17,8 @@ def check_location(method):
     @wraps(method)
     def add_location(self, path):
         try:
-            self.storage.location
-            path = self.storage._normalize_name(path)
+            if not path.startswith(self.storage.location):
+                path = self.storage._normalize_name(path)
         except AttributeError:
             pass
         return method(self, path)
