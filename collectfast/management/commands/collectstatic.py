@@ -3,6 +3,7 @@
 from __future__ import with_statement
 import hashlib
 from optparse import make_option
+from functools import wraps
 import datetime
 
 from django.contrib.staticfiles.management.commands import collectstatic
@@ -10,6 +11,18 @@ from django.core.cache import cache
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError
 from django.utils.encoding import smart_str
+
+
+def check_location(method):
+    @wraps(method)
+    def add_location(self, path):
+        try:
+            self.storage.location
+            path = self.storage._normalize_name(path)
+        except AttributeError:
+            pass
+        return method(self, path)
+    return add_location
 
 
 class Command(collectstatic.Command):
@@ -37,6 +50,7 @@ class Command(collectstatic.Command):
     def get_cache_key(self, path):
         return 'collectfast_asset_' + hashlib.md5(path).hexdigest()
 
+    @check_location
     def get_lookup(self, path):
         """Get lookup from local dict, cache or S3 — in that order"""
 
@@ -55,6 +69,7 @@ class Command(collectstatic.Command):
 
         return self.lookups[path]
 
+    @check_location
     def destroy_lookup(self, path):
         if path in self.lookups:
             del self.lookups[path]
