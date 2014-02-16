@@ -41,7 +41,10 @@ class Command(collectstatic.Command):
         return ret
 
     def get_cache_key(self, path):
-        return 'collectfast_asset_' + hashlib.md5(path).hexdigest()
+        try:
+            return 'collectfast_asset_' + hashlib.md5(path).hexdigest()
+        except TypeError:
+            return 'collectfast_asset_' + hashlib.md5(path.encode('utf-8')).hexdigest()
 
     def get_lookup(self, path):
         """Get lookup from local dict, cache or S3 — in that order"""
