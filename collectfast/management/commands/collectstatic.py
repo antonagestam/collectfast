@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import with_statement
+
+# Python 2/3 support for command line input
 try:
     import __builtin__
     input = getattr(__builtin__, 'raw_input')
@@ -41,6 +43,7 @@ class Command(collectstatic.Command):
         return ret
 
     def get_cache_key(self, path):
+        # Python 2/3 support for path hashing
         try:
             return 'collectfast_asset_' + hashlib.md5(path).hexdigest()
         except TypeError:
