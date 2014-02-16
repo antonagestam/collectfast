@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import with_statement
+try:
+    import __builtin__
+    input = getattr(__builtin__, 'raw_input')
+except (ImportError, AttributeError):
+    pass
+
 import hashlib
 from optparse import make_option
 import datetime
@@ -120,7 +126,7 @@ class Command(collectstatic.Command):
             clear_display = 'This will overwrite existing files!'
 
         if self.interactive:
-            confirm = raw_input(u"""
+            confirm = input(u"""
 You have requested to collect static files at the destination
 location as specified in your settings%s
 
