@@ -68,11 +68,11 @@ class Command(collectstatic.Command):
         """
 
         # staticfiles doesn't normalize the path to include any prefix
-        prefixed_path = self.storage._normalize_name(path)
+        remote_path = self.storage._normalize_name(path)
 
         if not self.ignore_etag and not self.dry_run:
             try:
-                storage_lookup = self.get_lookup(prefixed_path)
+                storage_lookup = self.get_lookup(remote_path)
                 local_file = source_storage.open(prefixed_path)
 
                 # Create md5 checksum from local file
