@@ -67,6 +67,9 @@ class Command(collectstatic.Command):
 
         """
 
+        # staticfiles doesn't normalize the path to include any prefix
+        prefixed_path = self.storage._normalize_name(path)
+
         if not self.ignore_etag and not self.dry_run:
             try:
                 storage_lookup = self.get_lookup(prefixed_path)
