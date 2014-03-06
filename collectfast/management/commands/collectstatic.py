@@ -67,9 +67,11 @@ class Command(collectstatic.Command):
 
         """
 
+        normalized_path = self.storage._normalize_name(path)
+
         if not self.ignore_etag and not self.dry_run:
             try:
-                storage_lookup = self.get_lookup(prefixed_path)
+                storage_lookup = self.get_lookup(normalized_path)
                 local_file = source_storage.open(prefixed_path)
 
                 # Create md5 checksum from local file
@@ -89,7 +91,7 @@ class Command(collectstatic.Command):
                 pass
 
             # Invalidate cached versions of lookup if copy is done
-            self.destroy_lookup(prefixed_path)
+            self.destroy_lookup(normalized_path)
 
         return super(Command, self).copy_file(path, prefixed_path,
                                               source_storage)
