@@ -93,8 +93,8 @@ class Command(collectstatic.Command):
             # Invalidate cached versions of lookup if copy is done
             self.destroy_lookup(normalized_path)
 
-        return super(Command, self).copy_file(path, prefixed_path,
-                                              source_storage)
+        return super(Command, self).copy_file(
+            path, prefixed_path, source_storage)
 
     def delete_file(self, path, prefixed_path, source_storage):
         """Override delete_file to skip modified time and exists lookups"""
