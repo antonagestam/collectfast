@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import with_statement
+
+# Python 2/3 support for command line input
+from django.utils.six.moves import input
+
 import hashlib
 from optparse import make_option
 import datetime
@@ -35,7 +39,11 @@ class Command(collectstatic.Command):
         return ret
 
     def get_cache_key(self, path):
-        return 'collectfast_asset_' + hashlib.md5(path).hexdigest()
+        # Python 2/3 support for path hashing
+        try:
+            return 'collectfast_asset_' + hashlib.md5(path).hexdigest()
+        except TypeError:
+            return 'collectfast_asset_' + hashlib.md5(path.encode('utf-8')).hexdigest()
 
     def get_lookup(self, path):
         """Get lookup from local dict, cache or S3 — in that order"""
@@ -120,7 +128,7 @@ class Command(collectstatic.Command):
             clear_display = 'This will overwrite existing files!'
 
         if self.interactive:
-            confirm = raw_input(u"""
+            confirm = input(u"""
 You have requested to collect static files at the destination
 location as specified in your settings%s
 
