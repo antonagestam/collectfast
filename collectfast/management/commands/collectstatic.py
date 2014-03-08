@@ -3,11 +3,7 @@
 from __future__ import with_statement
 
 # Python 2/3 support for command line input
-try:
-    import __builtin__
-    input = getattr(__builtin__, 'raw_input')
-except (ImportError, AttributeError):
-    pass
+from django.utils.six.moves import input
 
 import hashlib
 from optparse import make_option
