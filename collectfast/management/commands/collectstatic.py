@@ -9,12 +9,14 @@ import hashlib
 from optparse import make_option
 import datetime
 
+from django.conf import settings
 from django.contrib.staticfiles.management.commands import collectstatic
-from django.core.cache import cache
+from django.core.cache import get_cache
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError
 from django.utils.encoding import smart_str
 
+cache = get_cache(getattr(settings, "COLLECTFAST_CACHE", "default"))
 
 class Command(collectstatic.Command):
     option_list = collectstatic.Command.option_list + (

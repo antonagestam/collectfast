@@ -29,6 +29,8 @@ INSTALLED_APPS = (
 )
 ```
 
+Optionally, you can set `COLLECTFAST_CACHE` in your Django settings.py file to specify a specific cache backend for collectfast to use.  By default it is set to the `default` cache.
+
 Usage
 -----
 
