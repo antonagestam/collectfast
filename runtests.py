@@ -32,6 +32,12 @@ def main():
                 "PASSWORD": options.DATABASE_PASSWORD,
             }
         },
+        "CACHES": {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+                'LOCATION': 'test-collectfast'
+            }
+        },
         "ROOT_URLCONF": app_name + ".urls",
         "TEMPLATE_LOADERS": (
             "django.template.loaders.filesystem.Loader",
@@ -47,6 +53,7 @@ def main():
             "django.contrib.contenttypes",
             app_name,
         ),
+        "STATIC_URL": "/static/",
     })
     call_command("test", app_name)
 
