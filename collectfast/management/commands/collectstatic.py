@@ -11,7 +11,11 @@ from django.core.cache import get_cache
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError
 from django.utils.encoding import smart_str
-from django.utils.six.moves import input
+
+try:
+    from django.utils.six.moves import input as _input
+except ImportError:
+    _input = raw_input
 
 cache = get_cache(getattr(settings, "COLLECTFAST_CACHE", "default"))
 
@@ -24,27 +28,31 @@ class Command(collectstatic.Command):
     )
 
     lookups = None
+    cache_key_prefix = 'collectfast_asset_'
 
     def set_options(self, **options):
         self.ignore_etag = options.pop('ignore_etag', False)
         super(Command, self).set_options(**options)
 
-    def collect(self, *args, **kwargs):
+    def collect(self):
         """Override collect method to track time"""
 
         self.num_skipped_files = 0
         start = datetime.datetime.now()
-        ret = super(Command, self).collect(*args, **kwargs)
+        ret = super(Command, self).collect()
         self.collect_time = str(datetime.datetime.now() - start)
         return ret
 
     def get_cache_key(self, path):
         # Python 2/3 support for path hashing
         try:
-            return 'collectfast_asset_' + hashlib.md5(path).hexdigest()
+            path_hash = hashlib.md5(path).hexdigest()
         except TypeError:
-            return ('collectfast_asset_' +
-                    hashlib.md5(path.encode('utf-8')).hexdigest())
+            path_hash = hashlib.md5(path.encode('utf-8')).hexdigest()
+        return self.cache_key_prefix + path_hash
+
+    def get_storage_lookup(self, path):
+        return self.storage.bucket.lookup(path)
 
     def get_lookup(self, path):
         """Get lookup from local dict, cache or S3 — in that order"""
@@ -57,7 +65,7 @@ class Command(collectstatic.Command):
             cached = cache.get(cache_key, False)
 
             if cached is False:
-                self.lookups[path] = self.storage.bucket.lookup(path)
+                self.lookups[path] = self.get_storage_lookup(path)
                 cache.set(cache_key, self.lookups[path])
             else:
                 self.lookups[path] = cached
@@ -131,7 +139,7 @@ class Command(collectstatic.Command):
             clear_display = 'This will overwrite existing files!'
 
         if self.interactive:
-            confirm = input(u"""
+            confirm = _input(u"""
 You have requested to collect static files at the destination
 location as specified in your settings%s
 
