@@ -24,8 +24,19 @@ To test:
 
 from unittest import TestCase
 from mock import patch
+from django.core.files.storage import Storage
+from os.path import join
 
 from ..management.commands.collectstatic import Command, cache
+
+
+class BotolikeStorage(Storage):
+    location = None
+
+    def _normalize_name(self, path):
+        if self.location is not None:
+            path = join(self.location, path)
+        return path
 
 
 class TestCommand(TestCase):
@@ -97,8 +108,22 @@ class TestCommand(TestCase):
         self.assertEqual(cache.get(cache_key, 'empty'), 'empty')
         self.assertNotIn(path, c.lookups)
 
+    @patch("collectfast.management.commands.collectstatic.collectstatic.Command"
+           ".copy_file")
     @patch("collectfast.management.commands.collectstatic.Command.get_lookup")
-    def test_copy_file(self, mocked_lookup):
+    def test_copy_file(self, mocked_lookup, mocked_copy_file_super):
+        """
+        * Command.copy_file
+            - Respects self.ignore_etag and self.dry_run
+            - Respects storage.location
+            - Produces a proper md5 checksum
+            - Returns False and increments self.num_skipped_files if matching checksums
+            - Invalidates cache and self.lookups
+            - Properly calls super
+        """
+        path = '/a/sweet/path'
         c = self.get_command()
-        c.execute(interactive=False)
+        c.storage = BotolikeStorage()
+        c.copy_file(path, path, c.storage)
         self.assertEqual(mocked_lookup.call_count, 1)
+        mocked_copy_file_super.assert_called_once_with()
