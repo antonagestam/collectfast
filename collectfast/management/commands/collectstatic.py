@@ -77,7 +77,7 @@ class Command(collectstatic.Command):
 
         """
 
-        normalized_path = self.storage._normalize_name(path)
+        normalized_path = self.storage._normalize_name(prefixed_path)
 
         if not self.ignore_etag and not self.dry_run:
             try:
