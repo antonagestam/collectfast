@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import with_statement
-
-# Python 2/3 support for command line input
-from django.utils.six.moves import input
-
-import hashlib
 from optparse import make_option
+import hashlib
 import datetime
 
 from django.conf import settings
@@ -15,8 +11,10 @@ from django.core.cache import get_cache
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError
 from django.utils.encoding import smart_str
+from django.utils.six.moves import input
 
 cache = get_cache(getattr(settings, "COLLECTFAST_CACHE", "default"))
+
 
 class Command(collectstatic.Command):
     option_list = collectstatic.Command.option_list + (
@@ -49,7 +47,8 @@ class Command(collectstatic.Command):
         try:
             return 'collectfast_asset_' + hashlib.md5(path).hexdigest()
         except TypeError:
-            return 'collectfast_asset_' + hashlib.md5(path.encode('utf-8')).hexdigest()
+            return ('collectfast_asset_' +
+                    hashlib.md5(path.encode('utf-8')).hexdigest())
 
     def get_lookup(self, path):
         """Get lookup from local dict, cache or S3 — in that order"""
