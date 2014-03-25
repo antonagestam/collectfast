@@ -77,12 +77,12 @@ class Command(collectstatic.Command):
 
         """
 
-        normalized_path = self.storage._normalize_name(path)
+        normalized_path = self.storage._normalize_name(prefixed_path)
 
         if not self.ignore_etag and not self.dry_run:
             try:
                 storage_lookup = self.get_lookup(normalized_path)
-                local_file = source_storage.open(prefixed_path)
+                local_file = source_storage.open(path)
 
                 # Create md5 checksum from local file
                 file_contents = local_file.read()
