@@ -3,7 +3,6 @@ To test:
 
 * Command.collect
     - Sets collect_time properly
-    - Calls and returns value of super
 * Command.get_cache_key
     - test return value (needs both 2.7 and 3.x)
 * Command.get_lookup
@@ -111,19 +110,47 @@ class TestCommand(TestCase):
     @patch("collectfast.management.commands.collectstatic.collectstatic.Command"
            ".copy_file")
     @patch("collectfast.management.commands.collectstatic.Command.get_lookup")
-    def test_copy_file(self, mocked_lookup, mocked_copy_file_super):
+    def call_copy_file(self, mocked_lookup, mocked_copy_file_super, **kwargs):
+        options = {
+            "interactive": False,
+            "post_process": False,
+            "dry_run": False,
+            "clear": False,
+            "link": False,
+            "ignore_patterns": [],
+            "use_default_ignore_patterns": True}
+        options.update(kwargs)
+        path = options.pop('path', '/a/sweet/path')
+        c = self.get_command()
+        c.storage = options.pop('storage', BotolikeStorage())
+        c.set_options(**options)
+        ret_val = c.copy_file(path, path, c.storage)
+        return ret_val, mocked_copy_file_super, mocked_lookup
+
+    def test_copy_file(self):
         """
         * Command.copy_file
-            - Respects self.ignore_etag and self.dry_run
-            - Respects storage.location
+            X Respects self.ignore_etag and self.dry_run
             - Produces a proper md5 checksum
             - Returns False and increments self.num_skipped_files if matching checksums
             - Invalidates cache and self.lookups
-            - Properly calls super
+            X Properly calls super
         """
         path = '/a/sweet/path'
-        c = self.get_command()
-        c.storage = BotolikeStorage()
-        c.copy_file(path, path, c.storage)
-        self.assertEqual(mocked_lookup.call_count, 1)
-        mocked_copy_file_super.assert_called_once_with()
+        storage = BotolikeStorage()
+
+        # Calls super properly
+        ret_val, super_mock, lookup_mock = self.call_copy_file(
+            path=path, storage=storage)
+        super_mock.assert_called_once_with(path, path, storage)
+        self.assertFalse(ret_val is False)
+
+        # Respects ignore_etag
+        ret_val, super_mock, lookup_mock = self.call_copy_file(
+            path=path, storage=storage, ignore_etag=True)
+        self.assertEqual(lookup_mock.call_count, 0)
+
+        # Respects dry_run
+        ret_val, super_mock, lookup_mock = self.call_copy_file(
+            path=path, storage=storage, dry_run=True)
+        self.assertEqual(lookup_mock.call_count, 0)
