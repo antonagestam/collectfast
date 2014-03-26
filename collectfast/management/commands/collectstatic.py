@@ -84,7 +84,7 @@ class Command(collectstatic.Command):
     def copy_file(self, path, prefixed_path, source_storage):
         """
         Attempt to generate an md5 hash of the local file and compare it with
-        the S3 version's ETag before copying the file.
+        the S3 version's hash before copying the file.
 
         """
         if self.collectfast_enabled and not self.dry_run:
