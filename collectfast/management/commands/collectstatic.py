@@ -73,7 +73,7 @@ class Command(collectstatic.Command):
         return self.lookups[path]
 
     def destroy_lookup(self, path):
-        if path in self.lookups:
+        if self.lookups is not None and path in self.lookups:
             del self.lookups[path]
         cache.delete(self.get_cache_key(path))
 
