@@ -169,7 +169,6 @@ class TestCopyFile(CollectfastTestCase):
         """
         self.assertTrue(False)
 
-
     def test_invalidates_cache(self):
         """Invalidates cache and self.lookups"""
         self.assertTrue(False)
