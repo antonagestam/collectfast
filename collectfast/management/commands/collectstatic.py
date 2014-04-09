@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import with_statement
+from __future__ import with_statement, unicode_literals
 from optparse import make_option
 import hashlib
 import datetime
@@ -100,12 +100,12 @@ class Command(collectstatic.Command):
 
                 # Compare checksums and skip copying if matching
                 if storage_lookup.etag == local_etag:
-                    self.log(u"Skipping '%s' based on matching ETags" % path,
+                    self.log("Skipping '%s' based on matching ETags" % path,
                              level=2)
                     self.num_skipped_files += 1
                     return False
                 else:
-                    self.log(u"ETag didn't match", level=2)
+                    self.log("ETag didn't match", level=2)
             except Exception, e:
                 # Ignore errors and let super Command handle it
                 self.stdout.write(smart_str(
@@ -124,9 +124,9 @@ class Command(collectstatic.Command):
             return super(Command, self).delete_file(
                     path, prefixed_path, source_storage)
         if self.dry_run:
-            self.log(u"Pretending to delete '%s'" % path)
+            self.log("Pretending to delete '%s'" % path)
         else:
-            self.log(u"Deleting '%s'" % path)
+            self.log("Deleting '%s'" % path)
             self.storage.delete(prefixed_path)
         return True
 
@@ -147,7 +147,7 @@ class Command(collectstatic.Command):
             clear_display = 'This will overwrite existing files!'
 
         if self.interactive:
-            confirm = _input(u"""
+            confirm = _input("""
 You have requested to collect static files at the destination
 location as specified in your settings%s
 

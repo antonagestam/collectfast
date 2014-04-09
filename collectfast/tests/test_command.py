@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from unittest import TestCase
 from mock import patch
 from django.core.files.storage import Storage, FileSystemStorage
