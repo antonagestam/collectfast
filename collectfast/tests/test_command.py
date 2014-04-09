@@ -1,26 +1,3 @@
-"""
-To test:
-
-* Command.collect
-    - Sets collect_time properly
-* Command.get_cache_key
-    - test return value (needs both 2.7 and 3.x)
-* Command.get_lookup
-    - Uses self.lookups if populated
-    - Uses cache if populated
-    - Properly calls storage.bucket.lookup
-    - Properly populates cache and self.lookups
-* Command.destroy_lookup
-    - Properly deletes value from cache and self.lookups
-* Command.copy_file
-    - Respects self.ignore_etag and self.dry_run
-    - Respects storage.location
-    - Produces a proper md5 checksum
-    - Returns False and increments self.num_skipped_files if matching checksums
-    - Invalidates cache and self.lookups
-    - Properly calls super
-"""
-
 from unittest import TestCase
 from mock import patch
 from django.core.files.storage import Storage
@@ -38,13 +15,15 @@ class BotolikeStorage(Storage):
         return path
 
 
-class TestCommand(TestCase):
+class CollectfastTestCase(TestCase):
     def setUp(self):
         cache.clear()
 
     def get_command(self, *args, **kwargs):
         return Command(*args, **kwargs)
 
+
+class TestCommand(CollectfastTestCase):
     @patch("collectfast.management.commands.collectstatic.collectstatic"
            ".Command.collect")
     def test_collect(self, mocked_super):
@@ -107,6 +86,14 @@ class TestCommand(TestCase):
         self.assertEqual(cache.get(cache_key, 'empty'), 'empty')
         self.assertNotIn(path, c.lookups)
 
+
+class TestCopyFile(CollectfastTestCase):
+    def setUp(self):
+        super(TestCopyFile, self).setUp()
+
+    def tearDown(self):
+        pass
+
     @patch("collectfast.management.commands.collectstatic.collectstatic.Command"
            ".copy_file")
     @patch("collectfast.management.commands.collectstatic.Command.get_lookup")
@@ -127,23 +114,9 @@ class TestCommand(TestCase):
         ret_val = c.copy_file(path, path, c.storage)
         return ret_val, mocked_copy_file_super, mocked_lookup
 
-    def test_copy_file(self):
-        """
-        * Command.copy_file
-            X Respects self.ignore_etag and self.dry_run
-            - Produces a proper md5 checksum
-            - Returns False and increments self.num_skipped_files if matching checksums
-            - Invalidates cache and self.lookups
-            X Properly calls super
-        """
+    def test_respect_flags(self):
         path = '/a/sweet/path'
         storage = BotolikeStorage()
-
-        # Calls super properly
-        ret_val, super_mock, lookup_mock = self.call_copy_file(
-            path=path, storage=storage)
-        super_mock.assert_called_once_with(path, path, storage)
-        self.assertFalse(ret_val is False)
 
         # Respects ignore_etag
         ret_val, super_mock, lookup_mock = self.call_copy_file(
@@ -154,3 +127,28 @@ class TestCommand(TestCase):
         ret_val, super_mock, lookup_mock = self.call_copy_file(
             path=path, storage=storage, dry_run=True)
         self.assertEqual(lookup_mock.call_count, 0)
+
+    def test_calls_super(self):
+        path = '/a/sweet/path'
+        storage = BotolikeStorage()
+
+        # Calls super properly
+        ret_val, super_mock, lookup_mock = self.call_copy_file(
+            path=path, storage=storage)
+        super_mock.assert_called_once_with(path, path, storage)
+        self.assertFalse(ret_val is False)
+
+    def test_checksum(self):
+        """Produces a proper md5 checksum"""
+        pass
+
+    def test_skips(self):
+        """
+        Returns False and increments self.num_skipped_files if matching
+        hashes
+        """
+        pass
+
+
+    def test_invalidates_cache(self):
+        """Invalidates cache and self.lookups"""
