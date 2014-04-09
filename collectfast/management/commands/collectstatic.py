@@ -106,7 +106,7 @@ class Command(collectstatic.Command):
                     return False
                 else:
                     self.log("ETag didn't match", level=2)
-            except Exception, e:
+            except Exception as e:
                 # Ignore errors and let super Command handle it
                 self.stdout.write(smart_str(
                     "Ignored error in Collectfast:\n%s\n--> Continuing using "
