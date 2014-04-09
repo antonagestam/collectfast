@@ -11,6 +11,7 @@ This is a custom management command that compares the md5 sum of files with S3 a
 ignores `modified_time`. The results of the hash lookups are cached locally using your default
 Django cache. This can make deploying much faster!
 
+
 Installation
 ------------
 
@@ -31,12 +32,21 @@ INSTALLED_APPS = (
 
 Optionally, you can set `COLLECTFAST_CACHE` in your Django settings.py file to specify a specific cache backend for collectfast to use.  By default it is set to the `default` cache.
 
+
 Usage
 -----
 
 Collectfast overrides Django's builtin `collectstatic` command so just run
 `python manage.py collectstatic` as normal. You can disable collectfast
 by using the `--ignore-etag` option.
+
+
+Contribution
+------------
+
+Please feel free to contribute by using issues and pull requests. Discussion is open and welcome.
+Testing is currently being implemented and will be mandatory for new features once merged.
+
 
 License
 -------
