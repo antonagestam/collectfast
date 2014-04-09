@@ -96,9 +96,11 @@ class Command(collectstatic.Command):
                     return False
                 else:
                     self.log(u"ETag didn't match", level=2)
-            except:
-                # Ignore errors, let default Command handle it
-                pass
+            except Exception, e:
+                # Ignore errors and let super Command handle it
+                self.stdout.write(smart_str(
+                    "Ignored error in Collectfast:\n%s\n--> Continuing using "
+                    "default collectstatic." % e.message))
 
             # Invalidate cached versions of lookup if copy is done
             self.destroy_lookup(normalized_path)
