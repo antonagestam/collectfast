@@ -131,9 +131,16 @@ class TestCopyFile(CollectfastTestCase):
             "use_default_ignore_patterns": True}
         options.update(kwargs)
         path = options.pop('path', '/a/sweet/path')
+
+        if 'lookup_hash' in options:
+            class FakeLookup:
+                etag = options.pop('lookup_hash')
+            mocked_lookup.return_value = FakeLookup()
+
         c = self.get_command()
         c.storage = options.pop('storage', BotolikeStorage())
         c.set_options(**options)
+        c.num_skipped_files = 0
         ret_val = c.copy_file(path, path, c.storage)
         return ret_val, mocked_copy_file_super, mocked_lookup
 
@@ -150,7 +157,9 @@ class TestCopyFile(CollectfastTestCase):
             path=path, storage=storage, dry_run=True)
         self.assertEqual(lookup_mock.call_count, 0)
 
-    def test_calls_super(self):
+    @patch("collectfast.management.commands.collectstatic.Command"
+           ".get_file_hash")
+    def test_calls_super(self, mock_get_file_hash):
         """`copy_file` properly calls super method"""
         path = '/a/sweet/path'
         storage = BotolikeStorage()
@@ -160,12 +169,23 @@ class TestCopyFile(CollectfastTestCase):
         super_mock.assert_called_once_with(path, path, storage)
         self.assertFalse(ret_val is False)
 
-    def test_skips(self):
+    @patch("collectfast.management.commands.collectstatic.Command"
+           ".get_file_hash")
+    def test_skips(self, mock_get_file_hash):
         """
         Returns False and increments self.num_skipped_files if matching
         hashes
         """
-        self.assertTrue(False)
+        # mock get_file_hash and lookup to return the same hashes
+        mock_hash = 'thisisafakehash'
+        mock_get_file_hash.return_value = mock_hash
+
+        storage = BotolikeStorage()
+
+        ret_val, super_mock, lookup_mock = self.call_copy_file(
+            path=self.path, storage=storage, lookup_hash=mock_hash)
+        self.assertFalse(ret_val)
+        self.assertEqual(super_mock.call_count, 0)
 
     def test_invalidates_cache(self):
         """Invalidates cache and self.lookups"""

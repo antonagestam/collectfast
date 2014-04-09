@@ -15,6 +15,7 @@ def main():
     parser.add_option("--DATABASE_NAME", dest="DATABASE_NAME", default="")
     parser.add_option("--DATABASE_USER", dest="DATABASE_USER", default="")
     parser.add_option("--DATABASE_PASSWORD", dest="DATABASE_PASSWORD", default="")
+    parser.add_option("--TEST", dest="TEST_SUITE", default=None)
 
     options, args = parser.parse_args()
 
@@ -55,7 +56,13 @@ def main():
         ),
         "STATIC_URL": "/static/",
     })
-    call_command("test", app_name)
+
+    if options.TEST_SUITE is not None:
+        test_arg = "%s.%s" % (app_name, options.TEST_SUITE)
+    else:
+        test_arg = app_name
+
+    call_command("test", test_arg)
 
 if __name__ == "__main__":
     main()
