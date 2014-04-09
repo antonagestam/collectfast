@@ -29,6 +29,10 @@ class Command(collectstatic.Command):
 
     def set_options(self, **options):
         self.ignore_etag = options.pop('ignore_etag', False)
+        if self.ignore_etag:
+            self.collectfast_enabled = False
+        else:
+            self.collectfast_enabled = getattr(settings, "COLLECTFAST_ENABLED", True)
         super(Command, self).set_options(**options)
 
     def collect(self, *args, **kwargs):
@@ -76,10 +80,8 @@ class Command(collectstatic.Command):
         the S3 version's ETag before copying the file.
 
         """
-
-        normalized_path = self.storage._normalize_name(prefixed_path)
-
-        if not self.ignore_etag and not self.dry_run:
+        if self.collectfast_enabled and not self.ignore_etag and not self.dry_run:
+            normalized_path = self.storage._normalize_name(prefixed_path)
             try:
                 storage_lookup = self.get_lookup(normalized_path)
                 local_file = source_storage.open(path)
@@ -108,6 +110,9 @@ class Command(collectstatic.Command):
 
     def delete_file(self, path, prefixed_path, source_storage):
         """Override delete_file to skip modified time and exists lookups"""
+        if not self.collectfast_enabled:
+            return super(Command, self).delete_file(
+                    path, prefixed_path, source_storage)
         if self.dry_run:
             self.log(u"Pretending to delete '%s'" % path)
         else:
