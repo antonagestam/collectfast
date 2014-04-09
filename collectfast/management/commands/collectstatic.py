@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import with_statement
-
-# Python 2/3 support for command line input
-from django.utils.six.moves import input
-
-import hashlib
 from optparse import make_option
+import hashlib
 import datetime
 
 from django.conf import settings
@@ -16,7 +12,13 @@ from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError
 from django.utils.encoding import smart_str
 
+try:
+    from django.utils.six.moves import input as _input
+except ImportError:
+    _input = raw_input
+
 cache = get_cache(getattr(settings, "COLLECTFAST_CACHE", "default"))
+
 
 class Command(collectstatic.Command):
     option_list = collectstatic.Command.option_list + (
@@ -26,26 +28,31 @@ class Command(collectstatic.Command):
     )
 
     lookups = None
+    cache_key_prefix = 'collectfast_asset_'
 
     def set_options(self, **options):
         self.ignore_etag = options.pop('ignore_etag', False)
         super(Command, self).set_options(**options)
 
-    def collect(self, *args, **kwargs):
+    def collect(self):
         """Override collect method to track time"""
 
         self.num_skipped_files = 0
         start = datetime.datetime.now()
-        ret = super(Command, self).collect(*args, **kwargs)
+        ret = super(Command, self).collect()
         self.collect_time = str(datetime.datetime.now() - start)
         return ret
 
     def get_cache_key(self, path):
         # Python 2/3 support for path hashing
         try:
-            return 'collectfast_asset_' + hashlib.md5(path).hexdigest()
+            path_hash = hashlib.md5(path).hexdigest()
         except TypeError:
-            return 'collectfast_asset_' + hashlib.md5(path.encode('utf-8')).hexdigest()
+            path_hash = hashlib.md5(path.encode('utf-8')).hexdigest()
+        return self.cache_key_prefix + path_hash
+
+    def get_storage_lookup(self, path):
+        return self.storage.bucket.lookup(path)
 
     def get_lookup(self, path):
         """Get lookup from local dict, cache or S3 — in that order"""
@@ -58,7 +65,7 @@ class Command(collectstatic.Command):
             cached = cache.get(cache_key, False)
 
             if cached is False:
-                self.lookups[path] = self.storage.bucket.lookup(path)
+                self.lookups[path] = self.get_storage_lookup(path)
                 cache.set(cache_key, self.lookups[path])
             else:
                 self.lookups[path] = cached
@@ -66,14 +73,19 @@ class Command(collectstatic.Command):
         return self.lookups[path]
 
     def destroy_lookup(self, path):
-        if path in self.lookups:
+        if self.lookups is not None and path in self.lookups:
             del self.lookups[path]
         cache.delete(self.get_cache_key(path))
+
+    def get_file_hash(self, storage, path):
+        contents = storage.open(path).read()
+        file_hash = '"%s"' % hashlib.md5(contents).hexdigest()
+        return file_hash
 
     def copy_file(self, path, prefixed_path, source_storage):
         """
         Attempt to generate an md5 hash of the local file and compare it with
-        the S3 version's ETag before copying the file.
+        the S3 version's hash before copying the file.
 
         """
 
@@ -82,11 +94,7 @@ class Command(collectstatic.Command):
         if not self.ignore_etag and not self.dry_run:
             try:
                 storage_lookup = self.get_lookup(normalized_path)
-                local_file = source_storage.open(path)
-
-                # Create md5 checksum from local file
-                file_contents = local_file.read()
-                local_etag = '"%s"' % hashlib.md5(file_contents).hexdigest()
+                local_etag = self.get_file_hash(source_storage, path)
 
                 # Compare checksums and skip copying if matching
                 if storage_lookup.etag == local_etag:
@@ -132,7 +140,7 @@ class Command(collectstatic.Command):
             clear_display = 'This will overwrite existing files!'
 
         if self.interactive:
-            confirm = input(u"""
+            confirm = _input(u"""
 You have requested to collect static files at the destination
 location as specified in your settings%s
 
