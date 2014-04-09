@@ -30,7 +30,34 @@ INSTALLED_APPS = (
 )
 ```
 
-Optionally, you can set `COLLECTFAST_CACHE` in your Django settings.py file to specify a specific cache backend for collectfast to use.  By default it is set to the `default` cache.
+
+Setup dedicated cache backend
+-----------------------------
+
+It's recommended to setup a dedicated cache backend for Collectfast. Every time Collectfast does not
+find a lookup for a file in the cache it will trigger a lookup to the storage backend, so it's
+recommended to have a fairly high `TIMEOUT` setting.
+
+Set up your dedicated cache in settings.py with the `COLLECTFAST_CACHE` setting:
+
+```python
+CACHES = {
+    'default': {
+        # Your default cache
+    },
+    'collectfast': {
+        # Your dedicated Collectfast cache
+    }
+}
+
+COLLECTFAST_CACHE = 'collectfast'
+```
+
+By default Collectfast will use the `default` cache.
+
+Collectfast will never clean the cache of obsolete files. To clean out the entire cache, use `cache.clear()`.
+
+[Read more about Django's cache framework.](https://docs.djangoproject.com/en/stable/topics/cache/)
 
 
 Usage
