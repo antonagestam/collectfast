@@ -2,6 +2,7 @@ Collectfast
 ===========
 
 [![Downloads](https://pypip.in/v/Collectfast/badge.png)](https://pypi.python.org/pypi/Collectfast)
+[![Build Status](https://travis-ci.org/antonagestam/collectfast.svg)](https://travis-ci.org/antonagestam/collectfast)
 
 The fast `collectstatic` for Django projects with S3 as storage backend.
 
