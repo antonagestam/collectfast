@@ -67,6 +67,10 @@ Collectfast overrides Django's builtin `collectstatic` command so just run
 `python manage.py collectstatic` as normal. You can disable collectfast
 by using the `--ignore-etag` option.
 
+You can also disable collectfast by setting `COLLECTFAST_ENABLED = False` in
+your settings file. This is useful when using a local file storage backend
+for development.
+
 
 Contribution
 ------------
