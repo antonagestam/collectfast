@@ -29,7 +29,7 @@ class Command(collectstatic.Command):
 
     def set_options(self, **options):
         self.ignore_etag = options.pop('ignore_etag', False)
-        if self.ignore_etag:
+        if self.ignore_etag or self.dry_run:
             self.collectfast_enabled = False
         else:
             self.collectfast_enabled = getattr(settings, "COLLECTFAST_ENABLED", True)
@@ -80,7 +80,7 @@ class Command(collectstatic.Command):
         the S3 version's ETag before copying the file.
 
         """
-        if self.collectfast_enabled and not self.ignore_etag and not self.dry_run:
+        if self.collectfast_enabled:
             normalized_path = self.storage._normalize_name(prefixed_path)
             try:
                 storage_lookup = self.get_lookup(normalized_path)
