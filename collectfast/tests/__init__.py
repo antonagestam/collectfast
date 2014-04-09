@@ -1,1 +1,1 @@
-from .test_command import TestCommand
+from .test_command import TestCommand, TestCopyFile
