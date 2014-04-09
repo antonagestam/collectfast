@@ -1,1 +1,1 @@
-from .test_command import TestCommand, TestCopyFile
+from .test_command import TestCommand, TestCopyFile, TestGetFileHash

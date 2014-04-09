@@ -1,6 +1,7 @@
 from unittest import TestCase
 from mock import patch
-from django.core.files.storage import Storage
+from django.core.files.storage import Storage, FileSystemStorage
+from django.core.files.base import ContentFile
 from os.path import join
 
 from ..management.commands.collectstatic import Command, cache
@@ -86,8 +87,29 @@ class TestCommand(CollectfastTestCase):
         self.assertEqual(cache.get(cache_key, 'empty'), 'empty')
         self.assertNotIn(path, c.lookups)
 
+
+class TestGetFileHash(CollectfastTestCase):
+    def setUp(self):
+        self.path = '.collectfast-test-file.txt'
+        self.storage = FileSystemStorage(location='./')
+
     def test_get_file_hash(self):
-        self.assertTrue(False)
+        content = 'this is some content to be hashed'
+        expected_hash = '"16e71fd2be8be2a3a8c0be7b9aab6c04"'
+        c = self.get_command()
+
+        self.storage.save(self.path, ContentFile(content))
+        file_hash = c.get_file_hash(self.storage, self.path)
+        self.assertEqual(file_hash, expected_hash)
+
+        self.storage.delete(self.path)
+
+        self.storage.save(self.path, ContentFile('some nonsense'))
+        file_hash = c.get_file_hash(self.storage, self.path)
+        self.assertNotEqual(file_hash, expected_hash)
+
+    def tearDown(self):
+        self.storage.delete(self.path)
 
 
 class TestCopyFile(CollectfastTestCase):
