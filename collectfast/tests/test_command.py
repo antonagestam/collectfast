@@ -19,9 +19,14 @@ class BotolikeStorage(Storage):
 class CollectfastTestCase(TestCase):
     def setUp(self):
         cache.clear()
+        self.path = '.collectfast-test-file.txt'
+        self.storage = FileSystemStorage(location='./')
 
     def get_command(self, *args, **kwargs):
         return Command(*args, **kwargs)
+
+    def tearDown(self):
+        self.storage.delete(self.path)
 
 
 class TestCommand(CollectfastTestCase):
@@ -89,10 +94,6 @@ class TestCommand(CollectfastTestCase):
 
 
 class TestGetFileHash(CollectfastTestCase):
-    def setUp(self):
-        self.path = '.collectfast-test-file.txt'
-        self.storage = FileSystemStorage(location='./')
-
     def test_get_file_hash(self):
         content = 'this is some content to be hashed'
         expected_hash = '"16e71fd2be8be2a3a8c0be7b9aab6c04"'
@@ -107,9 +108,6 @@ class TestGetFileHash(CollectfastTestCase):
         self.storage.save(self.path, ContentFile('some nonsense'))
         file_hash = c.get_file_hash(self.storage, self.path)
         self.assertNotEqual(file_hash, expected_hash)
-
-    def tearDown(self):
-        self.storage.delete(self.path)
 
 
 class TestCopyFile(CollectfastTestCase):
