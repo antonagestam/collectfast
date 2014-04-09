@@ -86,6 +86,9 @@ class TestCommand(CollectfastTestCase):
         self.assertEqual(cache.get(cache_key, 'empty'), 'empty')
         self.assertNotIn(path, c.lookups)
 
+    def test_get_file_hash(self):
+        self.assertTrue(False)
+
 
 class TestCopyFile(CollectfastTestCase):
     def setUp(self):
@@ -115,40 +118,36 @@ class TestCopyFile(CollectfastTestCase):
         return ret_val, mocked_copy_file_super, mocked_lookup
 
     def test_respect_flags(self):
+        """`copy_file` respects --ignore_etag and --dry_run flags"""
         path = '/a/sweet/path'
         storage = BotolikeStorage()
 
-        # Respects ignore_etag
         ret_val, super_mock, lookup_mock = self.call_copy_file(
             path=path, storage=storage, ignore_etag=True)
         self.assertEqual(lookup_mock.call_count, 0)
 
-        # Respects dry_run
         ret_val, super_mock, lookup_mock = self.call_copy_file(
             path=path, storage=storage, dry_run=True)
         self.assertEqual(lookup_mock.call_count, 0)
 
     def test_calls_super(self):
+        """`copy_file` properly calls super method"""
         path = '/a/sweet/path'
         storage = BotolikeStorage()
 
-        # Calls super properly
         ret_val, super_mock, lookup_mock = self.call_copy_file(
             path=path, storage=storage)
         super_mock.assert_called_once_with(path, path, storage)
         self.assertFalse(ret_val is False)
-
-    def test_checksum(self):
-        """Produces a proper md5 checksum"""
-        pass
 
     def test_skips(self):
         """
         Returns False and increments self.num_skipped_files if matching
         hashes
         """
-        pass
+        self.assertTrue(False)
 
 
     def test_invalidates_cache(self):
         """Invalidates cache and self.lookups"""
+        self.assertTrue(False)

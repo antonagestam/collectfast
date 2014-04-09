@@ -77,6 +77,11 @@ class Command(collectstatic.Command):
             del self.lookups[path]
         cache.delete(self.get_cache_key(path))
 
+    def get_file_hash(self, storage, path):
+        contents = storage.open(path).read()
+        file_hash = '"%s"' % hashlib.md5(contents).hexdigest()
+        return file_hash
+
     def copy_file(self, path, prefixed_path, source_storage):
         """
         Attempt to generate an md5 hash of the local file and compare it with
@@ -89,11 +94,7 @@ class Command(collectstatic.Command):
         if not self.ignore_etag and not self.dry_run:
             try:
                 storage_lookup = self.get_lookup(normalized_path)
-                local_file = source_storage.open(path)
-
-                # Create md5 checksum from local file
-                file_contents = local_file.read()
-                local_etag = '"%s"' % hashlib.md5(file_contents).hexdigest()
+                local_etag = self.get_file_hash(source_storage, path)
 
                 # Compare checksums and skip copying if matching
                 if storage_lookup.etag == local_etag:
