@@ -111,12 +111,6 @@ class TestGetFileHash(CollectfastTestCase):
 
 
 class TestCopyFile(CollectfastTestCase):
-    def setUp(self):
-        super(TestCopyFile, self).setUp()
-
-    def tearDown(self):
-        pass
-
     @patch("collectfast.management.commands.collectstatic.collectstatic.Command"
            ".copy_file")
     @patch("collectfast.management.commands.collectstatic.Command.get_lookup")
@@ -159,7 +153,9 @@ class TestCopyFile(CollectfastTestCase):
 
     @patch("collectfast.management.commands.collectstatic.Command"
            ".get_file_hash")
-    def test_calls_super(self, mock_get_file_hash):
+    @patch("collectfast.management.commands.collectstatic.Command"
+           ".destroy_lookup")
+    def test_calls_super(self, mock_destroy_lookup, mock_get_file_hash):
         """`copy_file` properly calls super method"""
         path = '/a/sweet/path'
         storage = BotolikeStorage()
@@ -168,6 +164,7 @@ class TestCopyFile(CollectfastTestCase):
             path=path, storage=storage)
         super_mock.assert_called_once_with(path, path, storage)
         self.assertFalse(ret_val is False)
+        mock_destroy_lookup.assert_called_once_with(path)
 
     @patch("collectfast.management.commands.collectstatic.Command"
            ".get_file_hash")
@@ -186,7 +183,3 @@ class TestCopyFile(CollectfastTestCase):
             path=self.path, storage=storage, lookup_hash=mock_hash)
         self.assertFalse(ret_val)
         self.assertEqual(super_mock.call_count, 0)
-
-    def test_invalidates_cache(self):
-        """Invalidates cache and self.lookups"""
-        self.assertTrue(False)
