@@ -54,7 +54,8 @@ def main():
             "django.contrib.contenttypes",
             app_name,
         ),
-        "STATIC_URL": "/static/",
+        "STATIC_URL": "/staticfiles/",
+        "STATIC_ROOT": "./",
     })
 
     if options.TEST_SUITE is not None:
