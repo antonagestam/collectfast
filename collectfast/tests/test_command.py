@@ -1,9 +1,13 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
 from unittest import TestCase
 from mock import patch
+from os.path import join
+
 from django.core.files.storage import Storage, FileSystemStorage
 from django.core.files.base import ContentFile
-from os.path import join
+from django.conf import settings
 
 from ..management.commands.collectstatic import Command, cache
 
@@ -184,3 +188,28 @@ class TestCopyFile(CollectfastTestCase):
             path=self.path, storage=storage, lookup_hash=mock_hash)
         self.assertFalse(ret_val)
         self.assertEqual(super_mock.call_count, 0)
+
+
+class TestAwsPreloadMetadata(CollectfastTestCase):
+    def setUp(self):
+        super(TestAwsPreloadMetadata, self).setUp()
+        settings.AWS_PRELOAD_METADATA = False
+
+    def tearDown(self):
+        super(TestAwsPreloadMetadata, self).tearDown()
+        settings.AWS_PRELOAD_METADATA = True
+
+    @patch(
+        "collectfast.management.commands.collectstatic.Command._pre_setup_log")
+    def test_always_true(self, _mock_log):
+        c = self.get_command()
+        self.assertTrue(c.storage.preload_metadata)
+
+    @patch(
+        "collectfast.management.commands.collectstatic.Command._pre_setup_log")
+    def test_log(self, mock_log):
+        self.get_command()
+        mock_log.assert_called_once_with(
+            "----> WARNING!\nCollectfast does not work properly without "
+            "`AWS_PRELOAD_METADATA` set to `True`.\nOverriding "
+            "`storage.preload_metadata` and continuing.")
