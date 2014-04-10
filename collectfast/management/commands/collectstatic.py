@@ -50,7 +50,7 @@ class Command(collectstatic.Command):
         super(Command, self).set_options(**options)
 
     def _pre_setup_log(self, message):
-        print message
+        print(message)
 
     def collect(self):
         """Override collect method to track time"""
