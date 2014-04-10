@@ -56,6 +56,8 @@ def main():
         ),
         "STATIC_URL": "/staticfiles/",
         "STATIC_ROOT": "./",
+
+        "AWS_PRELOAD_METADATA": True,
     })
 
     if options.TEST_SUITE is not None:

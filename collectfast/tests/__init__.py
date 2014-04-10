@@ -1,1 +1,2 @@
-from .test_command import TestCommand, TestCopyFile, TestGetFileHash
+from .test_command import (
+    TestCommand, TestCopyFile, TestGetFileHash, TestAwsPreloadMetadata)

@@ -33,12 +33,13 @@ class Command(collectstatic.Command):
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
 
-        if settings.get('AWS_PRELOAD_METADATA', False) is not True:
-            self.stdout.write(smart_str(
-                "WARNING! Overriding `storage.preload_metadata`. Collectfast "
-                "does not work properly without `AWS_PRELOAD_METADATA` set to "
-                "`True`."))
-            self.storage.preload_metadata = True
+        self.storage.preload_metadata = True
+
+        if getattr(settings, 'AWS_PRELOAD_METADATA', False) is not True:
+            self._pre_setup_log(
+                "----> WARNING!\nCollectfast does not work properly without "
+                "`AWS_PRELOAD_METADATA` set to `True`.\nOverriding "
+                "`storage.preload_metadata` and continuing.")
 
     def set_options(self, **options):
         self.ignore_etag = options.pop('ignore_etag', False)
@@ -47,6 +48,9 @@ class Command(collectstatic.Command):
         else:
             self.collectfast_enabled = getattr(settings, "COLLECTFAST_ENABLED", True)
         super(Command, self).set_options(**options)
+
+    def _pre_setup_log(self, message):
+        print message
 
     def collect(self):
         """Override collect method to track time"""
