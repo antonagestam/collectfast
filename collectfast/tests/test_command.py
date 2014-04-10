@@ -202,15 +202,13 @@ class TestAwsPreloadMetadata(CollectfastTestCase):
     @patch(
         "collectfast.management.commands.collectstatic.Command._pre_setup_log")
     def test_always_true(self, _mock_log):
-        settings.AWS_PRELOAD_METADATA = False
         c = self.get_command()
         self.assertTrue(c.storage.preload_metadata)
 
     @patch(
         "collectfast.management.commands.collectstatic.Command._pre_setup_log")
     def test_log(self, mock_log):
-        settings.AWS_PRELOAD_METADATA = False
-        c = self.get_command()
+        self.get_command()
         mock_log.assert_called_once_with(
             "----> WARNING!\nCollectfast does not work properly without "
             "`AWS_PRELOAD_METADATA` set to `True`.\nOverriding "
