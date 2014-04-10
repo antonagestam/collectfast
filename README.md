@@ -1,5 +1,5 @@
-Collectfast
-===========
+Collectfast – A Faster Collectstatic
+====================================
 
 [![Downloads](https://pypip.in/v/Collectfast/badge.png)](https://pypi.python.org/pypi/Collectfast)
 [![Build Status](https://travis-ci.org/antonagestam/collectfast.svg)](https://travis-ci.org/antonagestam/collectfast)
@@ -32,7 +32,7 @@ INSTALLED_APPS = (
 ```
 
 
-Setup dedicated cache backend
+Setup Dedicated Cache Backend
 -----------------------------
 
 It's recommended to setup a dedicated cache backend for Collectfast. Every time Collectfast does not
@@ -56,9 +56,9 @@ COLLECTFAST_CACHE = 'collectfast'
 
 By default Collectfast will use the `default` cache.
 
-Collectfast will never clean the cache of obsolete files. To clean out the entire cache, use `cache.clear()`.
-
-[Read more about Django's cache framework.](https://docs.djangoproject.com/en/stable/topics/cache/)
+_**Note:** Collectfast will never clean the cache of obsolete files. To clean out the entire
+cache, use `cache.clear()`.
+[Read more about Django's cache framework.](https://docs.djangoproject.com/en/stable/topics/cache/)_
 
 
 Usage
