@@ -10,7 +10,9 @@ env:
 install:
   - pip install -r test-requirements.txt
   - pip install -q Django==$DJANGO_VERSION
-script: "./runtests.py"
+script: "coverage run --source=collectfast ./runtests.py"
+after_success:
+  coveralls
 matrix:
   exclude:
     - python: "3.2"
