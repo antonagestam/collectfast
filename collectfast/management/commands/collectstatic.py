@@ -112,14 +112,16 @@ class Command(collectstatic.Command):
                 storage_lookup = self.get_lookup(normalized_path)
                 local_etag = self.get_file_hash(source_storage, path)
 
-                # Compare checksums and skip copying if matching
-                if storage_lookup.etag == local_etag:
-                    self.log("Skipping '%s' based on matching ETags" % path,
-                             level=2)
+                # Compare hashes and skip copying if matching
+                if (hasattr(storage_lookup, 'etag') and
+                        storage_lookup.etag == local_etag):
+                    self.log(
+                        "Skipping '%s' based on matching file hashes" % path,
+                        level=2)
                     self.num_skipped_files += 1
                     return False
                 else:
-                    self.log("ETag didn't match", level=2)
+                    self.log("Hashes did not match", level=2)
             except Exception as e:
                 # Ignore errors and let super Command handle it
                 self.stdout.write(smart_str(

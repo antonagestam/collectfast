@@ -1,2 +1,4 @@
 *.pyc
 .coverage
+.DS_Store
+.coveragerc.swp
