@@ -107,7 +107,7 @@ class Command(collectstatic.Command):
 
         """
         if self.collectfast_enabled and not self.dry_run:
-            normalized_path = self.storage._normalize_name(prefixed_path)
+            normalized_path = self.storage._normalize_name(self.storage._clean_name(prefixed_path))
             try:
                 storage_lookup = self.get_lookup(normalized_path)
                 local_etag = self.get_file_hash(source_storage, path)
