@@ -31,6 +31,9 @@ INSTALLED_APPS = (
     'collectfast',
 )
 ```
+For Django 1.7+, `'collectfast'` should come before `'django.contrib.staticfiles'`. For Django versions
+bellow 1.7, it should come after `'django.contrib.staticfiles'`. Please note, that failure to do so
+will cause Django to use `django.contrib.staticfiles`'s `collectstatic`.
 
 _**Note:** `preload_metadata` of the storage class will be overwritten even if `AWS_PRELOAD_METADATA`
 is not set to True see [#30](https://github.com/antonagestam/collectfast/issues/30)_
