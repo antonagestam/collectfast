@@ -11,7 +11,7 @@ setup(
     author='Anton Agestam',
     author_email='msn@antonagestam.se',
     packages=find_packages(),
-    url='https://github.com/FundedByMe/collectfast/',
+    url='https://github.com/antonagestam/collectfast/',
     license='Creative Commons Attribution-ShareAlike 3.0 Unported License',
     include_package_data=True,
     install_requires=['Django>=1.4', 'python-dateutil>=2.1', 'pytz>=2014.2', ],
