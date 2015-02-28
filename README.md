@@ -4,6 +4,7 @@ Collectfast – A Faster Collectstatic
 [![Downloads](https://pypip.in/v/Collectfast/badge.png)](https://pypi.python.org/pypi/Collectfast)
 [![Build Status](https://travis-ci.org/antonagestam/collectfast.svg)](https://travis-ci.org/antonagestam/collectfast)
 [![Coverage Status](https://coveralls.io/repos/antonagestam/collectfast/badge.png)](https://coveralls.io/r/antonagestam/collectfast)
+[![Join the chat at https://gitter.im/antonagestam/collectfast](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/antonagestam/collectfast?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 The fast `collectstatic` for Django projects with S3 as storage backend.
 
