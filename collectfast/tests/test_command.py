@@ -5,6 +5,7 @@ from unittest import TestCase
 from mock import patch
 from os.path import join
 
+from django import VERSION
 from django.core.files.storage import Storage, FileSystemStorage
 from django.core.files.base import ContentFile
 from django.conf import settings
@@ -97,6 +98,14 @@ class TestCommand(CollectfastTestCase):
         self.assertEqual(cache.get(cache_key, 'empty'), 'empty')
         self.assertNotIn(path, c.lookups)
 
+    def test_make_sure_it_has_ignore_etag(self):
+        command = self.get_command()
+        parser = command.create_parser('', '')
+        if VERSION >= (1, 8):
+            self.assertIn('ignore_etag', parser.parse_args())
+        else:
+            self.assertTrue(parser.has_option('--ignore-etag'))
+
 
 class TestGetFileHash(CollectfastTestCase):
     def test_get_file_hash(self):
@@ -122,6 +131,7 @@ class TestCopyFile(CollectfastTestCase):
     def call_copy_file(self, mocked_lookup, mocked_copy_file_super, **kwargs):
         options = {
             "interactive": False,
+            "verbosity": 1,
             "post_process": False,
             "dry_run": False,
             "clear": False,

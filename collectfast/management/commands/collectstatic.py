@@ -5,9 +5,9 @@ from optparse import make_option
 import hashlib
 import datetime
 
+from django import VERSION
 from django.conf import settings
 from django.contrib.staticfiles.management.commands import collectstatic
-from django.core.cache import get_cache
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError
 from django.utils.encoding import smart_str
@@ -17,18 +17,26 @@ try:
 except ImportError:
     _input = raw_input
 
-cache = get_cache(getattr(settings, "COLLECTFAST_CACHE", "default"))
+
+collectfast_cache = getattr(settings, "COLLECTFAST_CACHE", "default")
+if VERSION >= (1, 7):
+    from django.core.cache import caches
+    cache = caches[collectfast_cache]
+else:
+    from django.core.cache import get_cache
+    cache = get_cache(collectfast_cache)
 
 
 class Command(collectstatic.Command):
-    option_list = collectstatic.Command.option_list + (
-        make_option(
-            '--ignore-etag', action="store_true", dest="ignore_etag",
-            default=False, help="Disable Collectfast."),
-    )
 
     lookups = None
     cache_key_prefix = 'collectfast_asset_'
+
+    def add_arguments(self, parser):
+        super(Command, self).add_arguments(parser)
+        parser.add_argument('--ignore-etag',
+            action='store_true', dest='ignore_etag', default=False,
+            help="Disable Collectfast.")
 
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
@@ -200,3 +208,11 @@ Type 'yes' to continue, or 'no' to cancel: """
                 'collect_time': self.collect_time,
             }
             self.stdout.write(smart_str(summary))
+
+
+if VERSION < (1, 8):
+    Command.option_list = collectstatic.Command.option_list + (
+         make_option(
+             '--ignore-etag', action="store_true", dest="ignore_etag",
+             default=False, help="Disable Collectfast."),
+    )
