@@ -6,8 +6,8 @@ from setuptools import find_packages
 setup(
     name='Collectfast',
     description='Collectstatic on Steroids',
-    version='0.2.2',
-    long_description=open('README.md').read(),
+    version='0.2.3',
+    long_description=open('README.rst').read(),
     author='Anton Agestam',
     author_email='msn@antonagestam.se',
     packages=find_packages(),
