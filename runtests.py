@@ -5,6 +5,7 @@ import sys
 
 from optparse import OptionParser
 
+import django
 from django.conf import settings
 from django.core.management import call_command
 
@@ -58,12 +59,15 @@ def main():
         "STATIC_ROOT": "./",
 
         "AWS_PRELOAD_METADATA": True,
+        "MIDDLEWARE_CLASSES": [],
     })
 
     if options.TEST_SUITE is not None:
         test_arg = "%s.%s" % (app_name, options.TEST_SUITE)
     else:
         test_arg = app_name
+    if django.VERSION >= (1, 7):
+        django.setup()
 
     call_command("test", test_arg)
 
