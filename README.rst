@@ -77,6 +77,10 @@ clean out the entire cache, use ``cache.clear()``. `Read more about
 Django's cache
 framework. <https://docs.djangoproject.com/en/stable/topics/cache/>`_
 
+**Note:** We recommend you to set the ``MAX_ENTRIES`` setting if you
+have more than 300 static files, see 
+`#47 <https://github.com/antonagestam/collectfast/issues/47>`_
+
 Usage
 -----
 
