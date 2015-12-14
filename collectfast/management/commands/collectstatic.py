@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import with_statement, unicode_literals
-from optparse import make_option
 import hashlib
 import datetime
 
@@ -15,7 +14,7 @@ from django.utils.encoding import smart_str
 try:
     from django.utils.six.moves import input as _input
 except ImportError:
-    _input = raw_input
+    _input = raw_input  # noqa
 
 
 collectfast_cache = getattr(settings, "COLLECTFAST_CACHE", "default")
@@ -34,8 +33,11 @@ class Command(collectstatic.Command):
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
-        parser.add_argument('--ignore-etag',
-            action='store_true', dest='ignore_etag', default=False,
+        parser.add_argument(
+            '--ignore-etag',
+            action='store_true',
+            dest='ignore_etag',
+            default=False,
             help="Disable Collectfast.")
 
     def __init__(self, *args, **kwargs):
@@ -146,7 +148,7 @@ class Command(collectstatic.Command):
         """Override delete_file to skip modified time and exists lookups"""
         if not self.collectfast_enabled:
             return super(Command, self).delete_file(
-                    path, prefixed_path, source_storage)
+                path, prefixed_path, source_storage)
         if self.dry_run:
             self.log("Pretending to delete '%s'" % path)
         else:
@@ -178,8 +180,8 @@ location as specified in your settings%s
 %s
 Are you sure you want to do this?
 
-Type 'yes' to continue, or 'no' to cancel: """
-% (destination_display, clear_display))
+Type 'yes' to continue, or 'no' to cancel: """ % (
+                destination_display, clear_display))
             if confirm != 'yes':
                 raise CommandError("Collecting static files cancelled.")
 
@@ -208,11 +210,3 @@ Type 'yes' to continue, or 'no' to cancel: """
                 'collect_time': self.collect_time,
             }
             self.stdout.write(smart_str(summary))
-
-
-if VERSION < (1, 8):
-    Command.option_list = collectstatic.Command.option_list + (
-         make_option(
-             '--ignore-etag', action="store_true", dest="ignore_etag",
-             default=False, help="Disable Collectfast."),
-    )
