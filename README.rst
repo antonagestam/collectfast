@@ -110,7 +110,7 @@ snippet. <http://djangosnippets.org/snippets/2889/>`__
 
 .. |Downloads| image:: https://pypip.in/v/Collectfast/badge.png
    :target: https://pypi.python.org/pypi/Collectfast
-.. |Build Status| image:: https://travis-ci.org/antonagestam/collectfast.svg
+.. |Build Status| image:: https://api.travis-ci.org/antonagestam/collectfast.svg?branch=master
    :target: https://travis-ci.org/antonagestam/collectfast
 .. |Coverage Status| image:: https://coveralls.io/repos/antonagestam/collectfast/badge.png
    :target: https://coveralls.io/r/antonagestam/collectfast
