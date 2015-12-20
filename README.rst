@@ -108,7 +108,7 @@ Collectfast is licensed under a `Creative Commons Attribution-ShareAlike
 Original idea taken from `this
 snippet. <http://djangosnippets.org/snippets/2889/>`__
 
-.. |Downloads| image:: https://pypip.in/v/Collectfast/badge.png
+.. |Downloads| image:: https://img.shields.io/pypi/dm/collectfast.svg
    :target: https://pypi.python.org/pypi/Collectfast
 .. |Build Status| image:: https://api.travis-ci.org/antonagestam/collectfast.svg?branch=master
    :target: https://travis-ci.org/antonagestam/collectfast
