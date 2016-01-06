@@ -18,12 +18,16 @@ except ImportError:
 
 
 collectfast_cache = getattr(settings, "COLLECTFAST_CACHE", "default")
+
 if VERSION >= (1, 7):
     from django.core.cache import caches
     cache = caches[collectfast_cache]
 else:
     from django.core.cache import get_cache
     cache = get_cache(collectfast_cache)
+
+debug = getattr(
+    settings, "COLLECTFAST_DEBUG", getattr(settings, "DEBUG", False))
 
 
 class Command(collectstatic.Command):
@@ -133,6 +137,8 @@ class Command(collectstatic.Command):
                 else:
                     self.log("Hashes did not match", level=2)
             except Exception as e:
+                if debug:
+                    raise
                 # Ignore errors and let super Command handle it
                 self.stdout.write(smart_str(
                     "Ignored error in Collectfast:\n%s\n--> Continuing using "
