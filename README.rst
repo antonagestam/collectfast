@@ -15,6 +15,7 @@ completely ignores ``modified_time``. The results of the hash lookups
 are cached locally using your default Django cache. This can make
 deploying much faster!
 
+
 Installation
 ------------
 
@@ -43,6 +44,19 @@ Please note, that failure to do so will cause Django to use
 **Note:** ``preload_metadata`` of the storage class will be overwritten
 even if ``AWS_PRELOAD_METADATA`` is not set to True see
 `#30 <https://github.com/antonagestam/collectfast/issues/30>`_
+
+
+Usage
+-----
+
+Collectfast overrides Django's builtin ``collectstatic`` command so just
+run ``python manage.py collectstatic`` as normal. You can disable
+collectfast by using the ``--ignore-etag`` option.
+
+You can also disable collectfast by setting
+``COLLECTFAST_ENABLED = False`` in your settings file. This is useful
+when using a local file storage backend for development.
+
 
 Setup Dedicated Cache Backend
 -----------------------------
@@ -79,16 +93,14 @@ framework. <https://docs.djangoproject.com/en/stable/topics/cache/>`_
 have more than 300 static files, see 
 `#47 <https://github.com/antonagestam/collectfast/issues/47>`_
 
-Usage
+
+Debug
 -----
 
-Collectfast overrides Django's builtin ``collectstatic`` command so just
-run ``python manage.py collectstatic`` as normal. You can disable
-collectfast by using the ``--ignore-etag`` option.
+By default, Collectfast will suppress any exceptions that happens when copying
+and let Django's ``collectstatic`` handle it. To debug those suppressed errors
+you can set ``COLLECTFAST_DEBUG = True`` in your Django settings file.
 
-You can also disable collectfast by setting
-``COLLECTFAST_ENABLED = False`` in your settings file. This is useful
-when using a local file storage backend for development.
 
 Contribution
 ------------
@@ -96,6 +108,7 @@ Contribution
 Please feel free to contribute by using issues and pull requests.
 Discussion is open and welcome. Testing is currently being implemented
 and will be mandatory for new features once merged.
+
 
 License
 -------
@@ -105,6 +118,7 @@ Collectfast is licensed under a `Creative Commons Attribution-ShareAlike
 
 Original idea taken from `this
 snippet. <http://djangosnippets.org/snippets/2889/>`__
+
 
 .. |Downloads| image:: https://img.shields.io/pypi/dm/collectfast.svg
    :target: https://pypi.python.org/pypi/Collectfast
