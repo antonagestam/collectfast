@@ -4,28 +4,21 @@ from __future__ import with_statement, unicode_literals
 import hashlib
 import datetime
 
-from django import VERSION
 from django.conf import settings
 from django.contrib.staticfiles.management.commands import collectstatic
+from django.core.cache import caches
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError
 from django.utils.encoding import smart_str
+
 
 try:
     from django.utils.six.moves import input as _input
 except ImportError:
     _input = raw_input  # noqa
 
-
 collectfast_cache = getattr(settings, "COLLECTFAST_CACHE", "default")
-
-if VERSION >= (1, 7):
-    from django.core.cache import caches
-    cache = caches[collectfast_cache]
-else:
-    from django.core.cache import get_cache
-    cache = get_cache(collectfast_cache)
-
+cache = caches[collectfast_cache]
 debug = getattr(
     settings, "COLLECTFAST_DEBUG", getattr(settings, "DEBUG", False))
 
