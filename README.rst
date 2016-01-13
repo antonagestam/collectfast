@@ -1,7 +1,7 @@
 Collectfast – A Faster Collectstatic
 ====================================
 
-|Downloads| |Build Status| |Coverage Status| |Join the chat at
+|Downloads| |Build Status| |Windows Build Status| |Coverage Status| |Join the chat at
 https://gitter.im/antonagestam/collectfast|
 
 The fast ``collectstatic`` for Django projects with S3 as storage
@@ -124,6 +124,8 @@ snippet. <http://djangosnippets.org/snippets/2889/>`__
    :target: https://pypi.python.org/pypi/Collectfast
 .. |Build Status| image:: https://api.travis-ci.org/antonagestam/collectfast.svg?branch=master
    :target: https://travis-ci.org/antonagestam/collectfast
+.. |Windows Build Status| image:: https://ci.appveyor.com/api/projects/status/github/antonagestam/collectfast?branch=master&svg=true
+   :target: https://ci.appveyor.com/project/antonagestam/collectfast/
 .. |Coverage Status| image:: https://coveralls.io/repos/antonagestam/collectfast/badge.png
    :target: https://coveralls.io/r/antonagestam/collectfast
 .. |Join the chat at https://gitter.im/antonagestam/collectfast| image:: https://badges.gitter.im/Join%20Chat.svg
