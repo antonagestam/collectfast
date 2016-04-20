@@ -1,7 +1,7 @@
 Collectfast – A Faster Collectstatic
 ====================================
 
-|Downloads| |Build Status| |Coverage Status| |Join the chat at
+|Downloads| |Build Status| |Windows Build Status| |Coverage Status| |Join the chat at
 https://gitter.im/antonagestam/collectfast|
 
 The fast ``collectstatic`` for Django projects with S3 as storage
@@ -14,6 +14,7 @@ management command that compares the md5 sum of files with S3 and
 completely ignores ``modified_time``. The results of the hash lookups
 are cached locally using your default Django cache. This can make
 deploying much faster!
+
 
 Installation
 ------------
@@ -36,15 +37,26 @@ to your ``INSTALLED_APPS``:
         'collectfast',
     )
 
-For Django 1.7+, ``'collectfast'`` should come before
-``'django.contrib.staticfiles'``. For Django versions below 1.7, it
-should come after ``'django.contrib.staticfiles'``. Please note, that
-failure to do so will cause Django to use
+``'collectfast'`` should come before ``'django.contrib.staticfiles'``.
+Please note, that failure to do so will cause Django to use
 ``django.contrib.staticfiles``'s ``collectstatic``.
 
 **Note:** ``preload_metadata`` of the storage class will be overwritten
 even if ``AWS_PRELOAD_METADATA`` is not set to True see
 `#30 <https://github.com/antonagestam/collectfast/issues/30>`_
+
+
+Usage
+-----
+
+Collectfast overrides Django's builtin ``collectstatic`` command so just
+run ``python manage.py collectstatic`` as normal. You can disable
+collectfast by using the ``--ignore-etag`` option.
+
+You can also disable collectfast by setting
+``COLLECTFAST_ENABLED = False`` in your settings file. This is useful
+when using a local file storage backend for development.
+
 
 Setup Dedicated Cache Backend
 -----------------------------
@@ -77,16 +89,18 @@ clean out the entire cache, use ``cache.clear()``. `Read more about
 Django's cache
 framework. <https://docs.djangoproject.com/en/stable/topics/cache/>`_
 
-Usage
+**Note:** We recommend you to set the ``MAX_ENTRIES`` setting if you
+have more than 300 static files, see 
+`#47 <https://github.com/antonagestam/collectfast/issues/47>`_
+
+
+Debug
 -----
 
-Collectfast overrides Django's builtin ``collectstatic`` command so just
-run ``python manage.py collectstatic`` as normal. You can disable
-collectfast by using the ``--ignore-etag`` option.
+By default, Collectfast will suppress any exceptions that happens when copying
+and let Django's ``collectstatic`` handle it. To debug those suppressed errors
+you can set ``COLLECTFAST_DEBUG = True`` in your Django settings file.
 
-You can also disable collectfast by setting
-``COLLECTFAST_ENABLED = False`` in your settings file. This is useful
-when using a local file storage backend for development.
 
 Contribution
 ------------
@@ -94,6 +108,7 @@ Contribution
 Please feel free to contribute by using issues and pull requests.
 Discussion is open and welcome. Testing is currently being implemented
 and will be mandatory for new features once merged.
+
 
 License
 -------
@@ -104,10 +119,13 @@ Collectfast is licensed under a `Creative Commons Attribution-ShareAlike
 Original idea taken from `this
 snippet. <http://djangosnippets.org/snippets/2889/>`__
 
-.. |Downloads| image:: https://pypip.in/v/Collectfast/badge.png
+
+.. |Downloads| image:: https://img.shields.io/pypi/dm/collectfast.svg
    :target: https://pypi.python.org/pypi/Collectfast
-.. |Build Status| image:: https://travis-ci.org/antonagestam/collectfast.svg
+.. |Build Status| image:: https://api.travis-ci.org/antonagestam/collectfast.svg?branch=master
    :target: https://travis-ci.org/antonagestam/collectfast
+.. |Windows Build Status| image:: https://ci.appveyor.com/api/projects/status/github/antonagestam/collectfast?branch=master&svg=true
+   :target: https://ci.appveyor.com/project/antonagestam/collectfast/
 .. |Coverage Status| image:: https://coveralls.io/repos/antonagestam/collectfast/badge.png
    :target: https://coveralls.io/r/antonagestam/collectfast
 .. |Join the chat at https://gitter.im/antonagestam/collectfast| image:: https://badges.gitter.im/Join%20Chat.svg

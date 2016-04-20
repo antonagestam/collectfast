@@ -1,30 +1,26 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import with_statement, unicode_literals
-from optparse import make_option
 import hashlib
 import datetime
 
-from django import VERSION
 from django.conf import settings
 from django.contrib.staticfiles.management.commands import collectstatic
+from django.core.cache import caches
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError
 from django.utils.encoding import smart_str
 
+
 try:
     from django.utils.six.moves import input as _input
 except ImportError:
-    _input = raw_input
-
+    _input = raw_input  # noqa
 
 collectfast_cache = getattr(settings, "COLLECTFAST_CACHE", "default")
-if VERSION >= (1, 7):
-    from django.core.cache import caches
-    cache = caches[collectfast_cache]
-else:
-    from django.core.cache import get_cache
-    cache = get_cache(collectfast_cache)
+cache = caches[collectfast_cache]
+debug = getattr(
+    settings, "COLLECTFAST_DEBUG", getattr(settings, "DEBUG", False))
 
 
 class Command(collectstatic.Command):
@@ -34,8 +30,11 @@ class Command(collectstatic.Command):
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
-        parser.add_argument('--ignore-etag',
-            action='store_true', dest='ignore_etag', default=False,
+        parser.add_argument(
+            '--ignore-etag',
+            action='store_true',
+            dest='ignore_etag',
+            default=False,
             help="Disable Collectfast.")
 
     def __init__(self, *args, **kwargs):
@@ -115,7 +114,7 @@ class Command(collectstatic.Command):
 
         """
         if self.collectfast_enabled and not self.dry_run:
-            normalized_path = self.storage._normalize_name(prefixed_path)
+            normalized_path = self.storage._normalize_name(prefixed_path).replace('\\', '/')
             try:
                 storage_lookup = self.get_lookup(normalized_path)
                 local_etag = self.get_file_hash(source_storage, path)
@@ -131,6 +130,8 @@ class Command(collectstatic.Command):
                 else:
                     self.log("Hashes did not match", level=2)
             except Exception as e:
+                if debug:
+                    raise
                 # Ignore errors and let super Command handle it
                 self.stdout.write(smart_str(
                     "Ignored error in Collectfast:\n%s\n--> Continuing using "
@@ -146,7 +147,7 @@ class Command(collectstatic.Command):
         """Override delete_file to skip modified time and exists lookups"""
         if not self.collectfast_enabled:
             return super(Command, self).delete_file(
-                    path, prefixed_path, source_storage)
+                path, prefixed_path, source_storage)
         if self.dry_run:
             self.log("Pretending to delete '%s'" % path)
         else:
@@ -178,8 +179,8 @@ location as specified in your settings%s
 %s
 Are you sure you want to do this?
 
-Type 'yes' to continue, or 'no' to cancel: """
-% (destination_display, clear_display))
+Type 'yes' to continue, or 'no' to cancel: """ % (
+                destination_display, clear_display))
             if confirm != 'yes':
                 raise CommandError("Collecting static files cancelled.")
 
@@ -208,11 +209,3 @@ Type 'yes' to continue, or 'no' to cancel: """
                 'collect_time': self.collect_time,
             }
             self.stdout.write(smart_str(summary))
-
-
-if VERSION < (1, 8):
-    Command.option_list = collectstatic.Command.option_list + (
-         make_option(
-             '--ignore-etag', action="store_true", dest="ignore_etag",
-             default=False, help="Disable Collectfast."),
-    )
