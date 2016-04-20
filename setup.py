@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import codecs
 from distutils.core import setup
 from setuptools import find_packages
 
@@ -7,7 +8,7 @@ setup(
     name='Collectfast',
     description='Collectstatic on Steroids',
     version='0.2.3',
-    long_description=open('README.rst').read(),
+    long_description=codecs.open('README.rst', 'r', 'utf-8').read(),
     author='Anton Agestam',
     author_email='msn@antonagestam.se',
     packages=find_packages(),
