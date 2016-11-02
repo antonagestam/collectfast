@@ -57,7 +57,7 @@ class TestCommand(CollectfastTestCase):
         mocked_lookup.return_value = 'a fresh lookup'
         mocked_cache.return_value = cached_value
         command = self.get_command()
-        ret_val = command.get_lookup(path)
+        ret_val = command.get_etag(path)
         return ret_val, mocked_lookup, mocked_cache
 
     def get_fresh_lookup(self, path):
@@ -89,11 +89,11 @@ class TestCommand(CollectfastTestCase):
         c = self.get_command()
         path = '/another/unique/path'
         cache_key = c.get_cache_key(path)
-        c.get_lookup(path)
+        c.get_etag(path)
         self.assertEqual(cache.get(cache_key), mocked_lookup.return_value)
         self.assertEqual(c.lookups[path], mocked_lookup.return_value)
 
-        c.destroy_lookup(path)
+        c.destroy_etag(path)
         self.assertEqual(cache.get(cache_key, 'empty'), 'empty')
         self.assertNotIn(path, c.lookups)
 
