@@ -111,18 +111,16 @@ Discussion is open and welcome.
 **Testing**
 
 To run tests, setup a virtualenv and install tox with ``pip install tox`` then
-run ``tox`` in the project directory. To only run tests for a certain environment
-run e.g. ``tox -e py35-django110``.
+run ``tox`` in the project directory. To only run tests for a certain
+environment run e.g. ``tox -e py35-django110``.
 
 
 License
 -------
 
-Collectfast is licensed under a `Creative Commons Attribution-ShareAlike
-3.0 Unported License <http://creativecommons.org/licenses/by-sa/3.0/>`_.
-
-Original idea taken from `this
-snippet. <http://djangosnippets.org/snippets/2889/>`__
+Collectfast is licensed under the MIT License, see LICENSE file for more
+information. Previous versions of Collectfast was licensed under Creative
+Commons Attribution-ShareAlike 3.0 Unported License.
 
 
 .. |Build Status| image:: https://api.travis-ci.org/antonagestam/collectfast.svg?branch=master
