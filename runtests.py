@@ -54,6 +54,7 @@ def main():
             "django.contrib.auth",
             "django.contrib.contenttypes",
             app_name,
+            "django.contrib.staticfiles",
         ),
         "STATIC_URL": "/staticfiles/",
         "STATIC_ROOT": "./",

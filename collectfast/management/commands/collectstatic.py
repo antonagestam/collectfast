@@ -26,7 +26,7 @@ debug = getattr(
 class Command(collectstatic.Command):
 
     etags = None
-    cache_key_prefix = 'collectfast3_asset_'
+    cache_key_prefix = 'collectfast03_asset_'
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)

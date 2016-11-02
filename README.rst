@@ -106,8 +106,13 @@ Contribution
 ------------
 
 Please feel free to contribute by using issues and pull requests.
-Discussion is open and welcome. Testing is currently being implemented
-and will be mandatory for new features once merged.
+Discussion is open and welcome.
+
+**Testing**
+
+To run tests, setup a virtualenv and install tox with ``pip install tox`` then
+run ``tox`` in the project directory. To only run tests for a certain environment
+run e.g. ``tox -e py35-django110``.
 
 
 License
