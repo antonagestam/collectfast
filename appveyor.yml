@@ -9,9 +9,9 @@ environment:
 
     # Python 2.7.10 is the latest version and is not pre-installed.
 
-    - PYTHON: "C:\\Python27.10"
-      PYTHON_VERSION: "2.7.10"
-      PYTHON_ARCH: "32"
+    # - PYTHON: "C:\\Python27.10"
+    #   PYTHON_VERSION: "2.7.10"
+    #   PYTHON_ARCH: "32"
 
     - PYTHON: "C:\\Python27.10-x64"
       PYTHON_VERSION: "2.7.10"
@@ -21,9 +21,9 @@ environment:
     # a later point release.
     # See: http://www.appveyor.com/docs/installed-software#python
 
-    - PYTHON: "C:\\Python34"
-      PYTHON_VERSION: "3.4.x" # currently 3.4.3
-      PYTHON_ARCH: "32"
+    # - PYTHON: "C:\\Python34"
+    #   PYTHON_VERSION: "3.4.x" # currently 3.4.3
+    #   PYTHON_ARCH: "32"
 
     - PYTHON: "C:\\Python34-x64"
       PYTHON_VERSION: "3.4.x" # currently 3.4.3
@@ -31,9 +31,9 @@ environment:
 
     # Python versions not pre-installed
 
-    - PYTHON: "C:\\Python35"
-      PYTHON_VERSION: "3.5.0"
-      PYTHON_ARCH: "32"
+    # - PYTHON: "C:\\Python35"
+    #   PYTHON_VERSION: "3.5.0"
+    #   PYTHON_ARCH: "32"
 
     - PYTHON: "C:\\Python35-x64"
       PYTHON_VERSION: "3.5.0"

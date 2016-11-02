@@ -7,11 +7,13 @@ env:
   matrix:
     - TOXENV=py27-django18
     - TOXENV=py27-django19
+    - TOXENV=py27-django110
     - TOXENV=py33-django18
     - TOXENV=py34-django18
     - TOXENV=py34-django19
     - TOXENV=py35-django18
     - TOXENV=py35-django19
+    - TOXENV=py35-django110
     - TOXENV=flake8
 # work-around for Python 3.5
 addons:

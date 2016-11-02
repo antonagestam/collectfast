@@ -52,12 +52,12 @@ class TestCommand(CollectfastTestCase):
 
     @patch("collectfast.management.commands.collectstatic.cache.get")
     @patch("collectfast.management.commands.collectstatic.Command"
-           ".get_storage_lookup")
+           ".get_remote_etag")
     def mock_get_lookup(self, path, cached_value, mocked_lookup, mocked_cache):
         mocked_lookup.return_value = 'a fresh lookup'
         mocked_cache.return_value = cached_value
         command = self.get_command()
-        ret_val = command.get_lookup(path)
+        ret_val = command.get_etag(path)
         return ret_val, mocked_lookup, mocked_cache
 
     def get_fresh_lookup(self, path):
@@ -83,19 +83,19 @@ class TestCommand(CollectfastTestCase):
         self.assertEqual(ret_val, 'a cached lookup')
 
     @patch("collectfast.management.commands.collectstatic.Command"
-           ".get_storage_lookup")
+           ".get_remote_etag")
     def test_destroy_lookup(self, mocked_lookup):
         mocked_lookup.return_value = 'a fake lookup'
         c = self.get_command()
         path = '/another/unique/path'
         cache_key = c.get_cache_key(path)
-        c.get_lookup(path)
+        c.get_etag(path)
         self.assertEqual(cache.get(cache_key), mocked_lookup.return_value)
-        self.assertEqual(c.lookups[path], mocked_lookup.return_value)
+        self.assertEqual(c.etags[path], mocked_lookup.return_value)
 
-        c.destroy_lookup(path)
+        c.destroy_etag(path)
         self.assertEqual(cache.get(cache_key, 'empty'), 'empty')
-        self.assertNotIn(path, c.lookups)
+        self.assertNotIn(path, c.etags)
 
     def test_make_sure_it_has_ignore_etag(self):
         command = self.get_command()
@@ -123,7 +123,7 @@ class TestGetFileHash(CollectfastTestCase):
 class TestCopyFile(CollectfastTestCase):
     @patch("collectfast.management.commands.collectstatic.collectstatic.Command"
            ".copy_file")
-    @patch("collectfast.management.commands.collectstatic.Command.get_lookup")
+    @patch("collectfast.management.commands.collectstatic.Command.get_etag")
     def call_copy_file(self, mocked_lookup, mocked_copy_file_super, **kwargs):
         options = {
             "interactive": False,
@@ -138,9 +138,7 @@ class TestCopyFile(CollectfastTestCase):
         path = options.pop('path', '/a/sweet/path')
 
         if 'lookup_hash' in options:
-            class FakeLookup:
-                etag = options.pop('lookup_hash')
-            mocked_lookup.return_value = FakeLookup()
+            mocked_lookup.return_value = options.pop('lookup_hash')
 
         c = self.get_command()
         c.storage = options.pop('storage', BotolikeStorage())
@@ -165,7 +163,7 @@ class TestCopyFile(CollectfastTestCase):
     @patch("collectfast.management.commands.collectstatic.Command"
            ".get_file_hash")
     @patch("collectfast.management.commands.collectstatic.Command"
-           ".destroy_lookup")
+           ".destroy_etag")
     def test_calls_super(self, mock_destroy_lookup, mock_get_file_hash):
         """`copy_file` properly calls super method"""
         path = '/a/sweet/path'

@@ -25,8 +25,8 @@ debug = getattr(
 
 class Command(collectstatic.Command):
 
-    lookups = None
-    cache_key_prefix = 'collectfast_asset_'
+    etags = None
+    cache_key_prefix = 'collectfast03_asset_'
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
@@ -39,9 +39,7 @@ class Command(collectstatic.Command):
 
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
-
         self.storage.preload_metadata = True
-
         if getattr(settings, 'AWS_PRELOAD_METADATA', False) is not True:
             self._pre_setup_log(
                 "----> WARNING!\nCollectfast does not work properly without "
@@ -53,7 +51,8 @@ class Command(collectstatic.Command):
         if self.ignore_etag:
             self.collectfast_enabled = False
         else:
-            self.collectfast_enabled = getattr(settings, "COLLECTFAST_ENABLED", True)
+            self.collectfast_enabled = getattr(
+                settings, "COLLECTFAST_ENABLED", True)
         super(Command, self).set_options(**options)
 
     def _pre_setup_log(self, message):
@@ -76,30 +75,39 @@ class Command(collectstatic.Command):
             path_hash = hashlib.md5(path.encode('utf-8')).hexdigest()
         return self.cache_key_prefix + path_hash
 
-    def get_storage_lookup(self, path):
-        return self.storage.bucket.lookup(path)
+    def get_boto3_etag(self, path):
+        try:
+            return self.storage.bucket.Object(path).e_tag
+        except:
+            return None
 
-    def get_lookup(self, path):
-        """Get lookup from local dict, cache or S3 — in that order"""
+    def get_remote_etag(self, path):
+        try:
+            return self.storage.bucket.get_key(path).etag
+        except AttributeError:
+            return self.get_boto3_etag(path)
 
-        if self.lookups is None:
-            self.lookups = {}
+    def get_etag(self, path):
+        """Get etag from local dict, cache or S3 — in that order"""
 
-        if path not in self.lookups:
+        if self.etags is None:
+            self.etags = {}
+
+        if path not in self.etags:
             cache_key = self.get_cache_key(path)
             cached = cache.get(cache_key, False)
 
             if cached is False:
-                self.lookups[path] = self.get_storage_lookup(path)
-                cache.set(cache_key, self.lookups[path])
+                self.etags[path] = self.get_remote_etag(path)
+                cache.set(cache_key, self.etags[path])
             else:
-                self.lookups[path] = cached
+                self.etags[path] = cached
 
-        return self.lookups[path]
+        return self.etags[path]
 
-    def destroy_lookup(self, path):
-        if self.lookups is not None and path in self.lookups:
-            del self.lookups[path]
+    def destroy_etag(self, path):
+        if self.etags is not None and path in self.etags:
+            del self.etags[path]
         cache.delete(self.get_cache_key(path))
 
     def get_file_hash(self, storage, path):
@@ -114,14 +122,14 @@ class Command(collectstatic.Command):
 
         """
         if self.collectfast_enabled and not self.dry_run:
-            normalized_path = self.storage._normalize_name(prefixed_path).replace('\\', '/')
+            normalized_path = self.storage._normalize_name(
+                prefixed_path).replace('\\', '/')
             try:
-                storage_lookup = self.get_lookup(normalized_path)
+                storage_etag = self.get_etag(normalized_path)
                 local_etag = self.get_file_hash(source_storage, path)
 
                 # Compare hashes and skip copying if matching
-                if (hasattr(storage_lookup, 'etag') and
-                        storage_lookup.etag == local_etag):
+                if storage_etag == local_etag:
                     self.log(
                         "Skipping '%s' based on matching file hashes" % path,
                         level=2)
@@ -138,7 +146,7 @@ class Command(collectstatic.Command):
                     "default collectstatic." % e.message))
 
             # Invalidate cached versions of lookup if copy is done
-            self.destroy_lookup(normalized_path)
+            self.destroy_etag(normalized_path)
 
         return super(Command, self).copy_file(
             path, prefixed_path, source_storage)
@@ -196,7 +204,8 @@ Type 'yes' to continue, or 'no' to cancel: """ % (
                         "%(destination)s%(unmodified)s%(post_processed)s.\n")
             summary = template % {
                 'modified_count': modified_count,
-                'identifier': 'static file' + (modified_count != 1 and 's' or ''),
+                'identifier': 'static file' + (
+                    modified_count != 1 and 's' or ''),
                 'action': self.symlink and 'symlinked' or 'copied',
                 'destination': (destination_path and " to '%s'"
                                 % destination_path or ''),
