@@ -143,7 +143,7 @@ class Command(collectstatic.Command):
                 # Ignore errors and let super Command handle it
                 self.stdout.write(smart_str(
                     "Ignored error in Collectfast:\n%s\n--> Continuing using "
-                    "default collectstatic." % e.message))
+                    "default collectstatic." % e))
 
             # Invalidate cached versions of lookup if copy is done
             self.destroy_etag(normalized_path)
