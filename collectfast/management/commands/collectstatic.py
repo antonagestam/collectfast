@@ -3,6 +3,7 @@
 from __future__ import with_statement, unicode_literals
 import hashlib
 import datetime
+from collections import namedtuple
 
 from django.conf import settings
 from django.contrib.staticfiles.management.commands import collectstatic
@@ -21,6 +22,8 @@ collectfast_cache = getattr(settings, "COLLECTFAST_CACHE", "default")
 cache = caches[collectfast_cache]
 debug = getattr(
     settings, "COLLECTFAST_DEBUG", getattr(settings, "DEBUG", False))
+
+pickleable_s3obj = namedtuple('pickleable_s3obj', ['etag'])
 
 
 class Command(collectstatic.Command):
@@ -77,7 +80,11 @@ class Command(collectstatic.Command):
         return self.cache_key_prefix + path_hash
 
     def get_storage_lookup(self, path):
-        return self.storage.bucket.lookup(path)
+        try:
+            return self.storage.bucket.lookup(path)
+        except AttributeError:
+            s3obj = self.storage.bucket.Object(path)
+            return pickleable_s3obj(etag=s3obj.e_tag)
 
     def get_lookup(self, path):
         """Get lookup from local dict, cache or S3 — in that order"""
