@@ -8,8 +8,6 @@ from multiprocessing.dummy import Pool
 from django.conf import settings
 from django.contrib.staticfiles.management.commands import collectstatic
 from django.core.cache import caches
-from django.core.files.storage import FileSystemStorage
-from django.core.management.base import CommandError
 from django.utils.encoding import smart_str
 
 
@@ -154,7 +152,7 @@ class Command(collectstatic.Command):
             self.destroy_etag(normalized_path)
 
         return super(Command, self).copy_file(
-             path, prefixed_path, source_storage)
+            path, prefixed_path, source_storage)
 
     def copy_file(self, path, prefixed_path, source_storage):
         args = (path, prefixed_path, source_storage)
