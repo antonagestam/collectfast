@@ -22,6 +22,7 @@ collectfast_cache = getattr(settings, "COLLECTFAST_CACHE", "default")
 cache = caches[collectfast_cache]
 debug = getattr(
     settings, "COLLECTFAST_DEBUG", getattr(settings, "DEBUG", False))
+threads = getattr(settings, "COLLECTFAST_THREADS", False)
 
 
 class Command(collectstatic.Command):
@@ -65,9 +66,10 @@ class Command(collectstatic.Command):
 
         self.num_skipped_files = 0
         start = datetime.datetime.now()
-        # Copy files asynchronously
         ret = super(Command, self).collect()
-        result = Pool(20).map(self.async_copy_file, self.tasks)
+        # Copy files asynchronously
+        if threads:
+            Pool(threads).map(self.do_copy_file, self.tasks)
         self.collect_time = str(datetime.datetime.now() - start)
         return ret
 
@@ -116,7 +118,7 @@ class Command(collectstatic.Command):
         file_hash = '"%s"' % hashlib.md5(contents).hexdigest()
         return file_hash
 
-    def async_copy_file(self, args):
+    def do_copy_file(self, args):
         """
         Attempt to generate an md5 hash of the local file and compare it with
         the S3 version's hash before copying the file.
@@ -155,7 +157,11 @@ class Command(collectstatic.Command):
              path, prefixed_path, source_storage)
 
     def copy_file(self, path, prefixed_path, source_storage):
-        self.tasks.append((path, prefixed_path, source_storage))
+        args = (path, prefixed_path, source_storage)
+        if threads:
+            self.tasks.append(args)
+        else:
+            self.do_copy_file(args)
 
     def delete_file(self, path, prefixed_path, source_storage):
         """Override delete_file to skip modified time and exists lookups"""
