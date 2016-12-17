@@ -3,12 +3,11 @@
 from __future__ import with_statement, unicode_literals
 import hashlib
 import datetime
+from multiprocessing.dummy import Pool
 
 from django.conf import settings
 from django.contrib.staticfiles.management.commands import collectstatic
 from django.core.cache import caches
-from django.core.files.storage import FileSystemStorage
-from django.core.management.base import CommandError
 from django.utils.encoding import smart_str
 
 
@@ -21,11 +20,11 @@ collectfast_cache = getattr(settings, "COLLECTFAST_CACHE", "default")
 cache = caches[collectfast_cache]
 debug = getattr(
     settings, "COLLECTFAST_DEBUG", getattr(settings, "DEBUG", False))
+threads = getattr(settings, "COLLECTFAST_THREADS", False)
 
 
 class Command(collectstatic.Command):
 
-    etags = None
     cache_key_prefix = 'collectfast03_asset_'
 
     def add_arguments(self, parser):
@@ -39,6 +38,8 @@ class Command(collectstatic.Command):
 
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
+        self.tasks = []
+        self.etags = {}
         self.storage.preload_metadata = True
         if getattr(settings, 'AWS_PRELOAD_METADATA', False) is not True:
             self._pre_setup_log(
@@ -64,6 +65,9 @@ class Command(collectstatic.Command):
         self.num_skipped_files = 0
         start = datetime.datetime.now()
         ret = super(Command, self).collect()
+        # Copy files asynchronously
+        if threads:
+            Pool(threads).map(self.do_copy_file, self.tasks)
         self.collect_time = str(datetime.datetime.now() - start)
         return ret
 
@@ -83,15 +87,12 @@ class Command(collectstatic.Command):
 
     def get_remote_etag(self, path):
         try:
-            return self.storage.bucket.get_key(path).etag
+            return self.storage.bucket_key(path).etag
         except AttributeError:
             return self.get_boto3_etag(path)
 
     def get_etag(self, path):
         """Get etag from local dict, cache or S3 — in that order"""
-
-        if self.etags is None:
-            self.etags = {}
 
         if path not in self.etags:
             cache_key = self.get_cache_key(path)
@@ -115,12 +116,14 @@ class Command(collectstatic.Command):
         file_hash = '"%s"' % hashlib.md5(contents).hexdigest()
         return file_hash
 
-    def copy_file(self, path, prefixed_path, source_storage):
+    def do_copy_file(self, args):
         """
         Attempt to generate an md5 hash of the local file and compare it with
         the S3 version's hash before copying the file.
 
         """
+        path, prefixed_path, source_storage = args
+
         if self.collectfast_enabled and not self.dry_run:
             normalized_path = self.storage._normalize_name(
                 prefixed_path).replace('\\', '/')
@@ -151,6 +154,13 @@ class Command(collectstatic.Command):
         return super(Command, self).copy_file(
             path, prefixed_path, source_storage)
 
+    def copy_file(self, path, prefixed_path, source_storage):
+        args = (path, prefixed_path, source_storage)
+        if threads:
+            self.tasks.append(args)
+        else:
+            self.do_copy_file(args)
+
     def delete_file(self, path, prefixed_path, source_storage):
         """Override delete_file to skip modified time and exists lookups"""
         if not self.collectfast_enabled:
@@ -162,59 +172,3 @@ class Command(collectstatic.Command):
             self.log("Deleting '%s'" % path)
             self.storage.delete(prefixed_path)
         return True
-
-    def handle_noargs(self, **options):
-        self.set_options(**options)
-        # Warn before doing anything more.
-        if (isinstance(self.storage, FileSystemStorage) and
-                self.storage.location):
-            destination_path = self.storage.location
-            destination_display = ':\n\n    %s' % destination_path
-        else:
-            destination_path = None
-            destination_display = '.'
-
-        if self.clear:
-            clear_display = 'This will DELETE EXISTING FILES!'
-        else:
-            clear_display = 'This will overwrite existing files!'
-
-        if self.interactive:
-            confirm = _input("""
-You have requested to collect static files at the destination
-location as specified in your settings%s
-
-%s
-Are you sure you want to do this?
-
-Type 'yes' to continue, or 'no' to cancel: """ % (
-                destination_display, clear_display))
-            if confirm != 'yes':
-                raise CommandError("Collecting static files cancelled.")
-
-        collected = self.collect()
-        modified_count = len(collected['modified'])
-        unmodified_count = len(collected['unmodified'])
-        post_processed_count = len(collected['post_processed'])
-
-        if self.verbosity >= 1:
-            template = ("Collected static files in %(collect_time)s."
-                        "\nSkipped %(num_skipped)i already synced files."
-                        "\n%(modified_count)s %(identifier)s %(action)s"
-                        "%(destination)s%(unmodified)s%(post_processed)s.\n")
-            summary = template % {
-                'modified_count': modified_count,
-                'identifier': 'static file' + (
-                    modified_count != 1 and 's' or ''),
-                'action': self.symlink and 'symlinked' or 'copied',
-                'destination': (destination_path and " to '%s'"
-                                % destination_path or ''),
-                'unmodified': (collected['unmodified'] and ', %s unmodified'
-                               % unmodified_count or ''),
-                'post_processed': (collected['post_processed'] and
-                                   ', %s post-processed'
-                                   % post_processed_count or ''),
-                'num_skipped': self.num_skipped_files,
-                'collect_time': self.collect_time,
-            }
-            self.stdout.write(smart_str(summary))
