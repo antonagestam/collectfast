@@ -3,6 +3,7 @@
 from __future__ import with_statement, unicode_literals
 import hashlib
 import datetime
+from multiprocessing.dummy import Pool
 
 from django.conf import settings
 from django.contrib.staticfiles.management.commands import collectstatic
@@ -25,7 +26,6 @@ debug = getattr(
 
 class Command(collectstatic.Command):
 
-    etags = None
     cache_key_prefix = 'collectfast03_asset_'
 
     def add_arguments(self, parser):
@@ -39,6 +39,8 @@ class Command(collectstatic.Command):
 
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
+        self.tasks = []
+        self.etags = {}
         self.storage.preload_metadata = True
         if getattr(settings, 'AWS_PRELOAD_METADATA', False) is not True:
             self._pre_setup_log(
@@ -63,7 +65,9 @@ class Command(collectstatic.Command):
 
         self.num_skipped_files = 0
         start = datetime.datetime.now()
+        # Copy files asynchronously
         ret = super(Command, self).collect()
+        result = Pool(20).map(self.async_copy_file, self.tasks)
         self.collect_time = str(datetime.datetime.now() - start)
         return ret
 
@@ -83,15 +87,12 @@ class Command(collectstatic.Command):
 
     def get_remote_etag(self, path):
         try:
-            return self.storage.bucket.get_key(path).etag
+            return self.storage.bucket_key(path).etag
         except AttributeError:
             return self.get_boto3_etag(path)
 
     def get_etag(self, path):
         """Get etag from local dict, cache or S3 — in that order"""
-
-        if self.etags is None:
-            self.etags = {}
 
         if path not in self.etags:
             cache_key = self.get_cache_key(path)
@@ -115,12 +116,14 @@ class Command(collectstatic.Command):
         file_hash = '"%s"' % hashlib.md5(contents).hexdigest()
         return file_hash
 
-    def copy_file(self, path, prefixed_path, source_storage):
+    def async_copy_file(self, args):
         """
         Attempt to generate an md5 hash of the local file and compare it with
         the S3 version's hash before copying the file.
 
         """
+        path, prefixed_path, source_storage = args
+
         if self.collectfast_enabled and not self.dry_run:
             normalized_path = self.storage._normalize_name(
                 prefixed_path).replace('\\', '/')
@@ -149,7 +152,10 @@ class Command(collectstatic.Command):
             self.destroy_etag(normalized_path)
 
         return super(Command, self).copy_file(
-            path, prefixed_path, source_storage)
+             path, prefixed_path, source_storage)
+
+    def copy_file(self, path, prefixed_path, source_storage):
+        self.tasks.append((path, prefixed_path, source_storage))
 
     def delete_file(self, path, prefixed_path, source_storage):
         """Override delete_file to skip modified time and exists lookups"""
