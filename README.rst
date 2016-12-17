@@ -7,6 +7,11 @@ https://gitter.im/antonagestam/collectfast|
 The fast ``collectstatic`` for Django projects with S3 as storage
 backend.
 
+**Features**
+
+- Comparing and caching of md5 checksums before uploading
+- Parallel file uploads using Python's multiprocessing module
+
 Running Django's ``collectstatic`` command can become really slow as
 more and more files are added to a project, especially if heavy
 libraries such as jQuery UI are included in the source. This is a custom
@@ -92,6 +97,22 @@ framework. <https://docs.djangoproject.com/en/stable/topics/cache/>`_
 **Note:** We recommend you to set the ``MAX_ENTRIES`` setting if you
 have more than 300 static files, see 
 `#47 <https://github.com/antonagestam/collectfast/issues/47>`_
+
+
+Enable Parallelization
+----------------------
+
+The parallelization feature enables parallel file uploads using Python's
+multiprocessing module. Enable it by setting the ``COLLECTFAST_THREADS``
+setting.
+
+To enable parallelization of file copying, a dedicated cache backend must be
+setup and it must use a backend that is threadsafe, i.e. something other than
+Django's default LocMemCache.
+
+.. code:: python
+
+    COLLECTFAST_THREADS = 20
 
 
 Debug
