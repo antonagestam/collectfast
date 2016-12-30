@@ -87,7 +87,7 @@ class Command(collectstatic.Command):
 
     def get_remote_etag(self, path):
         try:
-            return self.storage.bucket_key(path).etag
+            return self.storage.bucket.get_key(path).etag
         except AttributeError:
             return self.get_boto3_etag(path)
 
