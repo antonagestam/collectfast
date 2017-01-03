@@ -1,5 +1,6 @@
 from __future__ import with_statement, unicode_literals
 from multiprocessing.dummy import Pool
+import warnings
 
 from django.contrib.staticfiles.management.commands import collectstatic
 from django.utils.encoding import smart_str
@@ -30,8 +31,8 @@ class Command(collectstatic.Command):
         self.etags = {}
         self.storage.preload_metadata = True
         self.collectfast_enabled = settings.enabled
-        if getattr(settings, 'AWS_PRELOAD_METADATA', False) is not True:
-            raise Warning(
+        if not settings.preload_metadata_enabled:
+            warnings.warn(
                 "Collectfast does not work properly without "
                 "`AWS_PRELOAD_METADATA` set to `True`. Overriding "
                 "`storage.preload_metadata` and continuing.")
@@ -43,9 +44,9 @@ class Command(collectstatic.Command):
         ignore_etag = options.pop('ignore_etag', False)
         disable = options.pop('disable_collectfast', False)
         if ignore_etag:
-            raise DeprecationWarning(
-                "--ignore-etag is deprecated since 0.5.0, "
-                "use --disable-collectfast instead.")
+            warnings.warn(
+                "--ignore-etag is deprecated since 0.5.0, use "
+                "--disable-collectfast instead.")
         if ignore_etag or disable:
             self.collectfast_enabled = False
         super(Command, self).set_options(**options)

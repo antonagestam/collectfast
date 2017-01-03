@@ -29,10 +29,12 @@ def get_remote_etag(storage, path):
     try:
         return storage.bucket.get_key(path).etag
     except AttributeError:
-        try:
-            return storage.bucket.Object(path).e_tag
-        except AttributeError:
-            return None
+        pass
+    try:
+        return storage.bucket.Object(path).e_tag
+    except:
+        pass
+    return None
 
 
 def get_etag(storage, path):
@@ -40,7 +42,7 @@ def get_etag(storage, path):
     Get etag of path from cache or S3 - in that order.
     """
     cache_key = get_cache_key(path)
-    etag = settings.cache.get(cache_key, False)
+    etag = cache.get(cache_key, False)
     if etag is False:
         etag = get_remote_etag(storage, path)
         cache.set(cache_key, etag)
