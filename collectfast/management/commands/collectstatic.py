@@ -5,7 +5,7 @@ import warnings
 from django.contrib.staticfiles.management.commands import collectstatic
 from django.utils.encoding import smart_str
 
-from collectfast.etag import copy_file
+from collectfast.etag import should_copy_file
 from collectfast import settings
 
 
@@ -69,7 +69,7 @@ class Command(collectstatic.Command):
 
         if self.collectfast_enabled and not self.dry_run:
             try:
-                if not copy_file(
+                if not should_copy_file(
                         self.storage, path, prefixed_path, source_storage):
                     return False
             except Exception as e:

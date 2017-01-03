@@ -74,9 +74,9 @@ def has_matching_etag(remote_storage, source_storage, path):
     return storage_etag == local_etag
 
 
-def copy_file(remote_storage, path, prefixed_path, source_storage):
+def should_copy_file(remote_storage, path, prefixed_path, source_storage):
     """
-    Returns True if the file should be copied otherwise False.
+    Returns True if the file should be copied, otherwise False.
     """
     normalized_path = remote_storage._normalize_name(
         prefixed_path).replace('\\', '/')
