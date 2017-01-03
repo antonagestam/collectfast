@@ -63,8 +63,8 @@ install:
   # about it being out of date.
   - "pip install --disable-pip-version-check --user --upgrade pip"
 
-  # Install Mock
-  - "%CMD_IN_ENV% pip install mock==1.3.0"
+  # Install test dependencies
+  - "%CMD_IN_ENV% pip install mock==1.3.0 boto boto3 django-storages"
 
   # Install the build dependencies of the project. If some dependencies contain
   # compiled extensions and are not provided as pre-built wheel packages,
