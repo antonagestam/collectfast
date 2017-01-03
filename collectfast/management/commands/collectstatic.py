@@ -75,7 +75,7 @@ class Command(collectstatic.Command):
             except Exception as e:
                 if settings.debug:
                     raise
-                # Ignore errors and let super Command handle it
+                # Ignore errors and let default collectstatic handle copy
                 self.stdout.write(smart_str(
                     "Ignored error in Collectfast:\n%s\n--> Continuing using "
                     "default collectstatic." % e))

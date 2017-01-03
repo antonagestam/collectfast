@@ -69,7 +69,6 @@ def has_matching_etag(remote_storage, source_storage, path):
     """
     Compare etag of path in source storage with remote.
     """
-
     storage_etag = get_etag(remote_storage, path)
     local_etag = get_file_hash(source_storage, path)
     return storage_etag == local_etag
