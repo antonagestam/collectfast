@@ -7,9 +7,12 @@ from os.path import join
 
 from django.core.files.storage import Storage, FileSystemStorage
 from django.core.files.base import ContentFile
-from django.conf import settings
+from django.core.cache import caches
 
-from ..management.commands.collectstatic import Command, cache
+from collectfast.management.commands.collectstatic import Command
+from collectfast import settings
+
+cache = caches[settings.cache]
 
 
 class BotolikeStorage(Storage):
