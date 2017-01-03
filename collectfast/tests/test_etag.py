@@ -1,9 +1,15 @@
 import unittest
-from unittest.mock import patch
 import string
+import tempfile
+
+from mock import patch
+from django.contrib.staticfiles.storage import StaticFilesStorage
+from storages.backends.s3boto import S3BotoStorage
 
 from collectfast import etag
 from collectfast import settings
+
+hash_characters = string.ascii_letters + string.digits
 
 
 def test(func):
@@ -26,7 +32,7 @@ def test_get_cache_key(case):
     prefix_len = len(settings.cache_key_prefix)
     case.assertTrue(cache_key.startswith(settings.cache_key_prefix))
     case.assertEqual(32 + prefix_len, len(cache_key))
-    expected_chars = string.ascii_letters + string.digits + '_'
+    expected_chars = hash_characters + '_'
     for c in cache_key:
         case.assertIn(c, expected_chars)
 
@@ -55,19 +61,41 @@ def test_get_destroy_etag(case, mocked):
     mocked.assert_called_once_with('storage', 'path')
 
 
+@test
+def test_get_file_hash(case):
+    storage = StaticFilesStorage()
+    with tempfile.NamedTemporaryFile(dir=storage.base_location) as f:
+        f.write(b'spam')
+        h = etag.get_file_hash(storage, f.name)
+    case.assertEqual(len(h), 34)
+    case.assertTrue(h.startswith('"'))
+    case.assertTrue(h.endswith('"'))
+    for c in h[1:-1]:
+        case.assertIn(c, hash_characters)
 
-class TestGetRemoteEtag(unittest.TestCase):
-    # INTEGRATION TEST
-    # boto and bot3!!!
-    pass
 
-class TestGetFileHash(unittest.TestCase):
-    pass
-
-
-class TestHasMatchingEtag(unittest.TestCase):
-    pass
+@test
+@patch('collectfast.etag.get_etag')
+@patch('collectfast.etag.get_file_hash')
+def test_has_matching_etag(case, mocked_get_etag, mocked_get_file_hash):
+    mocked_get_etag.return_value = mocked_get_file_hash.return_value = 'hash'
+    case.assertTrue(etag.has_matching_etag('rs', 'ss', 'path'))
+    mocked_get_etag.return_value = 'not same'
+    case.assertFalse(etag.has_matching_etag('rs', 'ss', 'path'))
 
 
-class TestCopyFile(unittest.TestCase):
-    pass
+@test
+@patch('collectfast.etag.has_matching_etag')
+@patch('collectfast.etag.destroy_etag')
+def test_should_copy_file(case, mocked_destroy_etag, mocked_has_matching_etag):
+    remote_storage = S3BotoStorage()
+
+    mocked_has_matching_etag.return_value = True
+    case.assertFalse(etag.should_copy_file(
+        remote_storage, 'path', 'prefixed_path', 'source_storage'))
+    mocked_destroy_etag.assert_not_called()
+
+    mocked_has_matching_etag.return_value = False
+    case.assertTrue(etag.should_copy_file(
+        remote_storage, 'path', 'prefixed_path', 'source_storage'))
+    mocked_destroy_etag.assert_called()
