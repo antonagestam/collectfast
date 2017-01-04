@@ -6,8 +6,9 @@ from .utils import test, create_static_file
 
 def call_collectstatic():
     out = StringIO()
-    call_command('collectstatic', '--no-input', stdout=out)
+    call_command('collectstatic', interactive=False, stdout=out)
     return out.getvalue()
+
 
 @test
 def test_basics(case):

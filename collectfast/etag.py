@@ -1,10 +1,18 @@
 import hashlib
-from functools import lru_cache
 
 from django.core.cache import caches
 
 from collectfast import settings
 from .log import log
+
+try:
+    from functools import lru_cache
+except ImportError:
+    # make lru_cache do nothing in python 2.7
+    def lru_cache(maxsize=128, typed=False):
+        def decorator(func):
+            return func
+        return decorator
 
 cache = caches[settings.cache]
 
