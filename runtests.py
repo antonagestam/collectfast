@@ -34,6 +34,7 @@ def main():
         os.makedirs(staticroot_dir)
 
     settings.configure(**{
+        "USE_TZ": True,
         "DATABASES": {
             'default': {
                 "ENGINE": 'django.db.backends.%s' % options.DATABASE_ENGINE,
