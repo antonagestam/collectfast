@@ -68,9 +68,9 @@ class Command(collectstatic.Command):
         Override handle to supress summary output
         """
         super(Command, self).handle(**options)
-        return "{} static {} copied.".format(
+        return "{} static file{} copied.".format(
             self.num_copied_files,
-            's' if self.num_copied_files == 1 else '')
+            '' if self.num_copied_files == 1 else 's')
 
     def do_copy_file(self, args):
         """
