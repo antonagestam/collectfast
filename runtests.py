@@ -27,8 +27,11 @@ def main():
 
     # create static dir
     staticfiles_dir = "./static/"
+    staticroot_dir = "./static_root/"
     if not os.path.exists(staticfiles_dir):
         os.makedirs(staticfiles_dir)
+    if not os.path.exists(staticroot_dir):
+        os.makedirs(staticroot_dir)
 
     settings.configure(**{
         "DATABASES": {
@@ -62,7 +65,7 @@ def main():
             "django.contrib.staticfiles",
         ),
         "STATIC_URL": "/staticfiles/",
-        "STATIC_ROOT": "./",
+        "STATIC_ROOT": staticroot_dir,
         "STATICFILES_DIRS": [staticfiles_dir],
         "STATICFILES_STORAGE": "storages.backends.s3boto3.S3Boto3Storage",
 
@@ -88,6 +91,7 @@ def main():
 
     # delete static dir
     shutil.rmtree(staticfiles_dir)
+    shutil.rmtree(staticroot_dir)
 
 if __name__ == "__main__":
     main()
