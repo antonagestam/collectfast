@@ -51,7 +51,8 @@ def test_get_destroy_etag(case, mocked):
 @test
 def test_get_file_hash(case):
     # disable this test on appveyor until permissions issue is solved
-    if platform.system() == 'Windows': return
+    if platform.system() == 'Windows':
+        return
     storage = StaticFilesStorage()
     with tempfile.NamedTemporaryFile(dir=storage.base_location) as f:
         f.write(b'spam')
