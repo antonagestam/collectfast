@@ -2,7 +2,7 @@
 
 import os
 import sys
-
+import shutil
 from optparse import OptionParser
 
 import django
@@ -24,6 +24,14 @@ def main():
     app_path = 'collectfast'
     parent_dir, app_name = os.path.split(app_path)
     sys.path.insert(0, parent_dir)
+
+    # create static dir
+    staticfiles_dir = "./static/"
+    staticroot_dir = "./static_root/"
+    if not os.path.exists(staticfiles_dir):
+        os.makedirs(staticfiles_dir)
+    if not os.path.exists(staticroot_dir):
+        os.makedirs(staticroot_dir)
 
     settings.configure(**{
         "DATABASES": {
@@ -57,20 +65,33 @@ def main():
             "django.contrib.staticfiles",
         ),
         "STATIC_URL": "/staticfiles/",
-        "STATIC_ROOT": "./",
+        "STATIC_ROOT": staticroot_dir,
+        "STATICFILES_DIRS": [staticfiles_dir],
+        "STATICFILES_STORAGE": "storages.backends.s3boto3.S3Boto3Storage",
 
         "AWS_PRELOAD_METADATA": True,
         "MIDDLEWARE_CLASSES": [],
+
+        # credentials for integration test bucket
+        "AWS_STORAGE_BUCKET_NAME": "collectfast",
+        "AWS_ACCESS_KEY_ID": os.environ.get("AWS_ACCESS_KEY_ID", None),
+        "AWS_SECRET_ACCESS_KEY": os.environ.get("AWS_SECRET_ACCESS_KEY"),
+        "AWS_S3_REGION_NAME": "eu-central-1",
+        "AWS_S3_SIGNATURE_VERSION": "s3v4",
+        "AWS_QUERYSTRING_AUTH": False,
     })
 
     if options.TEST_SUITE is not None:
         test_arg = "%s.%s" % (app_name, options.TEST_SUITE)
     else:
         test_arg = app_name
-    if django.VERSION >= (1, 7):
-        django.setup()
+    django.setup()
 
     call_command("test", test_arg)
+
+    # delete static dir
+    shutil.rmtree(staticfiles_dir)
+    shutil.rmtree(staticroot_dir)
 
 if __name__ == "__main__":
     main()
