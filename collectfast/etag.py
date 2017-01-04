@@ -1,9 +1,9 @@
 import hashlib
+import logging
 
 from django.core.cache import caches
 
 from collectfast import settings
-from .log import log
 
 try:
     from functools import lru_cache
@@ -15,6 +15,7 @@ except ImportError:
         return decorator
 
 cache = caches[settings.cache]
+logger = logging.getLogger(__name__)
 
 
 @lru_cache()
@@ -92,10 +93,10 @@ def should_copy_file(remote_storage, path, prefixed_path, source_storage):
     # Compare hashes and skip copying if matching
     if has_matching_etag(
             remote_storage, source_storage, normalized_path):
-        log("Skipping '%s' based on matching file hashes" % path, level=2)
+        logger.info("%s: Skipping based on matching file hashes" % path)
         return False
 
     # Invalidate cached versions of lookup if copy is to be done
     destroy_etag(normalized_path)
-    log("Hashes did not match", level=2)
+    logger.info("%s: Hashes did not match" % path)
     return True
