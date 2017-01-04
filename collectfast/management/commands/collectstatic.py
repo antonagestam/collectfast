@@ -4,6 +4,7 @@ import warnings
 
 from django.contrib.staticfiles.management.commands import collectstatic
 from django.utils.encoding import smart_str
+from storages.backends.s3boto3 import S3Boto3Storage
 
 from collectfast.etag import should_copy_file
 from collectfast import settings
@@ -27,6 +28,7 @@ class Command(collectstatic.Command):
 
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
+        self.num_copied_files = 0
         self.tasks = []
         self.etags = {}
         self.storage.preload_metadata = True
@@ -61,11 +63,24 @@ class Command(collectstatic.Command):
             Pool(settings.threads).map(self.do_copy_file, self.tasks)
         return ret
 
+    def handle(self, **options):
+        """
+        Override handle to supress summary output
+        """
+        super(Command, self).handle(**options)
+        return "{} static {} copied.".format(
+            self.num_copied_files,
+            's' if self.num_copied_files == 1 else '')
+
     def do_copy_file(self, args):
         """
         Determine if file should be copied or not and handle exceptions.
         """
         path, prefixed_path, source_storage = args
+
+        if settings.threads and isinstance(self.storage, S3Boto3Storage):
+            # reset connection
+            self.storage._connection = None
 
         if self.collectfast_enabled and not self.dry_run:
             try:
@@ -80,6 +95,7 @@ class Command(collectstatic.Command):
                     "Ignored error in Collectfast:\n%s\n--> Continuing using "
                     "default collectstatic." % e))
 
+        self.num_copied_files += 1
         return super(Command, self).copy_file(
             path, prefixed_path, source_storage)
 

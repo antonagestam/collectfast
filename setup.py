@@ -14,7 +14,7 @@ setup(
     url='https://github.com/antonagestam/collectfast/',
     license='MIT License',
     include_package_data=True,
-    install_requires=['Django>=1.8'],
+    install_requires=['Django>=1.8', 'django-storages'],
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
