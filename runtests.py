@@ -34,6 +34,7 @@ def main():
         os.makedirs(staticroot_dir)
 
     settings.configure(**{
+        # Set USE_TZ to True to work around bug in django-storages
         "USE_TZ": True,
         "DATABASES": {
             'default': {

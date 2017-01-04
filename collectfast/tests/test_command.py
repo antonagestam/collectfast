@@ -60,7 +60,7 @@ def test_warn_preload_metadata(case):
 
 @test
 @override_setting("enabled", False)
-def test_warn_preload_metadata(case):
+def test_collectfast_disabled(case):
     call_collectstatic()
 
 
