@@ -32,6 +32,7 @@ def main():
         os.makedirs(staticfiles_dir)
     if not os.path.exists(staticroot_dir):
         os.makedirs(staticroot_dir)
+        os.chmod(staticroot_dir, 0o777)
 
     settings.configure(**{
         "DATABASES": {
