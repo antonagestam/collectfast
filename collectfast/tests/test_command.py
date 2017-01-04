@@ -5,7 +5,7 @@ from django.core.management import call_command
 from django.utils.six import StringIO
 
 from collectfast import settings
-from .utils import test, create_static_file
+from .utils import test, create_static_file, clean_static_dir
 
 
 def override_setting(name, value):
@@ -30,7 +30,8 @@ def call_collectstatic(*args, **kwargs):
 
 @test
 def test_basics(case):
-    create_static_file('static/testfile.txt')
+    clean_static_dir()
+    create_static_file()
     result = call_collectstatic()
     case.assertIn("1 static file copied.", result)
     # file state should now be cached
@@ -41,7 +42,8 @@ def test_basics(case):
 @test
 @override_setting("threads", 5)
 def test_threads(case):
-    create_static_file('static/testfile.txt')
+    clean_static_dir()
+    create_static_file()
     result = call_collectstatic()
     case.assertIn("1 static file copied.", result)
     # file state should now be cached
@@ -66,7 +68,8 @@ def test_collectfast_disabled(case):
 
 @test
 def test_disable_collectfast(case):
-    create_static_file('static/testfile.txt')
+    clean_static_dir()
+    create_static_file()
     result = call_collectstatic(disable_collectfast=True)
     case.assertIn("1 static file copied.", result)
 
