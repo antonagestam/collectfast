@@ -8,22 +8,9 @@ from storages.backends.s3boto import S3BotoStorage
 
 from collectfast import etag
 from collectfast import settings
+from .utils import test
 
 hash_characters = string.ascii_letters + string.digits
-
-
-def test(func):
-    """
-    Creates a class that inherits from unittest.TestCase with func as a method.
-    Create tests like this:
-
-    >>> @test
-    >>> def test_my_func(case):
-    >>>     case.assertEqual(my_func(), 1337)
-    """
-    cls = type(func.__name__, (unittest.TestCase, ), {func.__name__: func})
-    setattr(cls, func.__name__, func)
-    return cls
 
 
 @test
