@@ -131,9 +131,23 @@ Discussion is open and welcome.
 
 **Testing**
 
-To run tests, setup a virtualenv and install tox with ``pip install tox`` then
-run ``tox`` in the project directory. To only run tests for a certain
-environment run e.g. ``tox -e py35-django110``.
+To run integration tests you need to setup an S3 bucket with the name
+``collectfast`` and set your AWS credentials as environment variables. You can
+do this by adding them to a file ``aws-credentials`` like this:
+
+.. code:: bash
+
+    export AWS_ACCESS_KEY_ID="XXXX"
+    export AWS_SECRET_ACCESS_KEY="XXXX"
+
+And then running the tests with ``. aws-credentials && python runtests.py``.
+
+If you don't feel like setting up an S3 bucket, just skip setting the
+environment variables. The integration tests will still run but fail.
+
+To run tests with tox, setup a virtualenv and install tox with
+``pip install tox`` then run ``tox`` in the project directory. To only run
+tests for a certain environment run e.g. ``tox -e py35-django110``.
 
 
 License
