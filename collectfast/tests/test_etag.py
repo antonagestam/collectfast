@@ -85,4 +85,4 @@ def test_should_copy_file(case, mocked_destroy_etag, mocked_has_matching_etag):
     mocked_has_matching_etag.return_value = False
     case.assertTrue(etag.should_copy_file(
         remote_storage, 'path', 'prefixed_path', 'source_storage'))
-    mocked_destroy_etag.assert_called()
+    mocked_destroy_etag.assert_called_once_with('prefixed_path')

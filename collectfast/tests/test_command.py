@@ -4,13 +4,16 @@ from django.utils.six import StringIO
 from .utils import test, create_static_file
 
 
-@test
-def test_command(case):
-    create_static_file('static/testfile.txt')
+def call_collectstatic():
     out = StringIO()
     call_command('collectstatic', '--no-input', stdout=out)
-    result = out.getvalue()
+    return out.getvalue()
+
+@test
+def test_basics(case):
+    create_static_file('static/testfile.txt')
+    result = call_collectstatic()
     case.assertIn("1 static file copied.", result)
-    call_command('collectstatic', '--no-input', stdout=out)
-    result = out.getvalue()
+    # file state should now be cached
+    result = call_collectstatic()
     case.assertIn("0 static files copied.", result)

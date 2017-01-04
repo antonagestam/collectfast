@@ -20,3 +20,4 @@ def create_static_file(filename):
         with open(filename, 'w+') as f:
             for i in range(500):
                 f.write(chr(int(random.random() * 64)))
+            f.close()
