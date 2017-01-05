@@ -82,3 +82,6 @@ test_script:
 on_finish:
   - cmd: icacls C:\projects\collectfast\static_root
   - cmd: icacls C:\projects\collectfast\static_root\*
+
+before_script:
+  - cmd: icacls C:\projects\collectfast\static_root /inheritance:r /grant Everyone:F
