@@ -1,6 +1,5 @@
 import string
 import tempfile
-import platform
 
 from mock import patch
 from django.contrib.staticfiles.storage import StaticFilesStorage
