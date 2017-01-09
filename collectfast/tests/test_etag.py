@@ -30,22 +30,22 @@ def test_get_destroy_etag(case, mocked):
     mocked.return_value = expected_hash = 'hash'
 
     # empty cache
-    h = etag.get_etag('storage', 'path')
+    h = etag.get_etag('storage', 'path', 'prefixed_path')
     case.assertEqual(h, expected_hash)
-    mocked.assert_called_once_with('storage', 'path')
+    mocked.assert_called_once_with('storage', 'prefixed_path')
 
     # populated cache
     mocked.reset_mock()
-    h = etag.get_etag('storage', 'path')
+    h = etag.get_etag('storage', 'path', 'prefixed_path')
     case.assertEqual(h, expected_hash)
     mocked.assert_not_called()
 
     # test destroy_etag
     mocked.reset_mock()
     etag.destroy_etag('path')
-    h = etag.get_etag('storage', 'path')
+    h = etag.get_etag('storage', 'path', 'prefixed_path')
     case.assertEqual(h, expected_hash)
-    mocked.assert_called_once_with('storage', 'path')
+    mocked.assert_called_once_with('storage', 'prefixed_path')
 
 
 @test
@@ -69,9 +69,11 @@ def test_get_file_hash(case):
 @patch('collectfast.etag.get_file_hash')
 def test_has_matching_etag(case, mocked_get_etag, mocked_get_file_hash):
     mocked_get_etag.return_value = mocked_get_file_hash.return_value = 'hash'
-    case.assertTrue(etag.has_matching_etag('rs', 'ss', 'path'))
+    case.assertTrue(
+        etag.has_matching_etag('rs', 'ss', 'path', 'prefixed_path'))
     mocked_get_etag.return_value = 'not same'
-    case.assertFalse(etag.has_matching_etag('rs', 'ss', 'path'))
+    case.assertFalse(
+        etag.has_matching_etag('rs', 'ss', 'path', 'prefixed_path'))
 
 
 @test
@@ -88,4 +90,4 @@ def test_should_copy_file(case, mocked_destroy_etag, mocked_has_matching_etag):
     mocked_has_matching_etag.return_value = False
     case.assertTrue(etag.should_copy_file(
         remote_storage, 'path', 'prefixed_path', 'source_storage'))
-    mocked_destroy_etag.assert_called_once_with('prefixed_path')
+    mocked_destroy_etag.assert_called_once_with('path')
