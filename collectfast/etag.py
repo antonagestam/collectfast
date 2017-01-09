@@ -31,29 +31,31 @@ def get_cache_key(path):
     return settings.cache_key_prefix + path_hash
 
 
-def get_remote_etag(storage, path):
+def get_remote_etag(storage, prefixed_path):
     """
     Get etag of path from S3 using boto or boto3.
     """
+    normalized_path = storage._normalize_name(
+        prefixed_path).replace('\\', '/')
     try:
-        return storage.bucket.get_key(path).etag
+        return storage.bucket.get_key(normalized_path).etag
     except AttributeError:
         pass
     try:
-        return storage.bucket.Object(path).e_tag
+        return storage.bucket.Object(normalized_path).e_tag
     except:
         pass
     return None
 
 
-def get_etag(storage, path):
+def get_etag(storage, path, prefixed_path):
     """
     Get etag of path from cache or S3 - in that order.
     """
     cache_key = get_cache_key(path)
     etag = cache.get(cache_key, False)
     if etag is False:
-        etag = get_remote_etag(storage, path)
+        etag = get_remote_etag(storage, prefixed_path)
         cache.set(cache_key, etag)
     return etag
 
@@ -74,11 +76,11 @@ def get_file_hash(storage, path):
     return file_hash
 
 
-def has_matching_etag(remote_storage, source_storage, path):
+def has_matching_etag(remote_storage, source_storage, path, prefixed_path):
     """
     Compare etag of path in source storage with remote.
     """
-    storage_etag = get_etag(remote_storage, path)
+    storage_etag = get_etag(remote_storage, path, prefixed_path)
     local_etag = get_file_hash(source_storage, path)
     return storage_etag == local_etag
 
@@ -87,16 +89,12 @@ def should_copy_file(remote_storage, path, prefixed_path, source_storage):
     """
     Returns True if the file should be copied, otherwise False.
     """
-    normalized_path = remote_storage._normalize_name(
-        prefixed_path).replace('\\', '/')
-
-    # Compare hashes and skip copying if matching
     if has_matching_etag(
-            remote_storage, source_storage, normalized_path):
+            remote_storage, source_storage, path, prefixed_path):
         logger.info("%s: Skipping based on matching file hashes" % path)
         return False
 
-    # Invalidate cached versions of lookup if copy is to be done
-    destroy_etag(normalized_path)
+    # Invalidate cached versions of lookup before copy
+    destroy_etag(path)
     logger.info("%s: Hashes did not match" % path)
     return True
