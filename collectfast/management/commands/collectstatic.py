@@ -4,9 +4,9 @@ import warnings
 
 from django.contrib.staticfiles.management.commands import collectstatic
 from django.utils.encoding import smart_str
-from storages.backends.s3boto3 import S3Boto3Storage
 
 from collectfast.etag import should_copy_file
+from collectfast.boto import reset_connection
 from collectfast import settings
 
 
@@ -78,9 +78,7 @@ class Command(collectstatic.Command):
         """
         path, prefixed_path, source_storage = args
 
-        if settings.threads and isinstance(self.storage, S3Boto3Storage):
-            # reset connection
-            self.storage._connection = None
+        reset_connection(self.storage)
 
         if self.collectfast_enabled and not self.dry_run:
             try:
