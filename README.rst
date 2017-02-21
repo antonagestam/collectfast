@@ -1,8 +1,7 @@
 Collectfast – A Faster Collectstatic
 ====================================
 
-|Build Status| |Windows Build Status| |Coverage Status| |Join the chat at
-https://gitter.im/antonagestam/collectfast|
+|Jazzband| |Build Status| |Windows Build Status| |Coverage Status|
 
 The fast ``collectstatic`` for Django projects with S3 as storage
 backend.
@@ -48,7 +47,7 @@ Please note, that failure to do so will cause Django to use
 
 **Note:** ``preload_metadata`` of the storage class will be overwritten
 even if ``AWS_PRELOAD_METADATA`` is not set to True see
-`#30 <https://github.com/antonagestam/collectfast/issues/30>`_
+`#30 <https://github.com/jazzband/collectfast/issues/30>`_
 
 
 Usage
@@ -96,7 +95,7 @@ framework. <https://docs.djangoproject.com/en/stable/topics/cache/>`_
 
 **Note:** We recommend you to set the ``MAX_ENTRIES`` setting if you
 have more than 300 static files, see 
-`#47 <https://github.com/antonagestam/collectfast/issues/47>`_
+`#47 <https://github.com/jazzband/collectfast/issues/47>`_
 
 
 Enable Parallelization
@@ -158,11 +157,11 @@ information. Previous versions of Collectfast was licensed under Creative
 Commons Attribution-ShareAlike 3.0 Unported License.
 
 
-.. |Build Status| image:: https://api.travis-ci.org/antonagestam/collectfast.svg?branch=master
-   :target: https://travis-ci.org/antonagestam/collectfast
+.. |Build Status| image:: https://api.travis-ci.org/jazzband/collectfast.svg?branch=master
+   :target: https://travis-ci.org/jazzband/collectfast
 .. |Windows Build Status| image:: https://ci.appveyor.com/api/projects/status/github/antonagestam/collectfast?branch=master&svg=true
    :target: https://ci.appveyor.com/project/antonagestam/collectfast/
-.. |Coverage Status| image:: https://coveralls.io/repos/antonagestam/collectfast/badge.png
-   :target: https://coveralls.io/r/antonagestam/collectfast
-.. |Join the chat at https://gitter.im/antonagestam/collectfast| image:: https://badges.gitter.im/Join%20Chat.svg
-   :target: https://gitter.im/antonagestam/collectfast?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+.. |Coverage Status| image:: https://coveralls.io/repos/jazzband/collectfast/badge.png
+   :target: https://coveralls.io/r/jazzband/collectfast
+.. |Jazzband| image:: https://jazzband.co/static/img/badge.svg
+   :target: https://jazzband.co/

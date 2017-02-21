@@ -11,7 +11,7 @@ setup(
     author='Anton Agestam',
     author_email='msn@antonagestam.se',
     packages=find_packages(),
-    url='https://github.com/antonagestam/collectfast/',
+    url='https://github.com/jazzband/collectfast/',
     license='MIT License',
     include_package_data=True,
     install_requires=['Django>=1.8', 'django-storages'],
@@ -23,6 +23,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3',
         'Framework :: Django',
     ]
