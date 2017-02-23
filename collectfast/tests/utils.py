@@ -2,12 +2,15 @@ import random
 import unittest
 import uuid
 import os
+import functools
+
+from collectfast import settings
 
 
 def test(func):
     """
-    Creates a class that inherits from unittest.TestCase with func as a method.
-    Create tests like this:
+    Creates a class that inherits from `unittest.TestCase` with the decorated
+    function as a method. Create tests like this:
 
     >>> fn = lambda x: 1337
     >>> @test
@@ -32,3 +35,16 @@ def clean_static_dir():
         path = os.path.join(d, f)
         if os.path.isfile(path):
             os.unlink(path)
+
+
+def override_setting(name, value):
+    def decorator(fn):
+        @functools.wraps(fn)
+        def wrapper(*args, **kwargs):
+            original = getattr(settings, name)
+            setattr(settings, name, value)
+            ret = fn(*args, **kwargs)
+            setattr(settings, name, original)
+            return ret
+        return wrapper
+    return decorator
