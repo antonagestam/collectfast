@@ -1,24 +1,9 @@
-from functools import wraps
 import warnings
 
 from django.core.management import call_command
 from django.utils.six import StringIO
 
-from collectfast import settings
-from .utils import test, create_static_file, clean_static_dir
-
-
-def override_setting(name, value):
-    def decorator(fn):
-        @wraps(fn)
-        def wrapper(*args, **kwargs):
-            original = getattr(settings, name)
-            setattr(settings, name, value)
-            ret = fn(*args, **kwargs)
-            setattr(settings, name, original)
-            return ret
-        return wrapper
-    return decorator
+from .utils import test, create_static_file, clean_static_dir, override_setting
 
 
 def call_collectstatic(*args, **kwargs):
