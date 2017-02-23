@@ -161,7 +161,7 @@ Commons Attribution-ShareAlike 3.0 Unported License.
    :target: https://travis-ci.org/jazzband/collectfast
 .. |Windows Build Status| image:: https://ci.appveyor.com/api/projects/status/6ts6mvno3ce58kmw/branch/master?svg=true
    :target: https://ci.appveyor.com/project/antonagestam/collectfast/branch/master
-.. |Coverage Status| image:: https://coveralls.io/repos/jazzband/collectfast/badge.png
-   :target: https://coveralls.io/r/jazzband/collectfast
+.. |Coverage Status| image:: https://coveralls.io/repos/github/jazzband/collectfast/badge.svg?branch=master
+   :target: https://coveralls.io/github/jazzband/collectfast?branch=master
 .. |Jazzband| image:: https://jazzband.co/static/img/badge.svg
    :target: https://jazzband.co/
