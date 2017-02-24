@@ -3,7 +3,8 @@ import warnings
 from django.core.management import call_command
 from django.utils.six import StringIO
 
-from .utils import test, create_static_file, clean_static_dir, override_setting
+from .utils import test, clean_static_dir, create_static_file, override_setting
+from .utils import with_bucket
 
 
 def call_collectstatic(*args, **kwargs):
@@ -14,6 +15,7 @@ def call_collectstatic(*args, **kwargs):
 
 
 @test
+@with_bucket
 def test_basics(case):
     clean_static_dir()
     create_static_file()
@@ -26,6 +28,7 @@ def test_basics(case):
 
 @test
 @override_setting("threads", 5)
+@with_bucket
 def test_threads(case):
     clean_static_dir()
     create_static_file()
@@ -38,7 +41,10 @@ def test_threads(case):
 
 @test
 @override_setting("preload_metadata_enabled", False)
+@with_bucket
 def test_warn_preload_metadata(case):
+    clean_static_dir()
+    create_static_file()
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         call_collectstatic()
@@ -47,11 +53,15 @@ def test_warn_preload_metadata(case):
 
 @test
 @override_setting("enabled", False)
+@with_bucket
 def test_collectfast_disabled(case):
+    clean_static_dir()
+    create_static_file()
     call_collectstatic()
 
 
 @test
+@with_bucket
 def test_disable_collectfast(case):
     clean_static_dir()
     create_static_file()
@@ -60,7 +70,10 @@ def test_disable_collectfast(case):
 
 
 @test
+@with_bucket
 def test_ignore_etag_deprecated(case):
+    clean_static_dir()
+    create_static_file()
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         call_collectstatic(ignore_etag=True)
