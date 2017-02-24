@@ -4,6 +4,11 @@ import uuid
 import os
 import functools
 
+from django.conf import settings as django_settings
+
+import boto
+import moto
+
 from collectfast import settings
 
 
@@ -20,13 +25,22 @@ def test(func):
     return type(func.__name__, (unittest.TestCase, ), {func.__name__: func})
 
 
+def with_bucket(func):
+    @functools.wraps(func)
+    @moto.mock_s3
+    def wraps(*args, **kwargs):
+        boto.connect_s3().create_bucket(
+            django_settings.AWS_STORAGE_BUCKET_NAME)
+        return func(*args, **kwargs)
+    return wraps
+
+
 def create_static_file():
     filename = 'static/%s.txt' % uuid.uuid4()
-    for i in range(3):
-        with open(filename, 'w+') as f:
-            for i in range(500):
-                f.write(chr(int(random.random() * 64)))
-            f.close()
+    with open(filename, 'w+') as f:
+        for _ in range(500):
+            f.write(chr(int(random.random() * 64)))
+        f.close()
 
 
 def clean_static_dir():
