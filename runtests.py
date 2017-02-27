@@ -72,6 +72,7 @@ def main():
         "STATICFILES_STORAGE": "storages.backends.s3boto3.S3Boto3Storage",
         "MIDDLEWARE_CLASSES": [],
         "AWS_PRELOAD_METADATA": True,
+        "AWS_S3_FILE_OVERWRITE": True,
         "AWS_STORAGE_BUCKET_NAME": "collectfast",
     })
 

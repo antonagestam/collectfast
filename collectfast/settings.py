@@ -9,3 +9,5 @@ threads = getattr(settings, "COLLECTFAST_THREADS", False)
 enabled = getattr(settings, "COLLECTFAST_ENABLED", True)
 preload_metadata_enabled = True is getattr(
     settings, 'AWS_PRELOAD_METADATA', False)
+file_overwrite_enabled = True is getattr(
+    settings, 'AWS_S3_FILE_OVERWRITE', False)
