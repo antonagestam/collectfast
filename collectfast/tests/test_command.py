@@ -52,6 +52,18 @@ def test_warn_preload_metadata(case):
 
 
 @test
+@override_setting("file_overwrite_enabled", False)
+@with_bucket
+def test_warn_file_overwrite(case):
+    clean_static_dir()
+    create_static_file()
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        call_collectstatic()
+        case.assertIn('AWS_S3_FILE_OVERWRITE', str(w[0].message))
+
+
+@test
 @override_setting("enabled", False)
 @with_bucket
 def test_collectfast_disabled(case):

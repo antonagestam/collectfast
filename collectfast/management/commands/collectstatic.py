@@ -32,12 +32,19 @@ class Command(collectstatic.Command):
         self.tasks = []
         self.etags = {}
         self.storage.preload_metadata = True
+        self.storage.file_overwrite = True
         self.collectfast_enabled = settings.enabled
         if not settings.preload_metadata_enabled:
             warnings.warn(
                 "Collectfast does not work properly without "
                 "`AWS_PRELOAD_METADATA` set to `True`. Overriding "
                 "`storage.preload_metadata` and continuing.")
+
+        if not settings.file_overwrite_enabled:
+            warnings.warn(
+                "Collectfast does not work properly without "
+                "`AWS_S3_FILE_OVERWRITE` set to `True`. Overriding "
+                "`storage.file_overwrite` and continuing.")
 
     def set_options(self, **options):
         """
