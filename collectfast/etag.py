@@ -2,6 +2,7 @@ import hashlib
 import logging
 
 from django.core.cache import caches
+from storages.utils import safe_join
 
 from collectfast import settings
 
@@ -35,8 +36,8 @@ def get_remote_etag(storage, prefixed_path):
     """
     Get etag of path from S3 using boto or boto3.
     """
-    normalized_path = storage._normalize_name(
-        prefixed_path).replace('\\', '/')
+    normalized_path = safe_join(storage.location, prefixed_path).replace(
+        '\\', '/')
     try:
         return storage.bucket.get_key(normalized_path).etag
     except AttributeError:
