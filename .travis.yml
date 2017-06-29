@@ -1,4 +1,12 @@
 language: python
+python:
+  - 2.7
+  - pypy
+  - 3.3
+  - 3.4
+  - 3.5
+  - 3.6
+  - pypy3
 install:
   - pip install tox
 script: tox
@@ -19,6 +27,9 @@ env:
     - TOXENV=pypy-django18
     - TOXENV=pypy-django110
     - TOXENV=pypy-django111
+    - TOXENV=pypy3-django18
+    - TOXENV=pypy3-django110
+    - TOXENV=pypy3-django111
     - TOXENV=flake8
 # work-around for Python 3.5
 addons:
