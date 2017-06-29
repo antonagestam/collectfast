@@ -50,7 +50,6 @@ def main():
                 'LOCATION': 'test-collectfast'
             }
         },
-        "ROOT_URLCONF": app_name + ".urls",
         "TEMPLATE_LOADERS": (
             "django.template.loaders.filesystem.Loader",
             "django.template.loaders.app_directories.Loader",
