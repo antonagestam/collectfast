@@ -1,4 +1,6 @@
 language: python
+python:
+  - 3.6
 install:
   - pip install tox
 script: tox
@@ -6,14 +8,19 @@ sudo: false
 env:
   matrix:
     - TOXENV=py27-django18
-    - TOXENV=py27-django19
     - TOXENV=py27-django110
+    - TOXENV=py27-django111
     - TOXENV=py33-django18
     - TOXENV=py34-django18
-    - TOXENV=py34-django19
+    - TOXENV=py34-django110
+    - TOXENV=py34-django111
     - TOXENV=py35-django18
-    - TOXENV=py35-django19
     - TOXENV=py35-django110
+    - TOXENV=py35-django111
+    - TOXENV=py36-django111
+    - TOXENV=pypy-django18
+    - TOXENV=pypy-django110
+    - TOXENV=pypy-django111
     - TOXENV=flake8
 # work-around for Python 3.5
 addons:

@@ -2,3 +2,4 @@
 .coverage
 .DS_Store
 .coveragerc.swp
+.tox
