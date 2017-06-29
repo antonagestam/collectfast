@@ -16,6 +16,9 @@ env:
     - TOXENV=py35-django110
     - TOXENV=py35-django111
     - TOXENV=py36-django111
+    - TOXENV=pypy-django18
+    - TOXENV=pypy-django110
+    - TOXENV=pypy-django111
     - TOXENV=flake8
 # work-around for Python 3.5
 addons:
