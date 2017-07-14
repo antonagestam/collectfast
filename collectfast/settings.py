@@ -7,5 +7,3 @@ cache_key_prefix = getattr(
 cache = getattr(settings, "COLLECTFAST_CACHE", "default")
 threads = getattr(settings, "COLLECTFAST_THREADS", False)
 enabled = getattr(settings, "COLLECTFAST_ENABLED", True)
-preload_metadata_enabled = True is getattr(
-    settings, 'AWS_PRELOAD_METADATA', False)

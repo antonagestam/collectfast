@@ -2,6 +2,7 @@ import warnings
 
 from django.core.management import call_command
 from django.utils.six import StringIO
+from mock import patch
 
 from .utils import test, clean_static_dir, create_static_file, override_setting
 from .utils import with_bucket
@@ -40,9 +41,10 @@ def test_threads(case):
 
 
 @test
-@override_setting("preload_metadata_enabled", False)
 @with_bucket
-def test_warn_preload_metadata(case):
+@patch('django.contrib.staticfiles.management.commands.collectstatic.staticfiles_storage')  # noqa
+def test_warn_preload_metadata(case, mocked):
+    mocked.staticfiles_storage.return_value = False
     clean_static_dir()
     create_static_file()
     with warnings.catch_warnings(record=True) as w:

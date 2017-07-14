@@ -31,12 +31,13 @@ class Command(collectstatic.Command):
         self.num_copied_files = 0
         self.tasks = []
         self.etags = {}
-        self.storage.preload_metadata = True
         self.collectfast_enabled = settings.enabled
-        if not settings.preload_metadata_enabled:
+        if self.storage.preload_metadata is not True:
+            self.storage.preload_metadata = True
             warnings.warn(
                 "Collectfast does not work properly without "
-                "`AWS_PRELOAD_METADATA` set to `True`. Overriding "
+                "`preload_metadata` set to `True` on the storage class. Try"
+                "setting `AWS_PRELOAD_METADATA` to `True`. Overriding "
                 "`storage.preload_metadata` and continuing.")
 
     def set_options(self, **options):
