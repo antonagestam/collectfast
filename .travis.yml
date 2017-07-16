@@ -8,16 +8,13 @@ sudo: false
 env:
   matrix:
     - TOXENV=py27-django18
-    - TOXENV=py27-django19
     - TOXENV=py27-django110
     - TOXENV=py27-django111
     - TOXENV=py33-django18
     - TOXENV=py34-django18
-    - TOXENV=py34-django19
     - TOXENV=py34-django110
     - TOXENV=py34-django111
     - TOXENV=py35-django18
-    - TOXENV=py35-django19
     - TOXENV=py35-django110
     - TOXENV=py35-django111
     - TOXENV=py36-django111
@@ -31,12 +28,3 @@ addons:
       - python3.5
 notifications:
   email: false
-deploy:
-  provider: pypi
-  user: jazzband
-  password:
-    secure: ''
-  on:
-    tags: true
-    distributions: sdist bdist_wheel
-    repo: jazzband/collectfast
