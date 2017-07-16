@@ -16,3 +16,4 @@ and maintainable:
   related to the feature or bugfix
 - Branches are always merged with --ff-only, so that the master branch maintains
   a clean history that is easy to inspect
+- Never merge pull requests that aren't passing CI tests
