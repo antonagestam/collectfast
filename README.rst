@@ -125,8 +125,8 @@ you can set ``COLLECTFAST_DEBUG = True`` in your Django settings file.
 Contribution
 ------------
 
-Please feel free to contribute by using issues and pull requests.
-Discussion is open and welcome.
+Please feel free to contribute by using issues and pull requests. Discussion is
+open and welcome but please adhere to the guidelines_.
 
 **Testing**
 
@@ -151,3 +151,4 @@ Commons Attribution-ShareAlike 3.0 Unported License.
    :target: https://coveralls.io/github/jazzband/collectfast?branch=master
 .. |Jazzband| image:: https://jazzband.co/static/img/badge.svg
    :target: https://jazzband.co/
+.. _guidelines: ./CONTRIBUTING.md
