@@ -36,7 +36,7 @@ class Command(collectstatic.Command):
             self.storage.preload_metadata = True
             warnings.warn(
                 "Collectfast does not work properly without "
-                "`preload_metadata` set to `True` on the storage class. Try"
+                "`preload_metadata` set to `True` on the storage class. Try "
                 "setting `AWS_PRELOAD_METADATA` to `True`. Overriding "
                 "`storage.preload_metadata` and continuing.")
 
