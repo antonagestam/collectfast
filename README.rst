@@ -45,9 +45,8 @@ to your ``INSTALLED_APPS``:
 Please note, that failure to do so will cause Django to use
 ``django.contrib.staticfiles``'s ``collectstatic``.
 
-**Note:** ``preload_metadata`` of the storage class will be overwritten
-even if ``AWS_PRELOAD_METADATA`` is not set to True see
-`#30 <https://github.com/antonagestam/collectfast/issues/30>`_
+**Note:** ``preload_metadata`` of the storage class will be overwritten as
+`True`, see `#30 <https://github.com/antonagestam/collectfast/issues/30>`_
 
 
 Usage
