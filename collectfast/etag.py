@@ -84,7 +84,7 @@ def get_file_hash(storage, path):
 
     if settings.is_gzipped and content_type in settings.gzip_content_types:
         buffer = BytesIO()
-        zf = gzip.GzipFile(mode='wb', compresslevel=6, fileobj=buffer)
+        zf = gzip.GzipFile(mode='wb', compresslevel=6, fileobj=buffer, mtime=0.0)
         with storage.open(path, 'rb') as f:
             shutil.copyfileobj(f, zf)
         contents = buffer.getvalue()
