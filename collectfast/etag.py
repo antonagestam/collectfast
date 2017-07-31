@@ -1,5 +1,8 @@
+import gzip
 import hashlib
 import logging
+import mimetypes
+import shutil
 
 from django.core.cache import caches
 
@@ -13,6 +16,11 @@ except ImportError:
         def decorator(func):
             return func
         return decorator
+
+try:
+    from io import BytesIO
+except ImportError:
+    from cBytesIO import BytesIO
 
 cache = caches[settings.cache]
 logger = logging.getLogger(__name__)
@@ -71,7 +79,18 @@ def get_file_hash(storage, path):
     """
     Create md5 hash from file contents.
     """
-    contents = storage.open(path).read()
+    default_content_type = getattr(storage, 'default_content_type', 'application/octet-stream')
+    content_type = mimetypes.guess_type(path)[0] or default_content_type
+
+    if settings.is_gzipped and content_type in settings.gzip_content_types:
+        buffer = BytesIO()
+        zf = gzip.GzipFile(mode='wb', compresslevel=6, fileobj=buffer)
+        with storage.open(path, 'rb') as f:
+            shutil.copyfileobj(f, zf)
+        contents = buffer.getvalue()
+    else:
+        contents = storage.open(path).read()
+
     file_hash = '"%s"' % hashlib.md5(contents).hexdigest()
     return file_hash
 
