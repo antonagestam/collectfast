@@ -1,7 +1,12 @@
+import gzip
 import hashlib
 import logging
+import mimetypes
 
 from django.core.cache import caches
+from django.utils.encoding import force_bytes
+from django.utils.six import BytesIO
+
 from storages.utils import safe_join
 
 from collectfast import settings
@@ -73,8 +78,22 @@ def get_file_hash(storage, path):
     Create md5 hash from file contents.
     """
     contents = storage.open(path).read()
-    file_hash = '"%s"' % hashlib.md5(contents).hexdigest()
-    return file_hash
+    file_hash = hashlib.md5(contents).hexdigest()
+
+    # Check if content should be gzipped and hash gzipped content
+    content_type = mimetypes.guess_type(path)[0] or 'application/octet-stream'
+    if settings.is_gzipped and content_type in settings.gzip_content_types:
+        cache_key = get_cache_key('gzip_hash_%s' % file_hash)
+        file_hash = cache.get(cache_key, False)
+        if file_hash is False:
+            buffer = BytesIO()
+            zf = gzip.GzipFile(mode='wb', compresslevel=6, fileobj=buffer, mtime=0.0)
+            zf.write(force_bytes(contents))
+            zf.close()
+            file_hash = hashlib.md5(buffer.getvalue()).hexdigest()
+            cache.set(cache_key, file_hash)
+
+    return '"%s"' % file_hash
 
 
 def has_matching_etag(remote_storage, source_storage, path, prefixed_path):

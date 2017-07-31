@@ -5,6 +5,7 @@ import os
 import functools
 
 from django.conf import settings as django_settings
+from django.utils.module_loading import import_string
 
 import boto
 import moto
@@ -59,6 +60,20 @@ def override_setting(name, value):
             setattr(settings, name, value)
             ret = fn(*args, **kwargs)
             setattr(settings, name, original)
+            return ret
+        return wrapper
+    return decorator
+
+
+def override_storage_attr(name, value):
+    def decorator(fn):
+        @functools.wraps(fn)
+        def wrapper(*args, **kwargs):
+            storage = import_string(getattr(django_settings, 'STATICFILES_STORAGE'))
+            original = getattr(storage, name)
+            setattr(storage, name, value)
+            ret = fn(*args, **kwargs)
+            setattr(storage, name, original)
             return ret
         return wrapper
     return decorator
