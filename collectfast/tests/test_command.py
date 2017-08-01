@@ -1,10 +1,11 @@
 import warnings
 
 from django.core.management import call_command
-from django.test import override_settings as django_override_settings
 from django.utils.six import StringIO
 
-from .utils import test, clean_static_dir, create_static_file, override_setting
+from .utils import (
+    test, clean_static_dir, create_static_file, override_setting, override_storage_attr
+)
 from .utils import with_bucket
 
 
@@ -82,7 +83,7 @@ def test_ignore_etag_deprecated(case):
 
 
 @test
-@django_override_settings(AWS_IS_GZIPPED=True)
+@override_storage_attr("gzip", True)
 @override_setting("is_gzipped", True)
 @with_bucket
 def test_is_gzipped(case):

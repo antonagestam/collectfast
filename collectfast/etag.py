@@ -2,9 +2,9 @@ import gzip
 import hashlib
 import logging
 import mimetypes
-import shutil
 
 from django.core.cache import caches
+from django.utils.encoding import force_bytes
 from django.utils.six import BytesIO
 
 from collectfast import settings
@@ -78,14 +78,17 @@ def get_file_hash(storage, path):
     default_content_type = getattr(storage, 'default_content_type', 'application/octet-stream')
     content_type = mimetypes.guess_type(path)[0] or default_content_type
 
+    contents = storage.open(path).read()
+
     if settings.is_gzipped and content_type in settings.gzip_content_types:
         buffer = BytesIO()
         zf = gzip.GzipFile(mode='wb', compresslevel=6, fileobj=buffer, mtime=0.0)
-        with storage.open(path, 'rb') as f:
-            shutil.copyfileobj(f, zf)
+        try:
+            zf.write(force_bytes(contents))
+        finally:
+            zf.close()
+        buffer.seek(0)
         contents = buffer.getvalue()
-    else:
-        contents = storage.open(path).read()
 
     file_hash = '"%s"' % hashlib.md5(contents).hexdigest()
     return file_hash
