@@ -5,6 +5,7 @@ import mimetypes
 import shutil
 
 from django.core.cache import caches
+from django.utils.six import BytesIO
 
 from collectfast import settings
 
@@ -16,11 +17,6 @@ except ImportError:
         def decorator(func):
             return func
         return decorator
-
-try:
-    from io import BytesIO
-except ImportError:
-    from cBytesIO import BytesIO
 
 cache = caches[settings.cache]
 logger = logging.getLogger(__name__)

@@ -1,6 +1,7 @@
 import warnings
 
 from django.core.management import call_command
+from django.test import override_settings as django_override_settings
 from django.utils.six import StringIO
 
 from .utils import test, clean_static_dir, create_static_file, override_setting
@@ -78,3 +79,17 @@ def test_ignore_etag_deprecated(case):
         warnings.simplefilter("always")
         call_collectstatic(ignore_etag=True)
         case.assertIn('ignore-etag is deprecated', str(w[0].message))
+
+
+@test
+@django_override_settings(AWS_IS_GZIPPED=True)
+@override_setting("is_gzipped", True)
+@with_bucket
+def test_is_gzipped(case):
+    clean_static_dir()
+    create_static_file()
+    result = call_collectstatic()
+    case.assertIn("1 static file copied.", result)
+    # file state should now be cached
+    result = call_collectstatic()
+    case.assertIn("0 static files copied.", result)

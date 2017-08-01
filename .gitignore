@@ -4,3 +4,5 @@
 .coveragerc.swp
 .tox
 *.egg-info
+/static/
+/static_root/

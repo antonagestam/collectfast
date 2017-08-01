@@ -72,6 +72,7 @@ def main():
         "MIDDLEWARE_CLASSES": [],
         "AWS_PRELOAD_METADATA": True,
         "AWS_STORAGE_BUCKET_NAME": "collectfast",
+        "GZIP_CONTENT_TYPES": ('text/plain',),
     })
 
     if options.TEST_SUITE is not None:
