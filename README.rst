@@ -1,7 +1,7 @@
 Collectfast – A Faster Collectstatic
 ====================================
 
-|Jazzband| |Build Status| |Windows Build Status| |Coverage Status|
+|Build Status| |Windows Build Status| |Coverage Status|
 
 The fast ``collectstatic`` for Django projects with S3 as storage
 backend.
@@ -46,7 +46,7 @@ Please note, that failure to do so will cause Django to use
 ``django.contrib.staticfiles``'s ``collectstatic``.
 
 **Note:** ``preload_metadata`` of the storage class will be overwritten as
-`True`, see `#30 <https://github.com/jazzband/collectfast/issues/30>`_
+`True`, see `#30 <https://github.com/antonagestam/collectfast/issues/30>`_
 
 
 Usage
@@ -94,7 +94,7 @@ framework. <https://docs.djangoproject.com/en/stable/topics/cache/>`_
 
 **Note:** We recommend you to set the ``MAX_ENTRIES`` setting if you
 have more than 300 static files, see 
-`#47 <https://github.com/jazzband/collectfast/issues/47>`_
+`#47 <https://github.com/antonagestam/collectfast/issues/47>`_
 
 
 Enable Parallelization
@@ -124,8 +124,8 @@ you can set ``COLLECTFAST_DEBUG = True`` in your Django settings file.
 Contribution
 ------------
 
-Please feel free to contribute by using issues and pull requests.
-Discussion is open and welcome.
+Please feel free to contribute by using issues and pull requests. Discussion is
+open and welcome.
 
 **Testing**
 
@@ -142,11 +142,9 @@ information. Previous versions of Collectfast was licensed under Creative
 Commons Attribution-ShareAlike 3.0 Unported License.
 
 
-.. |Build Status| image:: https://api.travis-ci.org/jazzband/collectfast.svg?branch=master
-   :target: https://travis-ci.org/jazzband/collectfast
+.. |Build Status| image:: https://api.travis-ci.org/antonagestam/collectfast.svg?branch=master
+   :target: https://travis-ci.org/antonagestam/collectfast
 .. |Windows Build Status| image:: https://ci.appveyor.com/api/projects/status/t2whurifhvfnplv9/branch/master?svg=true
    :target: https://ci.appveyor.com/project/antonagestam/collectfast-m3q7r/branch/master
-.. |Coverage Status| image:: https://coveralls.io/repos/github/jazzband/collectfast/badge.svg?branch=master
-   :target: https://coveralls.io/github/jazzband/collectfast?branch=master
-.. |Jazzband| image:: https://jazzband.co/static/img/badge.svg
-   :target: https://jazzband.co/
+.. |Coverage Status| image:: https://coveralls.io/repos/github/antonagestam/collectfast/badge.svg?branch=master
+   :target: https://coveralls.io/github/antonagestam/collectfast?branch=master
