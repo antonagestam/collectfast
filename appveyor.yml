@@ -77,3 +77,11 @@ build: off
 test_script:
   # Run the project tests
   - "%CMD_IN_ENV% python runtests.py"
+
+# debug permissions
+on_finish:
+  - cmd: icacls C:\projects\collectfast\static_root
+  - cmd: icacls C:\projects\collectfast\static_root\*
+
+before_test:
+  - cmd: icacls C:\projects\collectfast\static_root /inheritance:r /grant Everyone:F
