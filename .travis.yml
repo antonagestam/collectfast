@@ -27,12 +27,3 @@ addons:
       - python3.5
 notifications:
   email: false
-deploy:
-  provider: pypi
-  user: jazzband
-  password:
-    secure: ''
-  on:
-    tags: true
-    distributions: sdist bdist_wheel
-    repo: jazzband/collectfast
