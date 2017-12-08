@@ -69,7 +69,8 @@ def override_storage_attr(name, value):
     def decorator(fn):
         @functools.wraps(fn)
         def wrapper(*args, **kwargs):
-            storage = import_string(getattr(django_settings, 'STATICFILES_STORAGE'))
+            storage = import_string(
+                getattr(django_settings, 'STATICFILES_STORAGE'))
             original = getattr(storage, name)
             setattr(storage, name, value)
             ret = fn(*args, **kwargs)

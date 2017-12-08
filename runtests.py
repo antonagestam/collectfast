@@ -12,10 +12,12 @@ from django.core.management import call_command
 
 def main():
     parser = OptionParser()
-    parser.add_option("--DATABASE_ENGINE", dest="DATABASE_ENGINE", default="sqlite3")
+    parser.add_option(
+        "--DATABASE_ENGINE", dest="DATABASE_ENGINE", default="sqlite3")
     parser.add_option("--DATABASE_NAME", dest="DATABASE_NAME", default="")
     parser.add_option("--DATABASE_USER", dest="DATABASE_USER", default="")
-    parser.add_option("--DATABASE_PASSWORD", dest="DATABASE_PASSWORD", default="")
+    parser.add_option(
+        "--DATABASE_PASSWORD", dest="DATABASE_PASSWORD", default="")
     parser.add_option("--TEST", dest="TEST_SUITE", default=None)
 
     options, args = parser.parse_args()
@@ -87,6 +89,7 @@ def main():
     # delete static dir
     shutil.rmtree(staticfiles_dir)
     shutil.rmtree(staticroot_dir)
+
 
 if __name__ == "__main__":
     main()

@@ -87,7 +87,8 @@ def get_file_hash(storage, path):
         file_hash = cache.get(cache_key, False)
         if file_hash is False:
             buffer = BytesIO()
-            zf = gzip.GzipFile(mode='wb', compresslevel=6, fileobj=buffer, mtime=0.0)
+            zf = gzip.GzipFile(
+                mode='wb', compresslevel=6, fileobj=buffer, mtime=0.0)
             zf.write(force_bytes(contents))
             zf.close()
             file_hash = hashlib.md5(buffer.getvalue()).hexdigest()
