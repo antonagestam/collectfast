@@ -2,6 +2,7 @@ import warnings
 
 from django.core.management import call_command
 from django.utils.six import StringIO
+from django.test import override_settings as override_django_setting
 from mock import patch
 
 from .utils import test, clean_static_dir, create_static_file, override_setting
@@ -57,6 +58,18 @@ def test_warn_preload_metadata(case, mocked):
 @override_setting("enabled", False)
 @with_bucket
 def test_collectfast_disabled(case):
+    clean_static_dir()
+    create_static_file()
+    call_collectstatic()
+
+
+@test
+@override_django_setting(
+    STATICFILES_STORAGE='django.contrib.staticfiles.storage.StaticFilesStorage'
+)
+@override_setting("enabled", False)
+@with_bucket
+def test_non_s3_storage(case):
     clean_static_dir()
     create_static_file()
     call_collectstatic()
