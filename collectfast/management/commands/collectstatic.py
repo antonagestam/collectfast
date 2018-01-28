@@ -32,7 +32,7 @@ class Command(collectstatic.Command):
         self.tasks = []
         self.etags = {}
         self.collectfast_enabled = settings.enabled
-        if self.storage.preload_metadata is not True:
+        if settings.enabled and self.storage.preload_metadata is not True:
             self.storage.preload_metadata = True
             warnings.warn(
                 "Collectfast does not work properly without "
