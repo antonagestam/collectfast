@@ -76,6 +76,22 @@ def test_non_s3_storage(case):
 
 
 @test
+@override_django_setting(
+    STATICFILES_STORAGE='django.contrib.staticfiles.storage.StaticFilesStorage'
+)
+@with_bucket
+def test_enabled_with_non_s3_storage(case):
+    """
+    Running collectfast in enabled mode with a storage type other than S3 should
+    exit with an error.
+    """
+    clean_static_dir()
+    create_static_file()
+    with case.assertRaises(RuntimeError):
+        call_collectstatic()
+
+
+@test
 @with_bucket
 def test_disable_collectfast(case):
     clean_static_dir()
