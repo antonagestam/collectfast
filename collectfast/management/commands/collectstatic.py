@@ -10,6 +10,12 @@ from collectfast.etag import should_copy_file
 from collectfast.boto import reset_connection
 from collectfast import settings
 
+# Backends with which Collectfast should work properly.
+VALID_BACKENDS = [
+    'storages.backends.s3boto3.S3Boto3Storage',
+    'storages.backends.s3boto.S3BotoStorage',
+]
+
 
 class Command(collectstatic.Command):
     def add_arguments(self, parser):
@@ -34,8 +40,7 @@ class Command(collectstatic.Command):
         self.etags = {}
         self.collectfast_enabled = settings.enabled
         if settings.enabled:
-            if django_settings.STATICFILES_STORAGE in ['storages.backends.s3boto3.S3Boto3Storage',
-                                                       'storages.backends.s3boto.S3BotoStorage']:
+            if django_settings.STATICFILES_STORAGE in VALID_BACKENDS:
                 if self.storage.preload_metadata is not True:
                     self.storage.preload_metadata = True
                     warnings.warn(
