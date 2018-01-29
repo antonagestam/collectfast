@@ -45,11 +45,15 @@ class Command(collectstatic.Command):
                     self.storage.preload_metadata = True
                     warnings.warn(
                         "Collectfast does not work properly without "
-                        "`preload_metadata` set to `True` on the storage class. Try "
-                        "setting `AWS_PRELOAD_METADATA` to `True`. Overriding "
-                        "`storage.preload_metadata` and continuing.")
+                        "`preload_metadata` set to `True` on the storage "
+                        "class. Try setting `AWS_PRELOAD_METADATA` to `True`. "
+                        "Overriding `storage.preload_metadata` and continuing."
+                    )
             else:
-                raise RuntimeError('Collectfast is intended to work with an S3 storage backend only.')
+                raise RuntimeError(
+                    "Collectfast is intended to work with an S3 storage "
+                    "backend only."
+                )
 
     def set_options(self, **options):
         """
