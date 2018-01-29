@@ -40,19 +40,18 @@ class Command(collectstatic.Command):
         self.etags = {}
         self.collectfast_enabled = settings.enabled
         if settings.enabled:
-            if django_settings.STATICFILES_STORAGE in VALID_BACKENDS:
-                if self.storage.preload_metadata is not True:
-                    self.storage.preload_metadata = True
-                    warnings.warn(
-                        "Collectfast does not work properly without "
-                        "`preload_metadata` set to `True` on the storage "
-                        "class. Try setting `AWS_PRELOAD_METADATA` to `True`. "
-                        "Overriding `storage.preload_metadata` and continuing."
-                    )
-            else:
+            if django_settings.STATICFILES_STORAGE not in VALID_BACKENDS:
                 raise RuntimeError(
                     "Collectfast is intended to work with an S3 storage "
                     "backend only."
+                )
+            if self.storage.preload_metadata is not True:
+                self.storage.preload_metadata = True
+                warnings.warn(
+                    "Collectfast does not work properly without "
+                    "`preload_metadata` set to `True` on the storage "
+                    "class. Try setting `AWS_PRELOAD_METADATA` to `True`. "
+                    "Overriding `storage.preload_metadata` and continuing."
                 )
 
     def set_options(self, **options):
