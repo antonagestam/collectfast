@@ -2,12 +2,19 @@ from __future__ import with_statement, unicode_literals
 from multiprocessing.dummy import Pool
 import warnings
 
+from django.conf import settings as django_settings
 from django.contrib.staticfiles.management.commands import collectstatic
 from django.utils.encoding import smart_str
 
 from collectfast.etag import should_copy_file
 from collectfast.boto import reset_connection
 from collectfast import settings
+
+# Backends with which Collectfast should work properly.
+VALID_BACKENDS = [
+    'storages.backends.s3boto3.S3Boto3Storage',
+    'storages.backends.s3boto.S3BotoStorage',
+]
 
 
 class Command(collectstatic.Command):
@@ -32,13 +39,20 @@ class Command(collectstatic.Command):
         self.tasks = []
         self.etags = {}
         self.collectfast_enabled = settings.enabled
-        if self.storage.preload_metadata is not True:
-            self.storage.preload_metadata = True
-            warnings.warn(
-                "Collectfast does not work properly without "
-                "`preload_metadata` set to `True` on the storage class. Try "
-                "setting `AWS_PRELOAD_METADATA` to `True`. Overriding "
-                "`storage.preload_metadata` and continuing.")
+        if settings.enabled:
+            if django_settings.STATICFILES_STORAGE not in VALID_BACKENDS:
+                raise RuntimeError(
+                    "Collectfast is intended to work with an S3 storage "
+                    "backend only."
+                )
+            if self.storage.preload_metadata is not True:
+                self.storage.preload_metadata = True
+                warnings.warn(
+                    "Collectfast does not work properly without "
+                    "`preload_metadata` set to `True` on the storage "
+                    "class. Try setting `AWS_PRELOAD_METADATA` to `True`. "
+                    "Overriding `storage.preload_metadata` and continuing."
+                )
 
     def set_options(self, **options):
         """
