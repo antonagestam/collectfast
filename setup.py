@@ -6,7 +6,7 @@ from setuptools import find_packages
 setup(
     name='Collectfast',
     description='A Faster Collectstatic',
-    version='0.6.0',
+    version='0.6.1',
     long_description=open('README.rst').read(),
     author='Anton Agestam',
     author_email='msn@antonagestam.se',
@@ -14,7 +14,7 @@ setup(
     url='https://github.com/antonagestam/collectfast/',
     license='MIT License',
     include_package_data=True,
-    install_requires=['Django>=1.8', 'django-storages'],
+    install_requires=['Django>=1.8', 'django-storages>=1.6'],
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
