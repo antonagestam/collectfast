@@ -30,8 +30,7 @@ def with_bucket(func):
     @functools.wraps(func)
     @moto.mock_s3
     def wraps(*args, **kwargs):
-        boto.connect_s3().create_bucket(
-            django_settings.AWS_STORAGE_BUCKET_NAME)
+        boto.connect_s3().create_bucket(django_settings.AWS_STORAGE_BUCKET_NAME)
         return func(*args, **kwargs)
     return wraps
 

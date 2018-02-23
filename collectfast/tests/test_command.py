@@ -2,7 +2,7 @@ import warnings
 
 from django.core.management import call_command
 from django.utils.six import StringIO
-from mock import patch
+from django.test import override_settings as override_django_settings
 
 from .utils import test, clean_static_dir, create_static_file, override_setting
 from .utils import with_bucket, override_storage_attr
@@ -42,9 +42,9 @@ def test_threads(case):
 
 @test
 @with_bucket
-@patch('django.contrib.staticfiles.management.commands.collectstatic.staticfiles_storage')  # noqa
-def test_warn_preload_metadata(case, mocked):
-    mocked.staticfiles_storage.return_value = False
+@override_django_settings(
+    STATICFILES_STORAGE="collectfast.tests.no_preload_metadata.NPM")
+def test_warn_preload_metadata(case):
     clean_static_dir()
     create_static_file()
     with warnings.catch_warnings(record=True) as w:
@@ -54,12 +54,22 @@ def test_warn_preload_metadata(case, mocked):
 
 
 @test
-@override_setting("enabled", False)
 @with_bucket
 def test_collectfast_disabled(case):
     clean_static_dir()
     create_static_file()
-    call_collectstatic()
+    result = call_collectstatic(disable_collectfast=True)
+    case.assertIn("1 static file copied.", result)
+
+
+@test
+@override_django_settings(
+    STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+def test_collectfast_disabled_default_storage(case):
+    clean_static_dir()
+    create_static_file()
+    result = call_collectstatic(disable_collectfast=True)
+    case.assertIn("1 static file copied.", result)
 
 
 @test
