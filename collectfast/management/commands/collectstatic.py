@@ -14,12 +14,6 @@ class Command(collectstatic.Command):
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
         parser.add_argument(
-            '--ignore-etag',
-            action='store_true',
-            dest='ignore_etag',
-            default=False,
-            help="Deprecated since 0.5.0, use --disable-collectfast instead.")
-        parser.add_argument(
             '--disable-collectfast',
             action='store_true',
             dest='disable_collectfast',
@@ -42,16 +36,7 @@ class Command(collectstatic.Command):
                 "`storage.preload_metadata` and continuing.")
 
     def set_options(self, **options):
-        """
-        Set options and handle deprecation.
-        """
-        ignore_etag = options.pop('ignore_etag', False)
-        disable = options.pop('disable_collectfast', False)
-        if ignore_etag:
-            warnings.warn(
-                "--ignore-etag is deprecated since 0.5.0, use "
-                "--disable-collectfast instead.")
-        if ignore_etag or disable:
+        if options.pop('disable_collectfast', False):
             self.collectfast_enabled = False
         super(Command, self).set_options(**options)
 

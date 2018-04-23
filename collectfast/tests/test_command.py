@@ -82,17 +82,6 @@ def test_disable_collectfast(case):
 
 
 @test
-@with_bucket
-def test_ignore_etag_deprecated(case):
-    clean_static_dir()
-    create_static_file()
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        call_collectstatic(ignore_etag=True)
-        case.assertIn('ignore-etag is deprecated', str(w[0].message))
-
-
-@test
 @override_storage_attr("gzip", True)
 @override_setting("is_gzipped", True)
 @with_bucket
