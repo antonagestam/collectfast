@@ -41,6 +41,15 @@ class Command(collectstatic.Command):
                 "setting `AWS_PRELOAD_METADATA` to `True`. Overriding "
                 "`storage.preload_metadata` and continuing.")
 
+        if settings.threads and hasattr(self.storage, 'post_process'):
+            post_process_fn = self.storage.post_process
+
+            def post_process_with_wait(paths, dry_run=False, **options):
+                self.pool.close()
+                self.pool.join()
+                return post_process_fn(paths, dry_run, **options)
+            self.storage.post_process = post_process_fn
+
     def set_options(self, **options):
         """
         Set options and handle deprecation.
@@ -60,9 +69,10 @@ class Command(collectstatic.Command):
         Override collect to copy files concurrently. The tasks are populated by
         Command.copy_file() which is called by super().collect().
         """
-        ret = super(Command, self).collect()
         if settings.threads:
-            Pool(settings.threads).map(self.do_copy_file, self.tasks)
+            self.pool = Pool(settings.threads)
+
+        ret = super(Command, self).collect()
         return ret
 
     def handle(self, **options):
@@ -106,7 +116,7 @@ class Command(collectstatic.Command):
         """
         args = (path, prefixed_path, source_storage)
         if settings.threads:
-            self.tasks.append(args)
+            self.pool.apply_async(self.do_copy_file, args)
         else:
             self.do_copy_file(args)
 
