@@ -129,6 +129,16 @@ open and welcome.
 
 **Testing**
 
+The test suite is built to run against an S3 bucket. To be able to test locally
+you need to provide AWS credentials for a bucket to test against. Add the
+credentials to a file named `aws-credentials` in the root of the project
+directory:
+
+.. code:: bash
+
+    export AWS_ACCESS_KEY_ID=''
+    export AWS_SECRET_ACCESS_KEY=''
+
 To run tests with tox, setup a virtualenv and install tox with
 ``pip install tox`` then run ``tox`` in the project directory. To only run
 tests for a certain environment run e.g. ``tox -e py35-django110``.

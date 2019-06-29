@@ -5,7 +5,7 @@ from django.utils.six import StringIO
 from django.test import override_settings as override_django_settings
 
 from .utils import test, clean_static_dir, create_static_file, override_setting
-from .utils import with_bucket, override_storage_attr
+from .utils import override_storage_attr
 
 
 def call_collectstatic(*args, **kwargs):
@@ -16,7 +16,6 @@ def call_collectstatic(*args, **kwargs):
 
 
 @test
-@with_bucket
 def test_basics(case):
     clean_static_dir()
     create_static_file()
@@ -29,7 +28,6 @@ def test_basics(case):
 
 @test
 @override_setting("threads", 5)
-@with_bucket
 def test_threads(case):
     clean_static_dir()
     create_static_file()
@@ -41,7 +39,6 @@ def test_threads(case):
 
 
 @test
-@with_bucket
 @override_django_settings(
     STATICFILES_STORAGE="collectfast.tests.no_preload_metadata.NPM")
 def test_warn_preload_metadata(case):
@@ -54,7 +51,6 @@ def test_warn_preload_metadata(case):
 
 
 @test
-@with_bucket
 def test_collectfast_disabled(case):
     clean_static_dir()
     create_static_file()
@@ -73,7 +69,6 @@ def test_collectfast_disabled_default_storage(case):
 
 
 @test
-@with_bucket
 def test_disable_collectfast(case):
     clean_static_dir()
     create_static_file()
@@ -82,7 +77,6 @@ def test_disable_collectfast(case):
 
 
 @test
-@with_bucket
 def test_ignore_etag_deprecated(case):
     clean_static_dir()
     create_static_file()
@@ -95,7 +89,6 @@ def test_ignore_etag_deprecated(case):
 @test
 @override_storage_attr("gzip", True)
 @override_setting("is_gzipped", True)
-@with_bucket
 def test_is_gzipped(case):
     clean_static_dir()
     create_static_file()

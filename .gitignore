@@ -8,3 +8,4 @@
 /static_root/
 build/
 dist/
+aws-credentials

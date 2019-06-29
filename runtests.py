@@ -75,7 +75,13 @@ def main():
         "AWS_PRELOAD_METADATA": True,
         "AWS_STORAGE_BUCKET_NAME": "collectfast",
         "AWS_IS_GZIPPED": False,
-        "GZIP_CONTENT_TYPES": ('text/plain',),
+        "GZIP_CONTENT_TYPES": ('text/plain', ),
+        "AWS_ACCESS_KEY_ID": os.environ.get("AWS_ACCESS_KEY_ID").strip(),
+        "AWS_SECRET_ACCESS_KEY": os.environ.get("AWS_SECRET_ACCESS_KEY").strip(),
+        "AWS_S3_REGION_NAME": "eu-central-1",
+        "AWS_S3_SIGNATURE_VERSION": "s3v4",
+        "AWS_QUERYSTRING_AUTH": False,
+        "AWS_DEFAULT_ACL": None,
     })
 
     if options.TEST_SUITE is not None:

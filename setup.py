@@ -6,7 +6,7 @@ from setuptools import find_packages
 setup(
     name='Collectfast',
     description='A Faster Collectstatic',
-    version='0.6.2',
+    version='0.6.3',
     long_description=open('README.rst').read(),
     author='Anton Agestam',
     author_email='msn@antonagestam.se',
