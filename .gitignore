@@ -9,3 +9,4 @@
 build/
 dist/
 aws-credentials
+.mypy_cache

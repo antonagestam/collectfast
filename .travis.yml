@@ -1,32 +1,30 @@
 language: python
+# see https://github.com/travis-ci/travis-ci/issues/9069#issuecomment-425720905
+dist: xenial
+sudo: required
 python:
+  - '3.4'
+  - '3.5'
   - '3.6'
+  - '3.7'
 install:
-  - pip install tox
+  - pip install django=="$DJANGO"
+env:
+  - DJANGO=1.11
+  - DJANGO=2.1
+  - DJANGO=2.2
 script:
   # see https://github.com/travis-ci/travis-ci/issues/7940
   - sudo rm -f /etc/boto.cfg
-  - tox
-sudo: false
-env:
-  matrix:
-    # django 1.11
-    - TOXENV=py27-django111
-    - TOXENV=py34-django111
-    - TOXENV=py35-django111
-    - TOXENV=py36-django111
-    # django 2.0
-    - TOXENV=py34-django200
-    - TOXENV=py35-django200
-    - TOXENV=py36-django200
-    # pep8
-    - TOXENV=flake8
-# work-around for Python 3.5
-addons:
-  apt:
-    sources:
-      - deadsnakes
-    packages:
-      - python3.5
+  - pip install -r test-requirements.txt
+  - flake8
+  - coverage run --source collectfast ./runtests.py
+  - coveralls
+matrix:
+  exclude:
+    - env: DJANGO=2.1
+      python: '3.4'
+    - env: DJANGO=2.2
+      python: '3.4'
 notifications:
   email: false

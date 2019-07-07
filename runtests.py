@@ -12,12 +12,6 @@ from django.core.management import call_command
 
 def main():
     parser = OptionParser()
-    parser.add_option(
-        "--DATABASE_ENGINE", dest="DATABASE_ENGINE", default="sqlite3")
-    parser.add_option("--DATABASE_NAME", dest="DATABASE_NAME", default="")
-    parser.add_option("--DATABASE_USER", dest="DATABASE_USER", default="")
-    parser.add_option(
-        "--DATABASE_PASSWORD", dest="DATABASE_PASSWORD", default="")
     parser.add_option("--TEST", dest="TEST_SUITE", default=None)
 
     options, args = parser.parse_args()
@@ -38,14 +32,6 @@ def main():
     settings.configure(**{
         # Set USE_TZ to True to work around bug in django-storages
         "USE_TZ": True,
-        "DATABASES": {
-            'default': {
-                "ENGINE": 'django.db.backends.%s' % options.DATABASE_ENGINE,
-                "NAME": options.DATABASE_NAME,
-                "USER": options.DATABASE_USER,
-                "PASSWORD": options.DATABASE_PASSWORD,
-            }
-        },
         "CACHES": {
             'default': {
                 'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -58,12 +44,9 @@ def main():
             "django.template.loaders.eggs.Loader",
         ),
         "TEMPLATE_DIRS": (
-            os.path.join(os.path.dirname(__file__),
-                         "collectfast/templates"),
+            os.path.join(os.path.dirname(__file__), "collectfast/templates"),
         ),
         "INSTALLED_APPS": (
-            "django.contrib.auth",
-            "django.contrib.contenttypes",
             app_name,
             "django.contrib.staticfiles",
         ),

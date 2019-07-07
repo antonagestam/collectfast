@@ -14,16 +14,16 @@ setup(
     url='https://github.com/antonagestam/collectfast/',
     license='MIT License',
     include_package_data=True,
-    install_requires=['Django>=1.8', 'django-storages>=1.6'],
+    install_requires=['Django>=1.11', 'django-storages>=1.6'],
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3',
         'Framework :: Django',
     ]

@@ -138,9 +138,19 @@ directory:
     export AWS_ACCESS_KEY_ID=''
     export AWS_SECRET_ACCESS_KEY=''
 
-To run tests with tox, setup a virtualenv and install tox with
-``pip install tox`` then run ``tox`` in the project directory. To only run
-tests for a certain environment run e.g. ``tox -e py35-django110``.
+Install test dependencies and target Django version:
+
+.. code:: bash
+
+    pip install -r test-requirements.txt
+    pip install django==2.2
+
+Run linter and test suite:
+
+.. code:: bash
+
+    flake8
+    make test
 
 
 License
