@@ -39,23 +39,11 @@ def get_cache_key(path):
     return settings.cache_key_prefix + path_hash
 
 
-def get_storage_identifier(storage):
-    try:
-        # boto/boto3
-        return storage.location
-    except AttributeError:
-        pass
-    # gcloud
-    return ''
-
-
-
 def get_remote_etag(storage, prefixed_path):
     """
     Get etag of path from S3 using boto, boto3 or gcloud.
     """
-    storage_identifier = get_storage_identifier(storage)
-    normalized_path = safe_join(storage_identifier, prefixed_path).replace(
+    normalized_path = safe_join(getattr(storage, 'location', ''), prefixed_path).replace(
         '\\', '/')
     try:
         return storage.bucket.get_key(normalized_path).etag
