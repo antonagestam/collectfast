@@ -46,7 +46,7 @@ def get_storage_identifier(storage):
     except AttributeError:
         pass
     # gcloud
-    return storage.bucket_name
+    return ''
 
 
 
