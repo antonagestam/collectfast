@@ -2,6 +2,8 @@ import gzip
 import hashlib
 import logging
 import mimetypes
+import base64
+import binascii
 
 from django.core.cache import caches
 from django.utils.encoding import force_bytes
@@ -64,7 +66,8 @@ def get_remote_etag(storage, prefixed_path):
     except:
         pass
     try:
-        return storage.bucket.get_blob(normalized_path).etag
+        md5_base64 = storage.bucket.get_blob(normalized_path)._properties['md5Hash']
+        return '"' + binascii.hexlify(base64.urlsafe_b64decode(md5_base64)).decode("utf-8") + '"'
     except:
         pass
     return None
