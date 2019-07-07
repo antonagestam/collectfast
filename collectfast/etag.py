@@ -39,7 +39,7 @@ def get_cache_key(path):
 
 def get_remote_etag(storage, prefixed_path):
     """
-    Get etag of path from S3 using boto or boto3.
+    Get etag of path from S3 using boto, boto3 or gcloud.
     """
     normalized_path = safe_join(storage.location, prefixed_path).replace(
         '\\', '/')
@@ -49,6 +49,10 @@ def get_remote_etag(storage, prefixed_path):
         pass
     try:
         return storage.bucket.Object(normalized_path).e_tag
+    except:
+        pass
+    try:
+        return storage.bucket.get_blob(normalized_path).etag
     except:
         pass
     return None
