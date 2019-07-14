@@ -2,14 +2,10 @@ import gzip
 import hashlib
 import logging
 import mimetypes
-import base64
-import binascii
 
 from django.core.cache import caches
 from django.utils.encoding import force_bytes
 from django.utils.six import BytesIO
-
-from storages.utils import safe_join
 
 from collectfast import settings
 
@@ -39,36 +35,21 @@ def get_cache_key(path):
     return settings.cache_key_prefix + path_hash
 
 
-def get_remote_etag(storage, prefixed_path):
+def get_remote_etag(storage_extensions, prefixed_path):
     """
     Get etag of path from S3 using boto, boto3 or gcloud.
     """
-    normalized_path = safe_join(getattr(storage, 'location', ''), prefixed_path).replace(
-        '\\', '/')
-    try:
-        return storage.bucket.get_key(normalized_path).etag
-    except AttributeError:
-        pass
-    try:
-        return storage.bucket.Object(normalized_path).e_tag
-    except:
-        pass
-    try:
-        md5_base64 = storage.bucket.get_blob(normalized_path)._properties['md5Hash']
-        return '"' + binascii.hexlify(base64.urlsafe_b64decode(md5_base64)).decode("utf-8") + '"'
-    except:
-        pass
-    return None
+    return storage_extensions.get_remote_etag(prefixed_path)
 
 
-def get_etag(storage, path, prefixed_path):
+def get_etag(storage_extensions, path, prefixed_path):
     """
     Get etag of path from cache or S3 - in that order.
     """
     cache_key = get_cache_key(path)
     etag = cache.get(cache_key, False)
     if etag is False:
-        etag = get_remote_etag(storage, prefixed_path)
+        etag = get_remote_etag(storage_extensions, prefixed_path)
         cache.set(cache_key, etag)
     return etag
 
@@ -104,21 +85,21 @@ def get_file_hash(storage, path):
     return '"%s"' % file_hash
 
 
-def has_matching_etag(remote_storage, source_storage, path, prefixed_path):
+def has_matching_etag(remote_storage_extensions, source_storage, path, prefixed_path):
     """
     Compare etag of path in source storage with remote.
     """
-    storage_etag = get_etag(remote_storage, path, prefixed_path)
+    storage_etag = get_etag(remote_storage_extensions, path, prefixed_path)
     local_etag = get_file_hash(source_storage, path)
     return storage_etag == local_etag
 
 
-def should_copy_file(remote_storage, path, prefixed_path, source_storage):
+def should_copy_file(remote_storage_extensions, path, prefixed_path, source_storage):
     """
     Returns True if the file should be copied, otherwise False.
     """
     if has_matching_etag(
-            remote_storage, source_storage, path, prefixed_path):
+            remote_storage_extensions, source_storage, path, prefixed_path):
         logger.info("%s: Skipping based on matching file hashes" % path)
         return False
 

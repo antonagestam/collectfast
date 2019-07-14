@@ -8,6 +8,7 @@ from storages.backends.s3boto import S3BotoStorage
 
 from collectfast import etag
 from collectfast import settings
+from collectfast.storage_extensions.s3boto import S3BotoStorageExtensions
 from .utils import test
 
 hash_characters = string.ascii_letters + string.digits
@@ -81,13 +82,14 @@ def test_has_matching_etag(case, mocked_get_etag, mocked_get_file_hash):
 @patch('collectfast.etag.destroy_etag')
 def test_should_copy_file(case, mocked_destroy_etag, mocked_has_matching_etag):
     remote_storage = S3BotoStorage()
+    remote_storage_extensions = S3BotoStorageExtensions(remote_storage)
 
     mocked_has_matching_etag.return_value = True
     case.assertFalse(etag.should_copy_file(
-        remote_storage, 'path', 'prefixed_path', 'source_storage'))
+        remote_storage_extensions, 'path', 'prefixed_path', 'source_storage'))
     mocked_destroy_etag.assert_not_called()
 
     mocked_has_matching_etag.return_value = False
     case.assertTrue(etag.should_copy_file(
-        remote_storage, 'path', 'prefixed_path', 'source_storage'))
+        remote_storage_extensions, 'path', 'prefixed_path', 'source_storage'))
     mocked_destroy_etag.assert_called_once_with('path')

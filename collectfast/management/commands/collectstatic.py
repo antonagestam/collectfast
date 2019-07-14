@@ -6,8 +6,8 @@ from django.contrib.staticfiles.management.commands import collectstatic
 from django.utils.encoding import smart_str
 
 from collectfast.etag import should_copy_file
-from collectfast.boto import reset_connection, is_boto
 from collectfast import settings
+from collectfast.storage_extensions import staticfiles_storage_extensions
 
 
 class Command(collectstatic.Command):
@@ -32,14 +32,7 @@ class Command(collectstatic.Command):
         self.tasks = []
         self.etags = {}
         self.collectfast_enabled = settings.enabled
-
-        if is_boto(self.storage) and self.storage.preload_metadata is not True:
-            self.storage.preload_metadata = True
-            warnings.warn(
-                "Collectfast does not work properly without "
-                "`preload_metadata` set to `True` on the storage class. Try "
-                "setting `AWS_PRELOAD_METADATA` to `True`. Overriding "
-                "`storage.preload_metadata` and continuing.")
+        self.storage_extensions = staticfiles_storage_extensions
 
     def set_options(self, **options):
         """
@@ -80,12 +73,12 @@ class Command(collectstatic.Command):
         """
         path, prefixed_path, source_storage = args
 
-        reset_connection(self.storage)
+        self.storage_extensions.reset_connection()
 
         if self.collectfast_enabled and not self.dry_run:
             try:
                 if not should_copy_file(
-                        self.storage, path, prefixed_path, source_storage):
+                        self.storage_extensions, path, prefixed_path, source_storage):
                     return False
             except Exception as e:
                 if settings.debug:
@@ -119,8 +112,7 @@ class Command(collectstatic.Command):
                 path, prefixed_path, source_storage)
         if not self.dry_run:
             self.log("Deleting '%s'" % path)
-            if self.storage.exists(prefixed_path):
-                self.storage.delete(prefixed_path)
+            self.storage.delete(prefixed_path)
         else:
             self.log("Pretending to delete '%s'" % path)
         return True
