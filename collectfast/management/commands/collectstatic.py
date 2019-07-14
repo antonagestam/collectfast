@@ -7,7 +7,7 @@ from django.utils.encoding import smart_str
 
 from collectfast.etag import should_copy_file
 from collectfast import settings
-from collectfast.storage_extensions import staticfiles_storage_extensions
+from collectfast.storage_extensions import get_storage_extensions
 
 
 class Command(collectstatic.Command):
@@ -32,7 +32,7 @@ class Command(collectstatic.Command):
         self.tasks = []
         self.etags = {}
         self.collectfast_enabled = settings.enabled
-        self.storage_extensions = staticfiles_storage_extensions
+        self.storage_extensions = get_storage_extensions(self.storage)
 
     def set_options(self, **options):
         """

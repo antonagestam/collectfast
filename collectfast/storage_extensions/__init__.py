@@ -1,5 +1,4 @@
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.utils.functional import LazyObject
 from django.utils.module_loading import import_string
 
 STORAGE_EXTENSIONS_MAP = {
@@ -10,10 +9,7 @@ STORAGE_EXTENSIONS_MAP = {
 }
 
 
-def get_storage_extensions(storage=None):
-    if storage is None:
-        storage = staticfiles_storage
-
+def get_storage_extensions(storage):
     for storage_path, storage_extensions_path in STORAGE_EXTENSIONS_MAP.items():
         try:
             storage_class = import_string(storage_path)
@@ -23,11 +19,3 @@ def get_storage_extensions(storage=None):
             pass
 
     raise RuntimeError('No `StorageExtensions` class found for %s' % storage)
-
-
-class ConfiguredStorageExtensions(LazyObject):
-    def _setup(self):
-        self._wrapped = get_storage_extensions()
-
-
-staticfiles_storage_extensions = ConfiguredStorageExtensions()
