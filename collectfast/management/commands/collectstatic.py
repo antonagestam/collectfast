@@ -74,11 +74,12 @@ class Command(collectstatic.Command):
         path, prefixed_path, source_storage = args
 
         self.storage_extensions.reset_connection()
+        source_storage_extensions= get_storage_extensions(source_storage)
 
         if self.collectfast_enabled and not self.dry_run:
             try:
                 if not should_copy_file(
-                        self.storage_extensions, path, prefixed_path, source_storage):
+                        self.storage_extensions, path, prefixed_path, source_storage_extensions):
                     return False
             except Exception as e:
                 if settings.debug:

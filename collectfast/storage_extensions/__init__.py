@@ -1,8 +1,8 @@
-from django.contrib.staticfiles.storage import staticfiles_storage
 from django.utils.module_loading import import_string
 
 STORAGE_EXTENSIONS_MAP = {
     # Maps the relevant `Storage` class to it corresponding `StorageExtensions` class
+    'django.core.files.storage.FileSystemStorage': 'collectfast.storage_extensions.file_system.FileSystemStorageExtensions',
     'storages.backends.s3boto.S3BotoStorage': 'collectfast.storage_extensions.s3boto.S3BotoStorageExtensions',
     'storages.backends.s3boto3.S3Boto3Storage': 'collectfast.storage_extensions.s3boto3.S3Boto3StorageExtensions',
     'storages.backends.gcloud.GoogleCloudStorage': 'collectfast.storage_extensions.gcloud.GoogleCloudStorageExtensions',
@@ -18,4 +18,5 @@ def get_storage_extensions(storage):
         except ImportError:
             pass
 
-    raise RuntimeError('No `StorageExtensions` class found for %s' % storage)
+    raise RuntimeError("No storage extension found for %s. Please register your storage extensions class in "
+        "`STORAGE_EXTENSIONS_MAP`." % storage)

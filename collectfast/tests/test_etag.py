@@ -8,6 +8,7 @@ from storages.backends.s3boto import S3BotoStorage
 
 from collectfast import etag
 from collectfast import settings
+from collectfast.storage_extensions import get_storage_extensions
 from collectfast.storage_extensions.s3boto import S3BotoStorageExtensions
 from .utils import test
 
@@ -55,9 +56,10 @@ def test_get_file_hash(case):
     if platform.system() == 'Windows':
         return
     storage = StaticFilesStorage()
+    storage_extensions = get_storage_extensions(storage)
     with tempfile.NamedTemporaryFile(dir=storage.base_location) as f:
         f.write(b'spam')
-        h = etag.get_file_hash(storage, f.name)
+        h = etag.get_file_hash(storage_extensions, f.name)
     case.assertEqual(len(h), 34)
     case.assertTrue(h.startswith('"'))
     case.assertTrue(h.endswith('"'))

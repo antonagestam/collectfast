@@ -20,8 +20,8 @@ class S3Boto3StorageExtensions(BaseStorageExtensions):
         if settings.threads:
             self.storage._connection = None
 
-    def get_remote_etag(self, prefixed_path):
-        normalized_path = safe_join(self.storage.location, prefixed_path).replace('\\', '/')
+    def get_etag(self, path):
+        normalized_path = safe_join(self.storage.location, path).replace('\\', '/')
         try:
             return self.storage.bucket.Object(normalized_path).e_tag
         except:

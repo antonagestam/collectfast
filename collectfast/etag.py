@@ -1,13 +1,10 @@
-import gzip
 import hashlib
 import logging
-import mimetypes
 
 from django.core.cache import caches
-from django.utils.encoding import force_bytes
-from django.utils.six import BytesIO
 
 from collectfast import settings
+from collectfast.storage_extensions import get_storage_extensions
 
 try:
     from functools import lru_cache
@@ -39,7 +36,7 @@ def get_remote_etag(storage_extensions, prefixed_path):
     """
     Get etag of path from S3 using boto, boto3 or gcloud.
     """
-    return storage_extensions.get_remote_etag(prefixed_path)
+    return storage_extensions.get_etag(prefixed_path)
 
 
 def get_etag(storage_extensions, path, prefixed_path):
@@ -61,28 +58,11 @@ def destroy_etag(path):
     cache.delete(get_cache_key(path))
 
 
-def get_file_hash(storage, path):
+def get_file_hash(storage_extensions, path):
     """
     Create md5 hash from file contents.
     """
-    contents = storage.open(path).read()
-    file_hash = hashlib.md5(contents).hexdigest()
-
-    # Check if content should be gzipped and hash gzipped content
-    content_type = mimetypes.guess_type(path)[0] or 'application/octet-stream'
-    if settings.is_gzipped and content_type in settings.gzip_content_types:
-        cache_key = get_cache_key('gzip_hash_%s' % file_hash)
-        file_hash = cache.get(cache_key, False)
-        if file_hash is False:
-            buffer = BytesIO()
-            zf = gzip.GzipFile(
-                mode='wb', compresslevel=6, fileobj=buffer, mtime=0.0)
-            zf.write(force_bytes(contents))
-            zf.close()
-            file_hash = hashlib.md5(buffer.getvalue()).hexdigest()
-            cache.set(cache_key, file_hash)
-
-    return '"%s"' % file_hash
+    return storage_extensions.get_etag(path)
 
 
 def has_matching_etag(remote_storage_extensions, source_storage, path, prefixed_path):
@@ -94,12 +74,12 @@ def has_matching_etag(remote_storage_extensions, source_storage, path, prefixed_
     return storage_etag == local_etag
 
 
-def should_copy_file(remote_storage_extensions, path, prefixed_path, source_storage):
+def should_copy_file(remote_storage_extensions, path, prefixed_path, source_storage_extensions):
     """
     Returns True if the file should be copied, otherwise False.
     """
     if has_matching_etag(
-            remote_storage_extensions, source_storage, path, prefixed_path):
+            remote_storage_extensions, source_storage_extensions, path, prefixed_path):
         logger.info("%s: Skipping based on matching file hashes" % path)
         return False
 

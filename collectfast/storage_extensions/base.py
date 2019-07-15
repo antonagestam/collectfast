@@ -2,13 +2,17 @@ import warnings
 
 
 class BaseStorageExtensions(object):
+    """
+    Base class for extension methods not implemented in `Storage` but required
+    for this project
+    """
     def __init__(self, storage):
         self.storage = storage
 
     def reset_connection(self):
-        raise NotImplementedError('Defined by subclass')
+        pass
 
-    def get_remote_etag(self, prefixed_path):
+    def get_etag(self, path):
         raise NotImplementedError('Defined by subclass')
 
 
