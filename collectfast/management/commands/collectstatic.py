@@ -32,7 +32,12 @@ class Command(collectstatic.Command):
         self.tasks = []
         self.etags = {}
         self.collectfast_enabled = settings.enabled
-        self.storage_extensions = get_storage_extensions(self.storage)
+
+    @property
+    def storage_extensions(self):
+        if not hasattr(self, '_storage_extensions'):
+            self._storage_extensions = get_storage_extensions(self.storage)
+        return self._storage_extensions
 
     def set_options(self, **options):
         """
