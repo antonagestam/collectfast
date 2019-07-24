@@ -1,6 +1,8 @@
 import base64
 import binascii
 
+from google.api_core.exceptions import NotFound
+
 from collectfast.storage_extensions.base import BaseStorageExtensions
 
 
@@ -16,3 +18,9 @@ class GoogleCloudStorageExtensions(BaseStorageExtensions):
             return '"' + binascii.hexlify(base64.urlsafe_b64decode(md5_base64)).decode("utf-8") + '"'
         except:
             return None
+
+    def try_delete(self, path):
+        try:
+            super(GoogleCloudStorageExtensions, self).try_delete(path)
+        except NotFound:
+            pass

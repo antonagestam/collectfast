@@ -15,6 +15,9 @@ class BaseStorageExtensions(object):
     def get_etag(self, path):
         raise NotImplementedError('Defined by subclass')
 
+    def try_delete(self, path):
+        self.storage.delete(path)
+
 
 def check_preload_metadata(storage):
     if storage.preload_metadata is not True:

@@ -118,7 +118,7 @@ class Command(collectstatic.Command):
                 path, prefixed_path, source_storage)
         if not self.dry_run:
             self.log("Deleting '%s'" % path)
-            self.storage.delete(prefixed_path)
+            self.storage_extensions.try_delete(prefixed_path)
         else:
             self.log("Pretending to delete '%s'" % path)
         return True
