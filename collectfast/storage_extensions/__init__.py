@@ -15,7 +15,8 @@ def get_storage_extensions(storage):
             storage_class = import_string(storage_path)
             if isinstance(storage, storage_class):
                 return import_string(storage_extensions_path)(storage)
-        except ImportError:
+        except:
+            # Catch any error while importing storage class or storage extension class
             pass
 
     raise RuntimeError("No storage extension found for %s. Please register your storage extensions class in "
