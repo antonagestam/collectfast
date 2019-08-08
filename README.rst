@@ -35,7 +35,6 @@ to your ``INSTALLED_APPS``:
 .. code:: python
 
     STATICFILES_STORAGE = "storages.backends.s3boto.S3BotoStorage"
-    AWS_PRELOAD_METADATA = True
     INSTALLED_APPS = (
         # …
         'collectfast',
