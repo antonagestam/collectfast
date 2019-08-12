@@ -9,7 +9,7 @@ from django.core.management.base import CommandParser
 from django.utils.encoding import smart_str
 
 from collectfast import settings
-from collectfast.boto import is_boto
+from collectfast.boto import is_any_boto
 from collectfast.boto import reset_connection
 from collectfast.etag import should_copy_file
 
@@ -41,7 +41,7 @@ class Command(collectstatic.Command):
         self.tasks = []  # type: List[Task]
         self.collectfast_enabled = settings.enabled
 
-        if is_boto(self.storage) and self.storage.preload_metadata is not True:
+        if is_any_boto(self.storage) and self.storage.preload_metadata is not True:
             self.storage.preload_metadata = True
             warnings.warn(
                 "Collectfast does not work properly without `preload_metadata` "
