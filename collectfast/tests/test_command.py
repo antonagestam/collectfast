@@ -47,7 +47,7 @@ def test_warn_preload_metadata(case):
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         call_collectstatic()
-        case.assertIn('AWS_PRELOAD_METADATA', str(w[0].message))
+        case.assertIn('preload_metadata', str(w[0].message))
 
 
 @test
