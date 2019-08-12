@@ -1,7 +1,7 @@
 Collectfast – A Faster Collectstatic
 ====================================
 
-|Build Status| |Windows Build Status| |Coverage Status|
+|Build Status| |Coverage Status|
 
 The fast ``collectstatic`` for Django projects with S3 as storage
 backend.
@@ -163,7 +163,5 @@ Commons Attribution-ShareAlike 3.0 Unported License.
 
 .. |Build Status| image:: https://api.travis-ci.org/antonagestam/collectfast.svg?branch=master
    :target: https://travis-ci.org/antonagestam/collectfast
-.. |Windows Build Status| image:: https://ci.appveyor.com/api/projects/status/t2whurifhvfnplv9/branch/master?svg=true
-   :target: https://ci.appveyor.com/project/antonagestam/collectfast-m3q7r/branch/master
 .. |Coverage Status| image:: https://coveralls.io/repos/github/antonagestam/collectfast/badge.svg?branch=master
    :target: https://coveralls.io/github/antonagestam/collectfast?branch=master
