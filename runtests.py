@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-
 import os
-import sys
 import shutil
+import sys
 from optparse import OptionParser
 
 import django
@@ -17,7 +16,7 @@ def main():
     options, args = parser.parse_args()
 
     # check for app in args
-    app_path = 'collectfast'
+    app_path = "collectfast"
     parent_dir, app_name = os.path.split(app_path)
     sys.path.insert(0, parent_dir)
 
@@ -29,43 +28,42 @@ def main():
     if not os.path.exists(staticroot_dir):
         os.makedirs(staticroot_dir)
 
-    settings.configure(**{
-        # Set USE_TZ to True to work around bug in django-storages
-        "USE_TZ": True,
-        "CACHES": {
-            'default': {
-                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-                'LOCATION': 'test-collectfast'
-            }
-        },
-        "TEMPLATE_LOADERS": (
-            "django.template.loaders.filesystem.Loader",
-            "django.template.loaders.app_directories.Loader",
-            "django.template.loaders.eggs.Loader",
-        ),
-        "TEMPLATE_DIRS": (
-            os.path.join(os.path.dirname(__file__), "collectfast/templates"),
-        ),
-        "INSTALLED_APPS": (
-            app_name,
-            "django.contrib.staticfiles",
-        ),
-        "STATIC_URL": "/staticfiles/",
-        "STATIC_ROOT": staticroot_dir,
-        "STATICFILES_DIRS": [staticfiles_dir],
-        "STATICFILES_STORAGE": "storages.backends.s3boto3.S3Boto3Storage",
-        "MIDDLEWARE_CLASSES": [],
-        "AWS_PRELOAD_METADATA": True,
-        "AWS_STORAGE_BUCKET_NAME": "collectfast",
-        "AWS_IS_GZIPPED": False,
-        "GZIP_CONTENT_TYPES": ('text/plain', ),
-        "AWS_ACCESS_KEY_ID": os.environ.get("AWS_ACCESS_KEY_ID").strip(),
-        "AWS_SECRET_ACCESS_KEY": os.environ.get("AWS_SECRET_ACCESS_KEY").strip(),
-        "AWS_S3_REGION_NAME": "eu-central-1",
-        "AWS_S3_SIGNATURE_VERSION": "s3v4",
-        "AWS_QUERYSTRING_AUTH": False,
-        "AWS_DEFAULT_ACL": None,
-    })
+    settings.configure(
+        **{
+            # Set USE_TZ to True to work around bug in django-storages
+            "USE_TZ": True,
+            "CACHES": {
+                "default": {
+                    "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                    "LOCATION": "test-collectfast",
+                }
+            },
+            "TEMPLATE_LOADERS": (
+                "django.template.loaders.filesystem.Loader",
+                "django.template.loaders.app_directories.Loader",
+                "django.template.loaders.eggs.Loader",
+            ),
+            "TEMPLATE_DIRS": (
+                os.path.join(os.path.dirname(__file__), "collectfast/templates"),
+            ),
+            "INSTALLED_APPS": (app_name, "django.contrib.staticfiles"),
+            "STATIC_URL": "/staticfiles/",
+            "STATIC_ROOT": staticroot_dir,
+            "STATICFILES_DIRS": [staticfiles_dir],
+            "STATICFILES_STORAGE": "storages.backends.s3boto3.S3Boto3Storage",
+            "MIDDLEWARE_CLASSES": [],
+            "AWS_PRELOAD_METADATA": True,
+            "AWS_STORAGE_BUCKET_NAME": "collectfast",
+            "AWS_IS_GZIPPED": False,
+            "GZIP_CONTENT_TYPES": ("text/plain",),
+            "AWS_ACCESS_KEY_ID": os.environ.get("AWS_ACCESS_KEY_ID").strip(),
+            "AWS_SECRET_ACCESS_KEY": os.environ.get("AWS_SECRET_ACCESS_KEY").strip(),
+            "AWS_S3_REGION_NAME": "eu-central-1",
+            "AWS_S3_SIGNATURE_VERSION": "s3v4",
+            "AWS_QUERYSTRING_AUTH": False,
+            "AWS_DEFAULT_ACL": None,
+        }
+    )
 
     if options.TEST_SUITE is not None:
         test_arg = "%s.%s" % (app_name, options.TEST_SUITE)

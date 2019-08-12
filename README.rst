@@ -92,7 +92,7 @@ Django's cache
 framework. <https://docs.djangoproject.com/en/stable/topics/cache/>`_
 
 **Note:** We recommend you to set the ``MAX_ENTRIES`` setting if you
-have more than 300 static files, see 
+have more than 300 static files, see
 `#47 <https://github.com/antonagestam/collectfast/issues/47>`_
 
 
@@ -150,6 +150,7 @@ Run linter and test suite:
 .. code:: bash
 
     flake8
+    black --check .
     make test
 
 
