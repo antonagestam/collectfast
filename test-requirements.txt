@@ -1,6 +1,9 @@
 flake8
 flake8-mutable
 mypy
+typing
+typing-extensions
+django-stubs
 mock==1.3.0
 coveralls
 django-storages

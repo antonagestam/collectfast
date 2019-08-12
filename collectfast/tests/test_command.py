@@ -1,17 +1,19 @@
 import warnings
 
 from django.core.management import call_command
-from django.utils.six import StringIO
 from django.test import override_settings as override_django_settings
+from django.utils.six import StringIO
 
-from .utils import test, clean_static_dir, create_static_file, override_setting
+from .utils import clean_static_dir
+from .utils import create_static_file
+from .utils import override_setting
 from .utils import override_storage_attr
+from .utils import test
 
 
 def call_collectstatic(*args, **kwargs):
     out = StringIO()
-    call_command(
-        'collectstatic', *args, interactive=False, stdout=out, **kwargs)
+    call_command("collectstatic", *args, interactive=False, stdout=out, **kwargs)
     return out.getvalue()
 
 
@@ -40,14 +42,15 @@ def test_threads(case):
 
 @test
 @override_django_settings(
-    STATICFILES_STORAGE="collectfast.tests.no_preload_metadata.NPM")
+    STATICFILES_STORAGE="collectfast.tests.no_preload_metadata.NPM"
+)
 def test_warn_preload_metadata(case):
     clean_static_dir()
     create_static_file()
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         call_collectstatic()
-        case.assertIn('preload_metadata', str(w[0].message))
+        case.assertIn("preload_metadata", str(w[0].message))
 
 
 @test
@@ -60,7 +63,8 @@ def test_collectfast_disabled(case):
 
 @test
 @override_django_settings(
-    STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+    STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage"
+)
 def test_collectfast_disabled_default_storage(case):
     clean_static_dir()
     create_static_file()
@@ -83,7 +87,7 @@ def test_ignore_etag_deprecated(case):
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         call_collectstatic(ignore_etag=True)
-        case.assertIn('ignore-etag is deprecated', str(w[0].message))
+        case.assertIn("ignore-etag is deprecated", str(w[0].message))
 
 
 @test
