@@ -1,23 +1,25 @@
-Collectfast – A Faster Collectstatic
-====================================
+Collectfast
+===========
+
+A faster collectstatic command.
 
 |Build Status| |Coverage Status|
 
-The fast ``collectstatic`` for Django projects with S3 as storage
-backend.
-
 **Features**
 
-- Comparing and caching of md5 checksums before uploading
-- Parallel file uploads using Python's multiprocessing module
+- Compares and caches file checksums before uploading
+- Parallelizes file uploads using Python's multiprocessing module
 
-Running Django's ``collectstatic`` command can become really slow as
-more and more files are added to a project, especially if heavy
-libraries such as jQuery UI are included in the source. This is a custom
-management command that compares the md5 sum of files with S3 and
-completely ignores ``modified_time``. The results of the hash lookups
-are cached locally using your default Django cache. This can make
-deploying much faster!
+**Supported Storage Backends**
+
+- ``storages.backends.s3boto.S3BotoStorage`` (deprecated)
+- ``storages.backends.s3boto3.S3Boto3Storage``
+
+Running Django's ``collectstatic`` command can become painfully slow as more
+and more files are added to a project, especially when heavy libraries such as
+jQuery UI are included in source code. Collectfast customizes the builtin
+``collectstatic`` command, adding different optimizations to make uploading
+large amounts of files much faster.
 
 
 Installation
@@ -29,47 +31,54 @@ Install the app using pip:
 
     $ pip install Collectfast
 
-Make sure you have this in your settings file and add ``'collectfast'``
-to your ``INSTALLED_APPS``:
+Make sure you have this in your settings file and add ``'collectfast'`` to your
+``INSTALLED_APPS``, before ``'django.contrib.staticfiles'``:
 
 .. code:: python
 
-    STATICFILES_STORAGE = "storages.backends.s3boto.S3BotoStorage"
+    STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    COLLECTFAST_STRATEGY = "collectfast.strategies.boto3.Boto3Strategy"
     INSTALLED_APPS = (
-        # …
+        # ...
         'collectfast',
     )
 
-``'collectfast'`` should come before ``'django.contrib.staticfiles'``.
-Please note, that failure to do so will cause Django to use
-``django.contrib.staticfiles``'s ``collectstatic``.
+Collectfast comes with these upload strategies:
 
-**Note:** ``preload_metadata`` of the storage class will be overwritten as
-`True`, see `#30 <https://github.com/antonagestam/collectfast/issues/30>`_
+- ``collectfast.strategies.boto.BotoStrategy`` for
+  ``storages.backends.s3boto.S3BotoStorage``
+- ``collectfast.strategies.boto3.Boto3Strategy`` for
+  ``storages.backends.s3boto3.S3Boto3Storage``
+
+**Note:** ``'collectfast'`` must come before ``'django.contrib.staticfiles'`` in
+``INSTALLED_APPS``.
+
+**Note:** Boto strategies will set ``preload_metadata`` on the remote storage to
+``True``, see `#30 <https://github.com/antonagestam/collectfast/issues/30>`_.
 
 
 Usage
 -----
 
-Collectfast overrides Django's builtin ``collectstatic`` command so just
-run ``python manage.py collectstatic`` as normal. You can disable
-Collectfast by using the ``--disable-collectfast`` option.
+Collectfast overrides Django's builtin ``collectstatic`` command so just run
+``python manage.py collectstatic`` as normal. You can disable Collectfast by
+using the ``--disable-collectfast`` option.
 
-You can also disable collectfast by setting
-``COLLECTFAST_ENABLED = False`` in your settings file. This is useful
-when using a local file storage backend for development.
+You can also disable collectfast by setting ``COLLECTFAST_ENABLED = False`` in
+your settings file. This is useful when using a local file storage backend for
+development.
 
 
 Setup Dedicated Cache Backend
 -----------------------------
 
-It's recommended to setup a dedicated cache backend for Collectfast.
-Every time Collectfast does not find a lookup for a file in the cache it
-will trigger a lookup to the storage backend, so it's recommended to
-have a fairly high ``TIMEOUT`` setting.
+It's recommended to setup a dedicated cache backend for Collectfast. Every
+time Collectfast does not find a lookup for a file in the cache it will trigger
+a lookup to the storage backend, so it's recommended to have a fairly high
+``TIMEOUT`` setting.
 
-Set up your dedicated cache in settings.py with the
-``COLLECTFAST_CACHE`` setting:
+Set up your dedicated cache in settings.py with the ``COLLECTFAST_CACHE``
+setting:
 
 .. code:: python
 
@@ -86,14 +95,13 @@ Set up your dedicated cache in settings.py with the
 
 By default Collectfast will use the ``default`` cache.
 
-**Note:** Collectfast will never clean the cache of obsolete files. To
-clean out the entire cache, use ``cache.clear()``. `Read more about
-Django's cache
+**Note:** Collectfast will never clean the cache of obsolete files. To clean
+out the entire cache, use ``cache.clear()``. `Read more about Django's cache
 framework. <https://docs.djangoproject.com/en/stable/topics/cache/>`_
 
-**Note:** We recommend you to set the ``MAX_ENTRIES`` setting if you
-have more than 300 static files, see
-`#47 <https://github.com/antonagestam/collectfast/issues/47>`_
+**Note:** We recommend you to set the ``MAX_ENTRIES`` setting if you have more
+than 300 static files, see `#47
+<https://github.com/antonagestam/collectfast/issues/47>`_
 
 
 Enable Parallelization
@@ -145,21 +153,31 @@ Install test dependencies and target Django version:
     pip install -r test-requirements.txt
     pip install django==2.2
 
-Run linter and test suite:
+Run test suite:
 
 .. code:: bash
 
-    flake8
-    black --check .
     make test
+
+Code quality tools are broken out from test requirements because some of them
+only install on Python >= 3.7.
+
+.. code:: bash
+
+    pip install -r lint-requirements.txt
+
+Run linters and static type check:
+
+.. code:: bash
+
+    make lint
 
 
 License
 -------
 
 Collectfast is licensed under the MIT License, see LICENSE file for more
-information. Previous versions of Collectfast was licensed under Creative
-Commons Attribution-ShareAlike 3.0 Unported License.
+information.
 
 
 .. |Build Status| image:: https://api.travis-ci.org/antonagestam/collectfast.svg?branch=master

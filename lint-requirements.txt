@@ -1,0 +1,6 @@
+flake8
+flake8-bugbear
+black
+sorti
+mypy>=0.730
+git+https://github.com/typeddjango/django-stubs.git@b939bc96b7ff0645da19c2ff960ac9bd0a50bee7#egg=django_stubs

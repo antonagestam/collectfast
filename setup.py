@@ -3,10 +3,12 @@ from distutils.core import setup
 
 from setuptools import find_packages
 
+import collectfast
+
 setup(
     name="Collectfast",
     description="A Faster Collectstatic",
-    version="1.0.0",
+    version=collectfast.__version__,
     long_description=open("README.rst").read(),
     author="Anton Agestam",
     author_email="msn@antonagestam.se",

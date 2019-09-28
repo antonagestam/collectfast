@@ -1,4 +1,0 @@
-[run]
-source = collectfast
-[report]
-omit = */tests/*

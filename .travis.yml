@@ -8,10 +8,12 @@ python:
   - '3.6'
   - '3.7'
 install:
+  - pip install --upgrade pip setuptools
   - pip install django=="$DJANGO"
   - pip install -r test-requirements.txt
-  # these are only supported on Python 3.7, so we allow the installation to fail
-  - pip install black sorti || true
+  # These are not supported on all Python versions, so we allow the installation
+  # to fail. Linting and static analysis only happens on the Python 3.7 builds.
+  - pip install -r lint-requirements.txt || true
 env:
   - DJANGO=1.11
   - DJANGO=2.1
@@ -23,7 +25,7 @@ script:
   - 'if [[ $(python --version) == "Python 3.7."* ]]; then flake8; fi'
   - 'if [[ $(python --version) == "Python 3.7."* ]]; then black --check .; fi'
   - 'if [[ $(python --version) == "Python 3.7."* ]]; then sorti --check .; fi'
-  - 'if [[ $(python --version) == "Python 3.7."* ]]; then mypy .; fi'
+  - 'if [[ $(python --version) == "Python 3.7."* && "$DJANGO" != "1.11" ]]; then pip install . && mypy .; fi'
   - coverage run --source collectfast ./runtests.py
 after_script:
   - coveralls

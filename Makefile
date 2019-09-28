@@ -1,3 +1,5 @@
+SHELL := /usr/bin/env bash
+
 test:
 	. aws-credentials && ./runtests.py
 
@@ -8,3 +10,9 @@ distribute:
 	pip install --upgrade wheel twine setuptools
 	python setup.py sdist bdist_wheel
 	twine upload dist/*
+
+lint:
+	flake8
+	sorti --check .
+	black --check .
+	mypy .

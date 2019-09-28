@@ -1,32 +1,62 @@
 import warnings
 from multiprocessing.dummy import Pool
+from typing import Any
+from typing import Dict
 from typing import List
 from typing import Tuple
+from typing import Type
 
+from django.conf import settings as django_settings
 from django.contrib.staticfiles.management.commands import collectstatic
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import Storage
 from django.core.management.base import CommandParser
-from django.utils.encoding import smart_str
 
+from collectfast import __version__
 from collectfast import settings
-from collectfast.boto import is_any_boto
-from collectfast.boto import reset_connection
-from collectfast.etag import should_copy_file
+from collectfast.strategies import guess_strategy
+from collectfast.strategies import load_strategy
+from collectfast.strategies import Strategy
 
 Task = Tuple[str, str, Storage]
 
 
 class Command(collectstatic.Command):
+    def __init__(self, *args, **kwargs):
+        # type: (Any, Any) -> None
+        super().__init__(*args, **kwargs)
+        self.num_copied_files = 0
+        self.tasks = []  # type: List[Task]
+        self.collectfast_enabled = settings.enabled
+        self.strategy = self._load_strategy()(self.storage)
+
+    @staticmethod
+    def _load_strategy():
+        # type: () -> Type[Strategy]
+        strategy_str = getattr(django_settings, "COLLECTFAST_STRATEGY", None)
+        if strategy_str is not None:
+            return load_strategy(strategy_str)
+
+        storage_str = getattr(django_settings, "STATICFILES_STORAGE", None)
+        if storage_str is not None:
+            warnings.warn(
+                "Falling back to guessing strategy for backwards compatibility. This "
+                "is deprecated and will be removed in a future release. Explicitly "
+                "set COLLECTFAST_STRATEGY to silence this warning."
+            )
+            return load_strategy(guess_strategy(storage_str))
+
+        raise ImproperlyConfigured(
+            "No strategy configured, please make sure COLLECTFAST_STRATEGY is set."
+        )
+
+    def get_version(self):
+        # type: () -> str
+        return __version__
+
     def add_arguments(self, parser):
         # type: (CommandParser) -> None
-        super(Command, self).add_arguments(parser)
-        parser.add_argument(
-            "--ignore-etag",
-            action="store_true",
-            dest="ignore_etag",
-            default=False,
-            help="Deprecated since 0.5.0, use --disable-collectfast instead.",
-        )
+        super().add_arguments(parser)
         parser.add_argument(
             "--disable-collectfast",
             action="store_true",
@@ -35,107 +65,65 @@ class Command(collectstatic.Command):
             help="Disable Collectfast.",
         )
 
-    def __init__(self, *args, **kwargs):
-        super(Command, self).__init__(*args, **kwargs)
-        self.num_copied_files = 0
-        self.tasks = []  # type: List[Task]
-        self.collectfast_enabled = settings.enabled
-
-        if is_any_boto(self.storage) and self.storage.preload_metadata is not True:
-            self.storage.preload_metadata = True
-            warnings.warn(
-                "Collectfast does not work properly without `preload_metadata` "
-                "set to `True` on the storage class. Overriding "
-                "`storage.preload_metadata` and continuing."
-            )
-
     def set_options(self, **options):
-        """
-        Set options and handle deprecation.
-        """
-        ignore_etag = options.pop("ignore_etag", False)
+        # type: (Any) -> None
+        """Set options and handle deprecation."""
         disable = options.pop("disable_collectfast", False)
-        if ignore_etag:
-            warnings.warn(
-                "--ignore-etag is deprecated since 0.5.0, use "
-                "--disable-collectfast instead."
-            )
-        if ignore_etag or disable:
-            self.collectfast_enabled = False
-        super(Command, self).set_options(**options)
+        self.collectfast_enabled = not disable
+        super().set_options(**options)
 
     def collect(self):
+        # type: () -> Dict[str, List[str]]
         """
         Override collect to copy files concurrently. The tasks are populated by
         Command.copy_file() which is called by super().collect().
         """
-        ret = super(Command, self).collect()
+        ret = super().collect()
         if settings.threads:
-            Pool(settings.threads).map(self.do_copy_file, self.tasks)
+            Pool(settings.threads).map(self.maybe_copy_file, self.tasks)
         return ret
 
-    def handle(self, **options):
-        """
-        Override handle to supress summary output
-        """
-        super(Command, self).handle(**options)
+    def handle(self, *args, **options):
+        """Override handle to suppress summary output."""
+        super().handle(**options)
         return "{} static file{} copied.".format(
             self.num_copied_files, "" if self.num_copied_files == 1 else "s"
         )
 
-    def do_copy_file(self, args):
-        """
-        Determine if file should be copied or not and handle exceptions.
-        """
+    def maybe_copy_file(self, args):
+        # type: (Tuple[str, str, Storage]) -> None
+        """Determine if file should be copied or not and handle exceptions."""
         path, prefixed_path, source_storage = args
 
-        reset_connection(self.storage)
+        self.strategy.pre_should_copy_hook()
 
         if self.collectfast_enabled and not self.dry_run:
-            try:
-                if not should_copy_file(
-                    self.storage, path, prefixed_path, source_storage
-                ):
-                    return False
-            except Exception as e:
-                if settings.debug:
-                    raise
-                # Ignore errors and let default collectstatic handle copy
-                self.stdout.write(
-                    smart_str(
-                        "Ignored error in Collectfast:\n%s\n--> Continuing using "
-                        "default collectstatic." % e
-                    )
-                )
+            if not self.strategy.should_copy_file(path, prefixed_path, source_storage):
+                self.log("Skipping '%s'" % path)
+                return
 
         self.num_copied_files += 1
-        return super(Command, self).copy_file(path, prefixed_path, source_storage)
+        return super().copy_file(path, prefixed_path, source_storage)
 
     def copy_file(self, path, prefixed_path, source_storage):
         # type: (str, str, Storage) -> None
         """
-        Appends path to task queue if threads are enabled, otherwise copies the
+        Append path to task queue if threads are enabled, otherwise copy the
         file with a blocking call.
         """
         args = (path, prefixed_path, source_storage)
         if settings.threads:
             self.tasks.append(args)
         else:
-            self.do_copy_file(args)
+            self.maybe_copy_file(args)
 
     def delete_file(self, path, prefixed_path, source_storage):
         # type: (str, str, Storage) -> bool
-        """
-        Override delete_file to skip modified time and exists lookups.
-        """
+        """Override delete_file to skip modified time and exists lookups."""
         if not self.collectfast_enabled:
-            # The delete_file method is incorrectly annotated in django-stubs,
-            # see https://github.com/typeddjango/django-stubs/issues/130
-            return super(Command, self).delete_file(  # type: ignore
-                path, prefixed_path, source_storage
-            )
+            return super().delete_file(path, prefixed_path, source_storage)
         if not self.dry_run:
-            self.log("Deleting '%s'" % path)
+            self.log("Deleting '%s' on remote storage" % path)
             self.storage.delete(prefixed_path)
         else:
             self.log("Pretending to delete '%s'" % path)

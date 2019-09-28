@@ -6,7 +6,9 @@
 *.egg-info
 /static/
 /static_root/
-build/
+/build/
 dist/
 aws-credentials
 .mypy_cache
+.idea
+.python-version
