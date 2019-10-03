@@ -46,7 +46,7 @@ def test_many(**mutations):
         ...     case.assertEqual(fn(), 1337)
         """
         case_dict = {
-            "%s[%s]" % (func.__name__, mutation_name): mutation(func)
+            "test_%s" % mutation_name: mutation(func)
             for mutation_name, mutation in mutations.items()
         }
 

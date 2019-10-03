@@ -8,7 +8,7 @@
 /static_root/
 /build/
 dist/
-aws-credentials
+storage-credentials
 .mypy_cache
 .idea
 .python-version

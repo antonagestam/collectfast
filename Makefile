@@ -1,10 +1,10 @@
 SHELL := /usr/bin/env bash
 
 test:
-	. aws-credentials && ./runtests.py
+	. storage-credentials && ./runtests.py
 
 test-coverage:
-	. aws-credentials && coverage run --source collectfast ./runtests.py
+	. storage-credentials && coverage run --source collectfast ./runtests.py
 
 distribute:
 	pip install --upgrade wheel twine setuptools

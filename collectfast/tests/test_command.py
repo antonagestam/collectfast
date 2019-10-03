@@ -14,16 +14,29 @@ from .utils import test
 from .utils import test_many
 from collectfast.management.commands.collectstatic import Command
 
-test_boto_and_boto3 = test_many(
-    boto3=override_django_settings(
+aws_backend_confs = {
+    "boto3": override_django_settings(
         STATICFILES_STORAGE="storages.backends.s3boto3.S3Boto3Storage",
         COLLECTFAST_STRATEGY="collectfast.strategies.boto3.Boto3Strategy",
     ),
-    boto=override_django_settings(
+    "boto": override_django_settings(
         STATICFILES_STORAGE="storages.backends.s3boto.S3BotoStorage",
         COLLECTFAST_STRATEGY="collectfast.strategies.boto.BotoStrategy",
     ),
+}
+# use PEP448-style unpacking instead of copy+update once 3.4 support is dropped
+all_backend_confs = aws_backend_confs.copy()
+all_backend_confs.update(
+    {
+        "google": override_django_settings(
+            STATICFILES_STORAGE="storages.backends.gcloud.GoogleCloudStorage",
+            COLLECTFAST_STRATEGY="collectfast.strategies.gcloud.GoogleCloudStrategy",
+        )
+    }
 )
+
+test_aws_backends = test_many(**aws_backend_confs)
+test_all_backends = test_many(**all_backend_confs)
 
 
 def call_collectstatic(*args, **kwargs):
@@ -35,7 +48,7 @@ def call_collectstatic(*args, **kwargs):
     return out.getvalue()
 
 
-@test_boto_and_boto3
+@test_all_backends
 def test_basics(case):
     # type: (TestCase) -> None
     clean_static_dir()
@@ -45,7 +58,7 @@ def test_basics(case):
     case.assertIn("0 static files copied.", call_collectstatic())
 
 
-@test_boto_and_boto3
+@test_all_backends
 @override_setting("threads", 5)
 def test_threads(case):
     # type: (TestCase) -> None
@@ -89,10 +102,10 @@ def test_dry_run(case):
     case.assertTrue("Pretending to delete", result)
 
 
-@test_boto_and_boto3
+@test_aws_backends
 @override_storage_attr("gzip", True)
 @override_setting("aws_is_gzipped", True)
-def test_is_gzipped(case):
+def test_aws_is_gzipped(case):
     # type: (TestCase) -> None
     clean_static_dir()
     create_static_file()

@@ -7,8 +7,10 @@ import warnings
 from functools import lru_cache
 from io import BytesIO
 from pydoc import locate
+from typing import ClassVar
 from typing import Generic
 from typing import Optional
+from typing import Tuple
 from typing import Type
 from typing import TypeVar
 from typing import Union
@@ -30,6 +32,10 @@ logger = logging.getLogger(__name__)
 
 
 class Strategy(abc.ABC, Generic[_RemoteStorage]):
+    # Exceptions raised by storage backend for delete calls to non-existing
+    # objects. The command silently catches these.
+    delete_not_found_exception = ()  # type: ClassVar[Tuple[Type[Exception], ...]]
+
     def __init__(self, remote_storage):
         # type: (_RemoteStorage) -> None
         self.remote_storage = remote_storage

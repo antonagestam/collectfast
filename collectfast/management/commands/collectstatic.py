@@ -117,8 +117,11 @@ class Command(collectstatic.Command):
         if not self.collectfast_enabled:
             return super().delete_file(path, prefixed_path, source_storage)
         if not self.dry_run:
-            self.log("Deleting '%s' on remote storage" % path)
-            self.storage.delete(prefixed_path)
+            try:
+                self.log("Deleting '%s' on remote storage" % path)
+                self.storage.delete(prefixed_path)
+            except self.strategy.delete_not_found_exception:
+                pass
         else:
             self.log("Pretending to delete '%s'" % path)
         return True

@@ -138,7 +138,7 @@ open and welcome.
 
 The test suite is built to run against an S3 bucket. To be able to test locally
 you need to provide AWS credentials for a bucket to test against. Add the
-credentials to a file named `aws-credentials` in the root of the project
+credentials to a file named `storage-credentials` in the root of the project
 directory:
 
 .. code:: bash
