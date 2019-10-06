@@ -3,6 +3,7 @@ import gzip
 import hashlib
 import logging
 import mimetypes
+import warnings
 from functools import lru_cache
 from io import BytesIO
 from pydoc import locate
@@ -16,6 +17,7 @@ from django.core.cache import caches
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import Storage
 from django.utils.encoding import force_bytes
+from typing_extensions import Final
 
 from collectfast import settings
 
@@ -141,9 +143,38 @@ def load_strategy(klass: Union[str, type, object]) -> Type[Strategy]:
     return klass
 
 
-def guess_strategy(storage: str) -> Optional[str]:
-    if storage == "storages.backends.s3boto.S3BotoStorage":
-        return "collectfast.strategies.boto.BotoStrategy"
-    if storage == "storages.backends.s3boto3.S3Boto3Storage":
-        return "collectfast.strategies.boto3.Boto3Strategy"
-    return None
+_BOTO_STORAGE = "storages.backends.s3boto.S3BotoStorage"  # type: Final
+_BOTO_STRATEGY = "collectfast.strategies.boto.BotoStrategy"  # type: Final
+_BOTO3_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"  # type: Final
+_BOTO3_STRATEGY = "collectfast.strategies.boto3.Boto3Strategy"  # type: Final
+
+
+def _resolves_to_subclass(subclass_ref: str, superclass_ref: str) -> bool:
+    subclass = locate(subclass_ref)
+    assert isinstance(subclass, type)
+    try:
+        superclass = locate(superclass_ref)
+        assert isinstance(superclass, type)
+    except (ImportError, AssertionError) as e:
+        logger.debug("Failed to import %s: %s" % (superclass_ref, e))
+        return False
+    return issubclass(subclass, superclass)
+
+
+def guess_strategy(storage: str) -> str:
+    warnings.warn(
+        "Falling back to guessing strategy for backwards compatibility. This "
+        "is deprecated and will be removed in a future release. Explicitly "
+        "set COLLECTFAST_STRATEGY to silence this warning."
+    )
+    if storage == _BOTO_STORAGE:
+        return _BOTO_STRATEGY
+    if storage == _BOTO3_STORAGE:
+        return _BOTO3_STRATEGY
+    if _resolves_to_subclass(storage, _BOTO_STORAGE):
+        return _BOTO_STRATEGY
+    if _resolves_to_subclass(storage, _BOTO3_STORAGE):
+        return _BOTO3_STRATEGY
+    raise ImproperlyConfigured(
+        "No strategy configured, please make sure COLLECTFAST_STRATEGY is set."
+    )

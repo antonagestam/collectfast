@@ -1,4 +1,3 @@
-import warnings
 from multiprocessing.dummy import Pool
 from typing import Any
 from typing import Dict
@@ -39,11 +38,6 @@ class Command(collectstatic.Command):
 
         storage_str = getattr(django_settings, "STATICFILES_STORAGE", None)
         if storage_str is not None:
-            warnings.warn(
-                "Falling back to guessing strategy for backwards compatibility. This "
-                "is deprecated and will be removed in a future release. Explicitly "
-                "set COLLECTFAST_STRATEGY to silence this warning."
-            )
             return load_strategy(guess_strategy(storage_str))
 
         raise ImproperlyConfigured(
