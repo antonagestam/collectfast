@@ -150,9 +150,9 @@ _BOTO3_STRATEGY = "collectfast.strategies.boto3.Boto3Strategy"  # type: Final
 
 
 def _resolves_to_subclass(subclass_ref: str, superclass_ref: str) -> bool:
-    subclass = locate(subclass_ref)
-    assert isinstance(subclass, type)
     try:
+        subclass = locate(subclass_ref)
+        assert isinstance(subclass, type)
         superclass = locate(superclass_ref)
         assert isinstance(superclass, type)
     except (ImportError, AssertionError) as e:
@@ -176,5 +176,6 @@ def guess_strategy(storage: str) -> str:
     if _resolves_to_subclass(storage, _BOTO3_STORAGE):
         return _BOTO3_STRATEGY
     raise ImproperlyConfigured(
-        "No strategy configured, please make sure COLLECTFAST_STRATEGY is set."
+        "Collectfast failed to guess strategy, please make sure "
+        "COLLECTFAST_STRATEGY is set."
     )
