@@ -6,6 +6,8 @@ import unittest
 import uuid
 from typing import Any
 from typing import Callable
+from typing import cast
+from typing import Type
 from typing import TypeVar
 
 from django.conf import settings as django_settings
@@ -14,11 +16,12 @@ from typing_extensions import Final
 
 from collectfast import settings
 
-F = TypeVar("F", bound=Callable)
+F = TypeVar("F", bound=Callable[..., Any])
 static_dir = pathlib.Path(django_settings.STATICFILES_DIRS[0])  # type: Final
 
 
 def test(func):
+    # type: (F) -> Type[unittest.TestCase]
     """
     Creates a class that inherits from `unittest.TestCase` with the decorated
     function as a method. Create tests like this:
@@ -34,8 +37,9 @@ def test(func):
 
 
 def test_many(**mutations):
-    # type: (Callable[[F], F]) -> Callable[[F], F]
+    # type: (Callable[[F], F]) -> Callable[[F], Type[unittest.TestCase]]
     def test(func):
+        # type: (F) -> Type[unittest.TestCase]
         """
         Creates a class that inherits from `unittest.TestCase` with the decorated
         function as a method. Create tests like this:
@@ -77,6 +81,7 @@ def clean_static_dir():
 def override_setting(name, value):
     # type: (str, Any) -> Callable[[F], F]
     def decorator(fn):
+        # type: (F) -> F
         @functools.wraps(fn)
         def wrapper(*args, **kwargs):
             original = getattr(settings, name)
@@ -86,7 +91,7 @@ def override_setting(name, value):
             finally:
                 setattr(settings, name, original)
 
-        return wrapper
+        return cast(F, wrapper)
 
     return decorator
 
@@ -94,6 +99,7 @@ def override_setting(name, value):
 def override_storage_attr(name, value):
     # type: (str, Any) -> Callable[[F], F]
     def decorator(fn):
+        # type: (F) -> F
         @functools.wraps(fn)
         def wrapper(*args, **kwargs):
             storage = import_string(django_settings.STATICFILES_STORAGE)
@@ -104,6 +110,6 @@ def override_storage_attr(name, value):
             finally:
                 setattr(storage, name, original)
 
-        return wrapper
+        return cast(F, wrapper)
 
     return decorator

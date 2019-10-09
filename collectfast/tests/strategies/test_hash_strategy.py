@@ -10,12 +10,13 @@ from collectfast.strategies.base import HashStrategy
 from collectfast.tests.utils import test
 
 
-class Strategy(HashStrategy):
+class Strategy(HashStrategy[FileSystemStorage]):
     def __init__(self):
         # type: () -> None
         super().__init__(FileSystemStorage())
 
     def get_remote_file_hash(self, prefixed_path):
+        # type: (str) -> None
         pass
 
 

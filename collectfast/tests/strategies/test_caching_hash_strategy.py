@@ -12,11 +12,13 @@ from collectfast.tests.utils import test
 hash_characters = string.ascii_letters + string.digits
 
 
-class Strategy(CachingHashStrategy):
+class Strategy(CachingHashStrategy[FileSystemStorage]):
     def __init__(self):
+        # type: () -> None
         super().__init__(FileSystemStorage())
 
     def get_remote_file_hash(self, prefixed_path):
+        # type: (str) -> None
         pass
 
 

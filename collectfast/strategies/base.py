@@ -138,7 +138,7 @@ class CachingHashStrategy(HashStrategy[_RemoteStorage], abc.ABC):
         return str(file_hash)
 
 
-def load_strategy(klass: Union[str, type, object]) -> Type[Strategy]:
+def load_strategy(klass: Union[str, type, object]) -> Type[Strategy[Storage]]:
     if isinstance(klass, str):
         klass = locate(klass)
     if not isinstance(klass, type) or not issubclass(klass, Strategy):

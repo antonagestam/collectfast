@@ -31,7 +31,7 @@ class Command(collectstatic.Command):
 
     @staticmethod
     def _load_strategy():
-        # type: () -> Type[Strategy]
+        # type: () -> Type[Strategy[Storage]]
         strategy_str = getattr(django_settings, "COLLECTFAST_STRATEGY", None)
         if strategy_str is not None:
             return load_strategy(strategy_str)
@@ -78,6 +78,7 @@ class Command(collectstatic.Command):
         return ret
 
     def handle(self, *args, **options):
+        # type: (Any, Any) -> str
         """Override handle to suppress summary output."""
         super().handle(**options)
         return "{} static file{} copied.".format(
