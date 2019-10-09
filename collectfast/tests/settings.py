@@ -25,6 +25,7 @@ TEMPLATE_DIRS = [str(base_path / "collectfast/templates")]
 INSTALLED_APPS = ("collectfast", "django.contrib.staticfiles")
 STATIC_URL = "/staticfiles/"
 STATIC_ROOT = str(base_path / "static_root")
+MEDIA_ROOT = str(base_path / "fs_remote")
 STATICFILES_DIRS = [str(base_path / "static")]
 STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 COLLECTFAST_STRATEGY = "collectfast.strategies.boto3.Boto3Strategy"

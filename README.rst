@@ -15,6 +15,7 @@ A faster collectstatic command.
 - ``storages.backends.s3boto.S3BotoStorage`` (deprecated)
 - ``storages.backends.s3boto3.S3Boto3Storage``
 - ``storages.backends.gcloud.GoogleCloudStorage``
+- ``django.core.files.storage.FileSystemStorage``
 
 Running Django's ``collectstatic`` command can become painfully slow as more
 and more files are added to a project, especially when heavy libraries such as
@@ -54,15 +55,17 @@ Make sure you have this in your settings file and add ``'collectfast'`` to your
 Supported Strategies
 ~~~~~~~~~~~~~~~~~~~~
 
-+-----------------------------------------------------+-----------------------------------------------+
-|Strategy class                                       |Storage class                                  |
-+=====================================================+===============================================+
-|``collectfast.strategies.boto.BotoStrategy``         |``storages.backends.s3boto.S3BotoStorage``     |
-+-----------------------------------------------------+-----------------------------------------------+
-|``collectfast.strategies.boto3.Boto3Strategy``       |``storages.backends.s3boto3.S3Boto3Storage``   |
-+-----------------------------------------------------+-----------------------------------------------+
-|``collectfast.strategies.gcloud.GoogleCloudStrategy``|``storages.backends.gcloud.GoogleCloudStorage``|
-+-----------------------------------------------------+-----------------------------------------------+
++--------------------------------------------------------+-----------------------------------------------+
+|Strategy class                                          |Storage class                                  |
++========================================================+===============================================+
+|``collectfast.strategies.boto.BotoStrategy``            |``storages.backends.s3boto.S3BotoStorage``     |
++--------------------------------------------------------+-----------------------------------------------+
+|``collectfast.strategies.boto3.Boto3Strategy``          |``storages.backends.s3boto3.S3Boto3Storage``   |
++--------------------------------------------------------+-----------------------------------------------+
+|``collectfast.strategies.gcloud.GoogleCloudStrategy``   |``storages.backends.gcloud.GoogleCloudStorage``|
++--------------------------------------------------------+-----------------------------------------------+
+|``collectfast.strategies.filesystem.FileSystemStrategy``|``django.core.files.storage.FileSystemStorage``|
++--------------------------------------------------------+-----------------------------------------------+
 
 
 Usage

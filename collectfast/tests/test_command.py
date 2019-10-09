@@ -28,10 +28,14 @@ aws_backend_confs = {
 all_backend_confs = aws_backend_confs.copy()
 all_backend_confs.update(
     {
-        "google": override_django_settings(
+        "gcloud": override_django_settings(
             STATICFILES_STORAGE="storages.backends.gcloud.GoogleCloudStorage",
             COLLECTFAST_STRATEGY="collectfast.strategies.gcloud.GoogleCloudStrategy",
-        )
+        ),
+        "filesystem": override_django_settings(
+            STATICFILES_STORAGE="django.core.files.storage.FileSystemStorage",
+            COLLECTFAST_STRATEGY="collectfast.strategies.filesystem.FileSystemStrategy",
+        ),
     }
 )
 

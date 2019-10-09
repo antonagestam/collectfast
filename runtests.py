@@ -33,13 +33,16 @@ def main():
     parent_dir, app_name = os.path.split(app_path)
     sys.path.insert(0, parent_dir)
 
-    # create static dir
+    # create static dirs
     staticfiles_dir = test_settings.STATICFILES_DIRS[0]
     staticroot_dir = test_settings.STATIC_ROOT
+    fs_remote = test_settings.MEDIA_ROOT
     if not os.path.exists(staticfiles_dir):
         os.makedirs(staticfiles_dir)
     if not os.path.exists(staticroot_dir):
         os.makedirs(staticroot_dir)
+    if not os.path.exists(fs_remote):
+        os.makedirs(fs_remote)
 
     if options.target is not None:
         test_arg = "%s.%s" % (app_name, options.target)
@@ -54,6 +57,7 @@ def main():
         # delete static dirs
         shutil.rmtree(staticfiles_dir)
         shutil.rmtree(staticroot_dir)
+        shutil.rmtree(fs_remote)
 
 
 if __name__ == "__main__":
