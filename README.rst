@@ -14,6 +14,7 @@ A faster collectstatic command.
 
 - ``storages.backends.s3boto.S3BotoStorage`` (deprecated)
 - ``storages.backends.s3boto3.S3Boto3Storage``
+- ``storages.backends.gcloud.GoogleCloudStorage``
 
 Running Django's ``collectstatic`` command can become painfully slow as more
 and more files are added to a project, especially when heavy libraries such as
@@ -43,18 +44,25 @@ Make sure you have this in your settings file and add ``'collectfast'`` to your
         'collectfast',
     )
 
-Collectfast comes with these upload strategies:
-
-- ``collectfast.strategies.boto.BotoStrategy`` for
-  ``storages.backends.s3boto.S3BotoStorage``
-- ``collectfast.strategies.boto3.Boto3Strategy`` for
-  ``storages.backends.s3boto3.S3Boto3Storage``
-
 **Note:** ``'collectfast'`` must come before ``'django.contrib.staticfiles'`` in
 ``INSTALLED_APPS``.
 
 **Note:** Boto strategies will set ``preload_metadata`` on the remote storage to
 ``True``, see `#30 <https://github.com/antonagestam/collectfast/issues/30>`_.
+
+
+Supported Strategies
+~~~~~~~~~~~~~~~~~~~~
+
++-----------------------------------------------------+-----------------------------------------------+
+|Strategy class                                       |Storage class                                  |
++=====================================================+===============================================+
+|``collectfast.strategies.boto.BotoStrategy``         |``storages.backends.s3boto.S3BotoStorage``     |
++-----------------------------------------------------+-----------------------------------------------+
+|``collectfast.strategies.boto3.Boto3Strategy``       |``storages.backends.s3boto3.S3Boto3Storage``   |
++-----------------------------------------------------+-----------------------------------------------+
+|``collectfast.strategies.gcloud.GoogleCloudStrategy``|``storages.backends.gcloud.GoogleCloudStorage``|
++-----------------------------------------------------+-----------------------------------------------+
 
 
 Usage
