@@ -6,3 +6,5 @@ django-storages
 boto3
 boto
 google-cloud-storage
+pytest
+pytest-django

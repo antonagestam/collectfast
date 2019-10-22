@@ -20,14 +20,14 @@ F = TypeVar("F", bound=Callable[..., Any])
 static_dir = pathlib.Path(django_settings.STATICFILES_DIRS[0])  # type: Final
 
 
-def test(func):
+def make_test(func):
     # type: (F) -> Type[unittest.TestCase]
     """
     Creates a class that inherits from `unittest.TestCase` with the decorated
     function as a method. Create tests like this:
 
     >>> fn = lambda x: 1337
-    >>> @test
+    >>> @make_test
     ... def test_fn(case):
     ...     case.assertEqual(fn(), 1337)
     """
@@ -45,7 +45,7 @@ def test_many(**mutations):
         function as a method. Create tests like this:
 
         >>> fn = lambda x: 1337
-        >>> @test
+        >>> @make_test
         ... def test_fn(case):
         ...     case.assertEqual(fn(), 1337)
         """

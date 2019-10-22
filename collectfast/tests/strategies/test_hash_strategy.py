@@ -7,7 +7,7 @@ from django.contrib.staticfiles.storage import StaticFilesStorage
 from django.core.files.storage import FileSystemStorage
 
 from collectfast.strategies.base import HashStrategy
-from collectfast.tests.utils import test
+from collectfast.tests.utils import make_test
 
 
 class Strategy(HashStrategy[FileSystemStorage]):
@@ -20,7 +20,7 @@ class Strategy(HashStrategy[FileSystemStorage]):
         pass
 
 
-@test
+@make_test
 def test_get_file_hash(case):
     # type: (TestCase) -> None
     strategy = Strategy()
@@ -32,7 +32,7 @@ def test_get_file_hash(case):
     case.assertTrue(re.fullmatch(r"^[A-z0-9]{32}$", hash_) is not None)
 
 
-@test
+@make_test
 def test_should_copy_file(case):
     # type: (TestCase) -> None
     strategy = Strategy()

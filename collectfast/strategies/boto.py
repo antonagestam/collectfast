@@ -1,4 +1,5 @@
 import logging
+import warnings
 from typing import Optional
 
 import boto.exception
@@ -14,6 +15,11 @@ logger = logging.getLogger(__name__)
 class BotoStrategy(CachingHashStrategy[S3BotoStorage]):
     def __init__(self, remote_storage):
         # type: (S3BotoStorage) -> None
+        warnings.warn(
+            "The BotoStrategy class is deprecated and will be removed in Collectfast "
+            "2.0.",
+            DeprecationWarning,
+        )
         super().__init__(remote_storage)
         self.remote_storage.preload_metadata = True
         self.use_gzip = settings.aws_is_gzipped

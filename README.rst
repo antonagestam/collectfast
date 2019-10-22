@@ -12,7 +12,7 @@ A faster collectstatic command.
 
 **Supported Storage Backends**
 
-- ``storages.backends.s3boto.S3BotoStorage`` (deprecated)
+- ``storages.backends.s3boto.S3BotoStorage`` (deprecated, will be removed in 2.0)
 - ``storages.backends.s3boto3.S3Boto3Storage``
 - ``storages.backends.gcloud.GoogleCloudStorage``
 - ``django.core.files.storage.FileSystemStorage``

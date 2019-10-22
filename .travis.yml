@@ -7,6 +7,7 @@ python:
   - '3.5'
   - '3.6'
   - '3.7'
+  - '3.8'
 install:
   - pip install --upgrade pip setuptools
   - pip install django=="$DJANGO"
@@ -26,7 +27,7 @@ script:
   - 'if [[ $(python --version) == "Python 3.7."* ]]; then black --check .; fi'
   - 'if [[ $(python --version) == "Python 3.7."* ]]; then sorti --check .; fi'
   - 'if [[ $(python --version) == "Python 3.7."* && "$DJANGO" != "1.11" ]]; then pip install . && mypy .; fi'
-  - coverage run --source collectfast ./runtests.py
+  - coverage run --source collectfast -m pytest
 after_script:
   - coveralls
 matrix:
@@ -35,5 +36,9 @@ matrix:
       python: '3.4'
     - env: DJANGO=2.2
       python: '3.4'
+    - env: DJANGO=1.11
+      python: '3.8'
+    - env: DJANGO=2.1
+      python: '3.8'
 notifications:
   email: false

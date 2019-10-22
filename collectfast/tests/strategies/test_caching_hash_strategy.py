@@ -6,7 +6,7 @@ from django.core.files.storage import FileSystemStorage
 
 from collectfast import settings
 from collectfast.strategies.base import CachingHashStrategy
-from collectfast.tests.utils import test
+from collectfast.tests.utils import make_test
 
 
 hash_characters = string.ascii_letters + string.digits
@@ -22,7 +22,7 @@ class Strategy(CachingHashStrategy[FileSystemStorage]):
         pass
 
 
-@test
+@make_test
 def test_get_cache_key(case):
     # type: (TestCase) -> None
     strategy = Strategy()
@@ -35,7 +35,7 @@ def test_get_cache_key(case):
         case.assertIn(c, expected_chars)
 
 
-@test
+@make_test
 def test_gets_and_invalidates_hash(case):
     # type: (TestCase) -> None
     strategy = Strategy()

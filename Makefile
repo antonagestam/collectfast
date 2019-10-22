@@ -1,10 +1,10 @@
 SHELL := /usr/bin/env bash
 
 test:
-	. storage-credentials && ./runtests.py
+	. storage-credentials && pytest
 
 test-coverage:
-	. storage-credentials && coverage run --source collectfast ./runtests.py
+	. storage-credentials && coverage run --source collectfast -m pytest
 
 distribute:
 	pip install --upgrade wheel twine setuptools

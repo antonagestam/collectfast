@@ -3,10 +3,10 @@ import gzip
 import hashlib
 import logging
 import mimetypes
+import pydoc
 import warnings
 from functools import lru_cache
 from io import BytesIO
-from pydoc import locate
 from typing import ClassVar
 from typing import Generic
 from typing import Optional
@@ -140,7 +140,7 @@ class CachingHashStrategy(HashStrategy[_RemoteStorage], abc.ABC):
 
 def load_strategy(klass: Union[str, type, object]) -> Type[Strategy[Storage]]:
     if isinstance(klass, str):
-        klass = locate(klass)
+        klass = pydoc.locate(klass)
     if not isinstance(klass, type) or not issubclass(klass, Strategy):
         raise ImproperlyConfigured(
             "Configured strategies must be subclasses of %s.%s"
@@ -157,11 +157,11 @@ _BOTO3_STRATEGY = "collectfast.strategies.boto3.Boto3Strategy"  # type: Final
 
 def _resolves_to_subclass(subclass_ref: str, superclass_ref: str) -> bool:
     try:
-        subclass = locate(subclass_ref)
+        subclass = pydoc.locate(subclass_ref)
         assert isinstance(subclass, type)
-        superclass = locate(superclass_ref)
+        superclass = pydoc.locate(superclass_ref)
         assert isinstance(superclass, type)
-    except (ImportError, AssertionError) as e:
+    except (ImportError, AssertionError, pydoc.ErrorDuringImport) as e:
         logger.debug("Failed to import %s: %s" % (superclass_ref, e))
         return False
     return issubclass(subclass, superclass)
@@ -171,7 +171,8 @@ def guess_strategy(storage: str) -> str:
     warnings.warn(
         "Falling back to guessing strategy for backwards compatibility. This "
         "is deprecated and will be removed in a future release. Explicitly "
-        "set COLLECTFAST_STRATEGY to silence this warning."
+        "set COLLECTFAST_STRATEGY to silence this warning.",
+        DeprecationWarning,
     )
     if storage == _BOTO_STORAGE:
         return _BOTO_STRATEGY
