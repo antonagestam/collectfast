@@ -2,6 +2,7 @@ from multiprocessing.dummy import Pool
 from typing import Any
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Tuple
 from typing import Type
 
@@ -13,6 +14,7 @@ from django.core.management.base import CommandParser
 
 from collectfast import __version__
 from collectfast import settings
+from collectfast.strategies import DisabledStrategy
 from collectfast.strategies import guess_strategy
 from collectfast.strategies import load_strategy
 from collectfast.strategies import Strategy
@@ -27,7 +29,7 @@ class Command(collectstatic.Command):
         self.num_copied_files = 0
         self.tasks = []  # type: List[Task]
         self.collectfast_enabled = settings.enabled
-        self.strategy = self._load_strategy()(self.storage)
+        self.strategy = DisabledStrategy(Storage())  # type: Strategy
 
     @staticmethod
     def _load_strategy():
@@ -62,8 +64,11 @@ class Command(collectstatic.Command):
     def set_options(self, **options):
         # type: (Any) -> None
         """Set options and handle deprecation."""
-        disable = options.pop("disable_collectfast", False)
-        self.collectfast_enabled = not disable
+        self.collectfast_enabled = self.collectfast_enabled and not options.pop(
+            "disable_collectfast"
+        )
+        if self.collectfast_enabled:
+            self.strategy = self._load_strategy()(self.storage)
         super().set_options(**options)
 
     def collect(self):
@@ -73,14 +78,18 @@ class Command(collectstatic.Command):
         Command.copy_file() which is called by super().collect().
         """
         ret = super().collect()
+        if not self.collectfast_enabled:
+            return ret
         if settings.threads:
             Pool(settings.threads).map(self.maybe_copy_file, self.tasks)
         return ret
 
     def handle(self, *args, **options):
-        # type: (Any, Any) -> str
+        # type: (Any, Any) -> Optional[str]
         """Override handle to suppress summary output."""
-        super().handle(**options)
+        ret = super().handle(**options)
+        if not self.collectfast_enabled:
+            return ret
         return "{} static file{} copied.".format(
             self.num_copied_files, "" if self.num_copied_files == 1 else "s"
         )
@@ -90,9 +99,9 @@ class Command(collectstatic.Command):
         """Determine if file should be copied or not and handle exceptions."""
         path, prefixed_path, source_storage = args
 
-        self.strategy.pre_should_copy_hook()
-
         if self.collectfast_enabled and not self.dry_run:
+            self.strategy.pre_should_copy_hook()
+
             if not self.strategy.should_copy_file(path, prefixed_path, source_storage):
                 self.log("Skipping '%s'" % path)
                 return
@@ -107,7 +116,7 @@ class Command(collectstatic.Command):
         file with a blocking call.
         """
         args = (path, prefixed_path, source_storage)
-        if settings.threads:
+        if settings.threads and self.collectfast_enabled:
             self.tasks.append(args)
         else:
             self.maybe_copy_file(args)

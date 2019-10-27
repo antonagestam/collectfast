@@ -1,18 +1,17 @@
-from io import StringIO
-from typing import Any
 from unittest import TestCase
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management import call_command
 from django.test import override_settings as override_django_settings
 
-from .utils import clean_static_dir
-from .utils import create_static_file
-from .utils import make_test
-from .utils import override_setting
-from .utils import override_storage_attr
-from .utils import test_many
+from .utils import call_collectstatic
 from collectfast.management.commands.collectstatic import Command
+from collectfast.tests.utils import clean_static_dir
+from collectfast.tests.utils import create_static_file
+from collectfast.tests.utils import make_test
+from collectfast.tests.utils import override_setting
+from collectfast.tests.utils import override_storage_attr
+from collectfast.tests.utils import test_many
+
 
 aws_backend_confs = {
     "boto3": override_django_settings(
@@ -43,15 +42,6 @@ make_test_aws_backends = test_many(**aws_backend_confs)
 make_test_all_backends = test_many(**all_backend_confs)
 
 
-def call_collectstatic(*args, **kwargs):
-    # type: (Any, Any) -> str
-    out = StringIO()
-    call_command(
-        "collectstatic", *args, verbosity=3, interactive=False, stdout=out, **kwargs
-    )
-    return out.getvalue()
-
-
 @make_test_all_backends
 def test_basics(case):
     # type: (TestCase) -> None
@@ -71,25 +61,6 @@ def test_threads(case):
     case.assertIn("1 static file copied.", call_collectstatic())
     # file state should now be cached
     case.assertIn("0 static files copied.", call_collectstatic())
-
-
-@make_test
-@override_django_settings(
-    STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage"
-)
-def test_disable_collectfast_with_default_storage(case):
-    # type: (TestCase) -> None
-    clean_static_dir()
-    create_static_file()
-    case.assertIn("1 static file copied.", call_collectstatic(disable_collectfast=True))
-
-
-@make_test
-def test_disable_collectfast(case):
-    # type: (TestCase) -> None
-    clean_static_dir()
-    create_static_file()
-    case.assertIn("1 static file copied.", call_collectstatic(disable_collectfast=True))
 
 
 @make_test

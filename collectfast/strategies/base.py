@@ -9,6 +9,7 @@ from functools import lru_cache
 from io import BytesIO
 from typing import ClassVar
 from typing import Generic
+from typing import NoReturn
 from typing import Optional
 from typing import Tuple
 from typing import Type
@@ -136,6 +137,16 @@ class CachingHashStrategy(HashStrategy[_RemoteStorage], abc.ABC):
             )
             cache.set(cache_key, file_hash)
         return str(file_hash)
+
+
+class DisabledStrategy(Strategy):
+    def should_copy_file(self, path, prefixed_path, local_storage):
+        # type: (str, str, Storage) -> NoReturn
+        raise NotImplementedError
+
+    def pre_should_copy_hook(self):
+        # type: () -> NoReturn
+        raise NotImplementedError
 
 
 def load_strategy(klass: Union[str, type, object]) -> Type[Strategy[Storage]]:
