@@ -19,7 +19,7 @@ setup(
     install_requires=[
         "Django>=1.11",
         "django-storages>=1.6",
-        "typing",
+        'typing;python_version<"3.5"',
         "typing-extensions",
     ],
     classifiers=[
