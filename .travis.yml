@@ -19,15 +19,6 @@ env:
   - DJANGO=1.11
   - DJANGO=2.1
   - DJANGO=2.2
-  - SKIP_LIVE_TESTS=false
-  - SKIP_LIVE_TESTS=true
-jobs:
-  exclude:
-    # Skip live tests when building forks
-    - if: fork
-      env: SKIP_LIVE_TESTS=false
-    - if: not fork
-      env: SKIP_LIVE_TESTS=true
 before_script:
   # see https://github.com/travis-ci/travis-ci/issues/7940
   - sudo rm -f /etc/boto.cfg
@@ -36,6 +27,7 @@ script:
   - 'if [[ $(python --version) == "Python 3.7."* ]]; then black --check .; fi'
   - 'if [[ $(python --version) == "Python 3.7."* ]]; then sorti --check .; fi'
   - 'if [[ $(python --version) == "Python 3.7."* && "$DJANGO" != "1.11" ]]; then pip install . && mypy .; fi'
+  - 'if [[ $TRAVIS_REPO_SLUG != "antonagestam/collectfast" ]]; then export SKIP_LIVE_TESTS=true; fi'
   - coverage run --source collectfast -m pytest
 after_script:
   - coveralls
