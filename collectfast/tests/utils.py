@@ -21,13 +21,12 @@ live_test = pytest.mark.skipif(
     os.environ.get("SKIP_LIVE_TESTS") == "true", reason="not running live tests"
 )
 
-static_dir = pathlib.Path(django_settings.STATICFILES_DIRS[0])  # type: Final
+static_dir: Final = pathlib.Path(django_settings.STATICFILES_DIRS[0])
 
 F = TypeVar("F", bound=Callable[..., Any])
 
 
-def make_test(func):
-    # type: (F) -> Type[unittest.TestCase]
+def make_test(func: F) -> Type[unittest.TestCase]:
     """
     Creates a class that inherits from `unittest.TestCase` with the decorated
     function as a method. Create tests like this:
@@ -42,10 +41,8 @@ def make_test(func):
     return case
 
 
-def test_many(**mutations):
-    # type: (Callable[[F], F]) -> Callable[[F], Type[unittest.TestCase]]
-    def test(func):
-        # type: (F) -> Type[unittest.TestCase]
+def test_many(**mutations: Callable[[F], F]) -> Callable[[F], Type[unittest.TestCase]]:
+    def test(func: F) -> Type[unittest.TestCase]:
         """
         Creates a class that inherits from `unittest.TestCase` with the decorated
         function as a method. Create tests like this:
@@ -67,8 +64,7 @@ def test_many(**mutations):
     return test
 
 
-def create_static_file():
-    # type: () -> None
+def create_static_file() -> None:
     """Write random characters to a file in the static directory."""
     filename = "%s.txt" % uuid.uuid4().hex
     with (static_dir / filename).open("w+") as file_:
@@ -76,18 +72,15 @@ def create_static_file():
             file_.write(chr(int(random.random() * 64)))
 
 
-def clean_static_dir():
-    # type: () -> None
+def clean_static_dir() -> None:
     for filename in os.listdir(static_dir.as_posix()):
         file = static_dir / filename
         if file.is_file():
             file.unlink()
 
 
-def override_setting(name, value):
-    # type: (str, Any) -> Callable[[F], F]
-    def decorator(fn):
-        # type: (F) -> F
+def override_setting(name: str, value: Any) -> Callable[[F], F]:
+    def decorator(fn: F) -> F:
         @functools.wraps(fn)
         def wrapper(*args, **kwargs):
             original = getattr(settings, name)
@@ -102,10 +95,8 @@ def override_setting(name, value):
     return decorator
 
 
-def override_storage_attr(name, value):
-    # type: (str, Any) -> Callable[[F], F]
-    def decorator(fn):
-        # type: (F) -> F
+def override_storage_attr(name: str, value: Any) -> Callable[[F], F]:
+    def decorator(fn: F) -> F:
         @functools.wraps(fn)
         def wrapper(*args, **kwargs):
             storage = import_string(django_settings.STATICFILES_STORAGE)

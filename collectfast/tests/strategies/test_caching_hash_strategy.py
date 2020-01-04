@@ -13,18 +13,15 @@ hash_characters = string.ascii_letters + string.digits
 
 
 class Strategy(CachingHashStrategy[FileSystemStorage]):
-    def __init__(self):
-        # type: () -> None
+    def __init__(self) -> None:
         super().__init__(FileSystemStorage())
 
-    def get_remote_file_hash(self, prefixed_path):
-        # type: (str) -> None
+    def get_remote_file_hash(self, prefixed_path: str) -> None:
         pass
 
 
 @make_test
-def test_get_cache_key(case):
-    # type: (TestCase) -> None
+def test_get_cache_key(case: TestCase) -> None:
     strategy = Strategy()
     cache_key = strategy.get_cache_key("/some/random/path")
     prefix_len = len(settings.cache_key_prefix)
@@ -36,8 +33,7 @@ def test_get_cache_key(case):
 
 
 @make_test
-def test_gets_and_invalidates_hash(case):
-    # type: (TestCase) -> None
+def test_gets_and_invalidates_hash(case: TestCase) -> None:
     strategy = Strategy()
     expected_hash = "hash"
     mocked = mock.MagicMock(return_value=expected_hash)

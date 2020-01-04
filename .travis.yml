@@ -1,7 +1,6 @@
 language: python
 sudo: required
 python:
-  - '3.5'
   - '3.6'
   - '3.7'
   - '3.8'
@@ -13,7 +12,6 @@ install:
   # to fail. Linting and static analysis only happens on the Python 3.8 builds.
   - pip install --upgrade -r lint-requirements.txt || true
 env:
-  - DJANGO=1.11
   - DJANGO=2.2
   - DJANGO=3.0
 before_script:
@@ -23,17 +21,13 @@ script:
   - 'if [[ $(python --version) == "Python 3.8."* ]]; then flake8; fi'
   - 'if [[ $(python --version) == "Python 3.8."* ]]; then black --check .; fi'
   - 'if [[ $(python --version) == "Python 3.8."* ]]; then sorti --check .; fi'
-  - 'if [[ $(python --version) == "Python 3.8."* && "$DJANGO" != "1.11" ]]; then pip install . && mypy .; fi'
+  - 'if [[ $(python --version) == "Python 3.8."* ]]; then pip install . && mypy .; fi'
   - 'if [[ $TRAVIS_REPO_SLUG != "antonagestam/collectfast" ]]; then export SKIP_LIVE_TESTS=true; fi'
   - coverage run --source collectfast -m pytest
 after_script:
   - coveralls
 matrix:
   exclude:
-    - env: DJANGO=3.0
-      python: '3.5'
-    - env: DJANGO=1.11
-      python: '3.8'
     - env: DJANGO=2.2
       python: '3.8'
 notifications:

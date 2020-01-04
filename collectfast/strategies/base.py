@@ -4,7 +4,6 @@ import hashlib
 import logging
 import mimetypes
 import pydoc
-import warnings
 from functools import lru_cache
 from io import BytesIO
 from typing import ClassVar
@@ -20,7 +19,6 @@ from django.core.cache import caches
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import Storage
 from django.utils.encoding import force_bytes
-from typing_extensions import Final
 
 from collectfast import settings
 
@@ -35,15 +33,15 @@ logger = logging.getLogger(__name__)
 class Strategy(abc.ABC, Generic[_RemoteStorage]):
     # Exceptions raised by storage backend for delete calls to non-existing
     # objects. The command silently catches these.
-    delete_not_found_exception = ()  # type: ClassVar[Tuple[Type[Exception], ...]]
+    delete_not_found_exception: ClassVar[Tuple[Type[Exception], ...]] = ()
 
-    def __init__(self, remote_storage):
-        # type: (_RemoteStorage) -> None
+    def __init__(self, remote_storage: _RemoteStorage) -> None:
         self.remote_storage = remote_storage
 
     @abc.abstractmethod
-    def should_copy_file(self, path, prefixed_path, local_storage):
-        # type: (str, str, Storage) -> bool
+    def should_copy_file(
+        self, path: str, prefixed_path: str, local_storage: Storage
+    ) -> bool:
         """
         Called for each file before copying happens, this method decides
         whether a file should be copied or not. Return False to indicate that
@@ -52,8 +50,7 @@ class Strategy(abc.ABC, Generic[_RemoteStorage]):
         """
         ...
 
-    def pre_should_copy_hook(self):
-        # type: () -> None
+    def pre_should_copy_hook(self) -> None:
         """Hook called before calling should_copy_file."""
         ...
 
@@ -61,22 +58,23 @@ class Strategy(abc.ABC, Generic[_RemoteStorage]):
 class HashStrategy(Strategy[_RemoteStorage], abc.ABC):
     use_gzip = False
 
-    def should_copy_file(self, path, prefixed_path, local_storage):
-        # type: (str, str, Storage) -> bool
+    def should_copy_file(
+        self, path: str, prefixed_path: str, local_storage: Storage
+    ) -> bool:
         local_hash = self.get_local_file_hash(path, local_storage)
         remote_hash = self.get_remote_file_hash(prefixed_path)
         return local_hash != remote_hash
 
-    def get_gzipped_local_file_hash(self, uncompressed_file_hash, path, contents):
-        # type: (str, str, str) -> str
+    def get_gzipped_local_file_hash(
+        self, uncompressed_file_hash: str, path: str, contents: str
+    ) -> str:
         buffer = BytesIO()
         zf = gzip.GzipFile(mode="wb", compresslevel=6, fileobj=buffer, mtime=0.0)
         zf.write(force_bytes(contents))
         zf.close()
         return hashlib.md5(buffer.getvalue()).hexdigest()
 
-    def get_local_file_hash(self, path, local_storage):
-        # type: (str, Storage) -> str
+    def get_local_file_hash(self, path: str, local_storage: Storage) -> str:
         """Create md5 hash from file contents."""
         contents = local_storage.open(path).read()
         file_hash = hashlib.md5(contents).hexdigest()
@@ -89,24 +87,22 @@ class HashStrategy(Strategy[_RemoteStorage], abc.ABC):
         return file_hash
 
     @abc.abstractmethod
-    def get_remote_file_hash(self, prefixed_path):
-        # type: (str) -> Optional[str]
+    def get_remote_file_hash(self, prefixed_path: str) -> Optional[str]:
         ...
 
 
 class CachingHashStrategy(HashStrategy[_RemoteStorage], abc.ABC):
     @lru_cache()
-    def get_cache_key(self, path):
-        # type: (str) -> str
+    def get_cache_key(self, path: str) -> str:
         path_hash = hashlib.md5(path.encode()).hexdigest()
         return settings.cache_key_prefix + path_hash
 
-    def invalidate_cached_hash(self, path):
-        # type: (str) -> None
+    def invalidate_cached_hash(self, path: str) -> None:
         cache.delete(self.get_cache_key(path))
 
-    def should_copy_file(self, path, prefixed_path, local_storage):
-        # type: (str, str, Storage) -> bool
+    def should_copy_file(
+        self, path: str, prefixed_path: str, local_storage: Storage
+    ) -> bool:
         local_hash = self.get_local_file_hash(path, local_storage)
         remote_hash = self.get_cached_remote_file_hash(path, prefixed_path)
         if local_hash != remote_hash:
@@ -116,8 +112,7 @@ class CachingHashStrategy(HashStrategy[_RemoteStorage], abc.ABC):
             return True
         return False
 
-    def get_cached_remote_file_hash(self, path, prefixed_path):
-        # type: (str, str) -> str
+    def get_cached_remote_file_hash(self, path: str, prefixed_path: str) -> str:
         """Cache the hash of the remote storage file."""
         cache_key = self.get_cache_key(path)
         hash_ = cache.get(cache_key, False)
@@ -126,8 +121,9 @@ class CachingHashStrategy(HashStrategy[_RemoteStorage], abc.ABC):
             cache.set(cache_key, hash_)
         return str(hash_)
 
-    def get_gzipped_local_file_hash(self, uncompressed_file_hash, path, contents):
-        # type: (str, str, str) -> str
+    def get_gzipped_local_file_hash(
+        self, uncompressed_file_hash: str, path: str, contents: str
+    ) -> str:
         """Cache the hash of the gzipped local file."""
         cache_key = self.get_cache_key("gzip_hash_%s" % uncompressed_file_hash)
         file_hash = cache.get(cache_key, False)
@@ -140,12 +136,12 @@ class CachingHashStrategy(HashStrategy[_RemoteStorage], abc.ABC):
 
 
 class DisabledStrategy(Strategy):
-    def should_copy_file(self, path, prefixed_path, local_storage):
-        # type: (str, str, Storage) -> NoReturn
+    def should_copy_file(
+        self, path: str, prefixed_path: str, local_storage: Storage
+    ) -> NoReturn:
         raise NotImplementedError
 
-    def pre_should_copy_hook(self):
-        # type: () -> NoReturn
+    def pre_should_copy_hook(self) -> NoReturn:
         raise NotImplementedError
 
 
@@ -158,42 +154,3 @@ def load_strategy(klass: Union[str, type, object]) -> Type[Strategy[Storage]]:
             % (Strategy.__module__, Strategy.__qualname__)
         )
     return klass
-
-
-_BOTO_STORAGE = "storages.backends.s3boto.S3BotoStorage"  # type: Final
-_BOTO_STRATEGY = "collectfast.strategies.boto.BotoStrategy"  # type: Final
-_BOTO3_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"  # type: Final
-_BOTO3_STRATEGY = "collectfast.strategies.boto3.Boto3Strategy"  # type: Final
-
-
-def _resolves_to_subclass(subclass_ref: str, superclass_ref: str) -> bool:
-    try:
-        subclass = pydoc.locate(subclass_ref)
-        assert isinstance(subclass, type)
-        superclass = pydoc.locate(superclass_ref)
-        assert isinstance(superclass, type)
-    except (ImportError, AssertionError, pydoc.ErrorDuringImport) as e:
-        logger.debug("Failed to import %s: %s" % (superclass_ref, e))
-        return False
-    return issubclass(subclass, superclass)
-
-
-def guess_strategy(storage: str) -> str:
-    warnings.warn(
-        "Falling back to guessing strategy for backwards compatibility. This "
-        "is deprecated and will be removed in a future release. Explicitly "
-        "set COLLECTFAST_STRATEGY to silence this warning.",
-        DeprecationWarning,
-    )
-    if storage == _BOTO_STORAGE:
-        return _BOTO_STRATEGY
-    if storage == _BOTO3_STORAGE:
-        return _BOTO3_STRATEGY
-    if _resolves_to_subclass(storage, _BOTO_STORAGE):
-        return _BOTO_STRATEGY
-    if _resolves_to_subclass(storage, _BOTO3_STORAGE):
-        return _BOTO3_STRATEGY
-    raise ImproperlyConfigured(
-        "Collectfast failed to guess strategy, please make sure "
-        "COLLECTFAST_STRATEGY is set."
-    )
