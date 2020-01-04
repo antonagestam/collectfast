@@ -75,7 +75,7 @@ Collectfast overrides Django's builtin ``collectstatic`` command so just run
 ``python manage.py collectstatic`` as normal. You can disable Collectfast by
 using the ``--disable-collectfast`` option.
 
-You can also disable collectfast by setting ``COLLECTFAST_ENABLED = False`` in
+You can also disable Collectfast by setting ``COLLECTFAST_ENABLED = False`` in
 your settings file. This is useful when using a local file storage backend for
 development.
 
@@ -147,15 +147,16 @@ open and welcome.
 
 **Testing**
 
-The test suite is built to run against an S3 bucket. To be able to test locally
-you need to provide AWS credentials for a bucket to test against. Add the
-credentials to a file named `storage-credentials` in the root of the project
-directory:
+The test suite is built to run against live S3 and GCloud buckets. You can disable live
+tests by setting `SKIP_LIVE_TESTS=true` or running `make test-skip-live`. To run live
+tests locally you need to provide API credentials to test against. Add the credentials
+to a file named `storage-credentials` in the root of the project directory:
 
 .. code:: bash
 
-    export AWS_ACCESS_KEY_ID=''
-    export AWS_SECRET_ACCESS_KEY=''
+    export AWS_ACCESS_KEY_ID='...'
+    export AWS_SECRET_ACCESS_KEY='...'
+    export GCLOUD_CREDENTIALS='{...}'  # Google Cloud credentials as JSON
 
 Install test dependencies and target Django version:
 

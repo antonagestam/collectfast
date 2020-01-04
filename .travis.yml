@@ -11,14 +11,23 @@ python:
 install:
   - pip install --upgrade pip setuptools
   - pip install django=="$DJANGO"
-  - pip install -r test-requirements.txt
+  - pip install --upgrade -r test-requirements.txt
   # These are not supported on all Python versions, so we allow the installation
   # to fail. Linting and static analysis only happens on the Python 3.7 builds.
-  - pip install -r lint-requirements.txt || true
+  - pip install --upgrade -r lint-requirements.txt || true
 env:
   - DJANGO=1.11
   - DJANGO=2.1
   - DJANGO=2.2
+  - SKIP_LIVE_TESTS=false
+  - SKIP_LIVE_TESTS=true
+jobs:
+  exclude:
+    # Skip live tests when building forks
+    - if: fork
+      env: SKIP_LIVE_TESTS=false
+    - if: not fork
+      env: SKIP_LIVE_TESTS=true
 before_script:
   # see https://github.com/travis-ci/travis-ci/issues/7940
   - sudo rm -f /etc/boto.cfg

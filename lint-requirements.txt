@@ -2,5 +2,5 @@ flake8
 flake8-bugbear
 black
 sorti
-mypy>=0.730
-django-stubs>=1.2.0
+mypy>=0.761
+django-stubs>=1.4.0
