@@ -6,6 +6,7 @@ from django.test import override_settings as override_django_settings
 from .utils import call_collectstatic
 from collectfast.tests.utils import clean_static_dir
 from collectfast.tests.utils import create_static_file
+from collectfast.tests.utils import live_test
 from collectfast.tests.utils import make_test
 from collectfast.tests.utils import override_setting
 
@@ -22,6 +23,7 @@ def test_disable_collectfast_with_default_storage(case):
 
 
 @make_test
+@live_test
 def test_disable_collectfast(case):
     # type: (TestCase) -> None
     clean_static_dir()

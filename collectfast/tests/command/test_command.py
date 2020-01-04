@@ -7,6 +7,7 @@ from .utils import call_collectstatic
 from collectfast.management.commands.collectstatic import Command
 from collectfast.tests.utils import clean_static_dir
 from collectfast.tests.utils import create_static_file
+from collectfast.tests.utils import live_test
 from collectfast.tests.utils import make_test
 from collectfast.tests.utils import override_setting
 from collectfast.tests.utils import override_storage_attr
@@ -43,6 +44,7 @@ make_test_all_backends = test_many(**all_backend_confs)
 
 
 @make_test_all_backends
+@live_test
 def test_basics(case):
     # type: (TestCase) -> None
     clean_static_dir()
@@ -53,6 +55,7 @@ def test_basics(case):
 
 
 @make_test_all_backends
+@live_test
 @override_setting("threads", 5)
 def test_threads(case):
     # type: (TestCase) -> None
@@ -78,6 +81,7 @@ def test_dry_run(case):
 
 
 @make_test_aws_backends
+@live_test
 @override_storage_attr("gzip", True)
 @override_setting("aws_is_gzipped", True)
 def test_aws_is_gzipped(case):
