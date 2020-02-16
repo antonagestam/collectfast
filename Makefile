@@ -9,10 +9,18 @@ test-skip-live:
 test-coverage:
 	. storage-credentials && coverage run --source collectfast -m pytest
 
-distribute:
-	pip install --upgrade wheel twine setuptools
-	python setup.py sdist bdist_wheel
-	twine upload dist/*
+clean:
+	rm -rf Collectfast.egg-info __pycache__ build dist
+
+build: clean
+	python3 -m pip install --upgrade wheel twine setuptools
+	python3 setup.py sdist bdist_wheel
+
+distribute: build
+	python3 -m twine upload dist/*
+
+test-distribute: build
+	python3 -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
 lint:
 	flake8

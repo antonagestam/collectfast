@@ -15,7 +15,6 @@ from django.core.management.base import CommandParser
 from collectfast import __version__
 from collectfast import settings
 from collectfast.strategies import DisabledStrategy
-from collectfast.strategies import guess_strategy
 from collectfast.strategies import load_strategy
 from collectfast.strategies import Strategy
 
@@ -23,35 +22,27 @@ Task = Tuple[str, str, Storage]
 
 
 class Command(collectstatic.Command):
-    def __init__(self, *args, **kwargs):
-        # type: (Any, Any) -> None
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.num_copied_files = 0
-        self.tasks = []  # type: List[Task]
+        self.tasks: List[Task] = []
         self.collectfast_enabled = settings.enabled
-        self.strategy = DisabledStrategy(Storage())  # type: Strategy
+        self.strategy: Strategy = DisabledStrategy(Storage())
 
     @staticmethod
-    def _load_strategy():
-        # type: () -> Type[Strategy[Storage]]
+    def _load_strategy() -> Type[Strategy[Storage]]:
         strategy_str = getattr(django_settings, "COLLECTFAST_STRATEGY", None)
         if strategy_str is not None:
             return load_strategy(strategy_str)
-
-        storage_str = getattr(django_settings, "STATICFILES_STORAGE", None)
-        if storage_str is not None:
-            return load_strategy(guess_strategy(storage_str))
 
         raise ImproperlyConfigured(
             "No strategy configured, please make sure COLLECTFAST_STRATEGY is set."
         )
 
-    def get_version(self):
-        # type: () -> str
+    def get_version(self) -> str:
         return __version__
 
-    def add_arguments(self, parser):
-        # type: (CommandParser) -> None
+    def add_arguments(self, parser: CommandParser) -> None:
         super().add_arguments(parser)
         parser.add_argument(
             "--disable-collectfast",
@@ -61,8 +52,7 @@ class Command(collectstatic.Command):
             help="Disable Collectfast.",
         )
 
-    def set_options(self, **options):
-        # type: (Any) -> None
+    def set_options(self, **options: Any) -> None:
         """Set options and handle deprecation."""
         self.collectfast_enabled = self.collectfast_enabled and not options.pop(
             "disable_collectfast"
@@ -71,8 +61,7 @@ class Command(collectstatic.Command):
             self.strategy = self._load_strategy()(self.storage)
         super().set_options(**options)
 
-    def collect(self):
-        # type: () -> Dict[str, List[str]]
+    def collect(self) -> Dict[str, List[str]]:
         """
         Override collect to copy files concurrently. The tasks are populated by
         Command.copy_file() which is called by super().collect().
@@ -84,8 +73,7 @@ class Command(collectstatic.Command):
             Pool(settings.threads).map(self.maybe_copy_file, self.tasks)
         return ret
 
-    def handle(self, *args, **options):
-        # type: (Any, Any) -> Optional[str]
+    def handle(self, *args: Any, **options: Any) -> Optional[str]:
         """Override handle to suppress summary output."""
         ret = super().handle(**options)
         if not self.collectfast_enabled:
@@ -94,8 +82,7 @@ class Command(collectstatic.Command):
             self.num_copied_files, "" if self.num_copied_files == 1 else "s"
         )
 
-    def maybe_copy_file(self, args):
-        # type: (Tuple[str, str, Storage]) -> None
+    def maybe_copy_file(self, args: Task) -> None:
         """Determine if file should be copied or not and handle exceptions."""
         path, prefixed_path, source_storage = args
 
@@ -109,8 +96,7 @@ class Command(collectstatic.Command):
         self.num_copied_files += 1
         return super().copy_file(path, prefixed_path, source_storage)
 
-    def copy_file(self, path, prefixed_path, source_storage):
-        # type: (str, str, Storage) -> None
+    def copy_file(self, path: str, prefixed_path: str, source_storage: Storage) -> None:
         """
         Append path to task queue if threads are enabled, otherwise copy the
         file with a blocking call.
@@ -121,8 +107,9 @@ class Command(collectstatic.Command):
         else:
             self.maybe_copy_file(args)
 
-    def delete_file(self, path, prefixed_path, source_storage):
-        # type: (str, str, Storage) -> bool
+    def delete_file(
+        self, path: str, prefixed_path: str, source_storage: Storage
+    ) -> bool:
         """Override delete_file to skip modified time and exists lookups."""
         if not self.collectfast_enabled:
             return super().delete_file(path, prefixed_path, source_storage)

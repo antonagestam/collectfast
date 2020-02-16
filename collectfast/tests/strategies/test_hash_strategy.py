@@ -11,18 +11,15 @@ from collectfast.tests.utils import make_test
 
 
 class Strategy(HashStrategy[FileSystemStorage]):
-    def __init__(self):
-        # type: () -> None
+    def __init__(self) -> None:
         super().__init__(FileSystemStorage())
 
-    def get_remote_file_hash(self, prefixed_path):
-        # type: (str) -> None
+    def get_remote_file_hash(self, prefixed_path: str) -> None:
         pass
 
 
 @make_test
-def test_get_file_hash(case):
-    # type: (TestCase) -> None
+def test_get_file_hash(case: TestCase) -> None:
     strategy = Strategy()
     local_storage = StaticFilesStorage()
 
@@ -33,8 +30,7 @@ def test_get_file_hash(case):
 
 
 @make_test
-def test_should_copy_file(case):
-    # type: (TestCase) -> None
+def test_should_copy_file(case: TestCase) -> None:
     strategy = Strategy()
     local_storage = StaticFilesStorage()
     remote_hash = "foo"

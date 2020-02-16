@@ -15,8 +15,7 @@ from collectfast.tests.utils import override_setting
 @override_django_settings(
     STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage"
 )
-def test_disable_collectfast_with_default_storage(case):
-    # type: (TestCase) -> None
+def test_disable_collectfast_with_default_storage(case: TestCase) -> None:
     clean_static_dir()
     create_static_file()
     case.assertIn("1 static file copied", call_collectstatic(disable_collectfast=True))
@@ -24,8 +23,7 @@ def test_disable_collectfast_with_default_storage(case):
 
 @make_test
 @live_test
-def test_disable_collectfast(case):
-    # type: (TestCase) -> None
+def test_disable_collectfast(case: TestCase) -> None:
     clean_static_dir()
     create_static_file()
     case.assertIn("1 static file copied.", call_collectstatic(disable_collectfast=True))
@@ -33,16 +31,14 @@ def test_disable_collectfast(case):
 
 @override_setting("enabled", False)
 @mock.patch("collectfast.management.commands.collectstatic.Command._load_strategy")
-def test_no_load_with_disable_setting(mocked_load_strategy):
-    # type: (mock.MagicMock) -> None
+def test_no_load_with_disable_setting(mocked_load_strategy: mock.MagicMock) -> None:
     clean_static_dir()
     call_collectstatic()
     mocked_load_strategy.assert_not_called()
 
 
 @mock.patch("collectfast.management.commands.collectstatic.Command._load_strategy")
-def test_no_load_with_disable_flag(mocked_load_strategy):
-    # type: (mock.MagicMock) -> None
+def test_no_load_with_disable_flag(mocked_load_strategy: mock.MagicMock) -> None:
     clean_static_dir()
     call_collectstatic(disable_collectfast=True)
     mocked_load_strategy.assert_not_called()
