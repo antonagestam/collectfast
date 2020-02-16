@@ -2,7 +2,7 @@ typing;python_version<"3.5"
 typing-extensions
 mock
 coveralls
-django-storages
+django-storages<1.9
 boto3
 boto
 google-cloud-storage
