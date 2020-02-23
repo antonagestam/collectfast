@@ -8,10 +8,6 @@
   `collectfast.strategies.boto.BotoStrategy`).
 - Drop support for guessing strategies, e.g. require
   `COLLECTFAST_STRATEGY` to be set.
-- Use annotations instead of comment syntax.
-- Use setup.cfg for package metadata.
-- Update and rewrite readme in markdown.
-- Introduce `make clean`.
 - Package type hints.
 - Support django-storages 1.9+.
 - Validate types of settings.
