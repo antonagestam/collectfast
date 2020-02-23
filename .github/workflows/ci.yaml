@@ -1,0 +1,80 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8']
+        django-version: ['>=2.2,<2.3', '>=3.0,<3.1']
+    name: Test Python ${{ matrix.python-version }} Django ${{ matrix.django-version }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: pip cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('setup.cfg') }}
+          restore-keys: ${{ runner.os }}-pip
+      - name: Install dependencies
+        run: |
+          pip install --upgrade django'${{ matrix.django-version }}'
+          pip install --upgrade -r test-requirements.txt
+          pip install .
+      - name: Run tests
+        run: |
+          if [[ "${{github.repository}}" != "antonagestam/collectfast" ]]; then
+            export SKIP_LIVE_TESTS=true
+          fi
+          coverage run --source collectfast -m pytest
+      - name: Coveralls
+          uses: coverallsapp/github-action@v1
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            parallel: true
+  finish-coveralls:
+    name: Finish coveralls
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send parallel finished
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true
+  lint:
+    name: Static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: pip cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('setup.cfg') }}
+          restore-keys: ${{ runner.os }}-pip
+      - name: Install dependencies
+        run: |
+          pip install --upgrade django>=3.0,<3.1
+          pip install --upgrade -r test-requirements.txt
+          pip install --upgrade -r lint-requirements.txt
+          pip install .
+      - name: mypy cache
+        uses: actions/cache@v1
+        with:
+          path: .mypy_cache
+          key: ${{ runner.os }}-mypy
+          restore-keys: ${{ runner.os }}-mypy
+      - name: Run linters and static type checks
+        run: |
+          flake8
+          sorti --check .
+          black --check .
+          mypy
