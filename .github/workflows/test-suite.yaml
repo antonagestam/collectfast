@@ -1,4 +1,4 @@
-name: CI
+name: Test Suite
 on: [push, pull_request]
 jobs:
   test:
@@ -82,6 +82,6 @@ jobs:
           key: ${{ runner.os }}-mypy
           restore-keys: ${{ runner.os }}-mypy
       - run: flake8
-      - run: sorti --check .
+      - run: PYTHONPATH=. sorti --check .
       - run: black --check .
       - run: mypy
