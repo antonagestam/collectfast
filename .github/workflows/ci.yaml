@@ -26,6 +26,10 @@ jobs:
           pip install --upgrade -r test-requirements.txt
           pip install .
       - name: Run tests
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          GCLOUD_CREDENTIALS: ${{ secrets.GCLOUD_CREDENTIALS }}
         run: |
           if [[ "${{github.repository}}" != "antonagestam/collectfast" ]]; then
             export SKIP_LIVE_TESTS=true
