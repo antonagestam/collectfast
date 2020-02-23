@@ -34,14 +34,16 @@ jobs:
           if [[ "${{github.repository}}" != "antonagestam/collectfast" ]]; then
             export SKIP_LIVE_TESTS=true
           fi
-          coverage run --source collectfast -m pytest
+          coverage run -m pytest
           coverage xml
       - name: Coveralls
-        uses: coverallsapp/github-action@master
+        # See https://github.com/coverallsapp/github-action/pull/25
+        uses: ly-cultureiq/github-action@support-cobertura
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           parallel: true
-          path-to-lcov: coverage.xml
+          path-to-file: coverage.xml
+          coverage-format: cobertura
   finish-coveralls:
     name: Finish coveralls
     runs-on: ubuntu-latest
