@@ -2,7 +2,7 @@
 
 A faster collectstatic command.
 
-[![Build Status](https://api.travis-ci.org/antonagestam/collectfast.svg?branch=master)](https://travis-ci.org/antonagestam/collectfast)
+![Test Suite](https://github.com/antonagestam/collectfast/workflows/Test%20Suite/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/antonagestam/collectfast/badge.svg?branch=master)](https://coveralls.io/github/antonagestam/collectfast?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/ae25f7543fea0bbccb01/maintainability)](https://codeclimate.com/github/antonagestam/collectfast/maintainability)
 
