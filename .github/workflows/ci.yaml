@@ -67,7 +67,7 @@ jobs:
           restore-keys: ${{ runner.os }}-pip
       - name: Install dependencies
         run: |
-          pip install --upgrade django>=3.0,<3.1
+          pip install --upgrade 'django>=3.0,<3.1'
           pip install --upgrade -r test-requirements.txt
           pip install --upgrade -r lint-requirements.txt
           pip install .
