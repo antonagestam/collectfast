@@ -78,9 +78,8 @@ class Command(collectstatic.Command):
         ret = super().handle(**options)
         if not self.collectfast_enabled:
             return ret
-        return "{} static file{} copied.".format(
-            self.num_copied_files, "" if self.num_copied_files == 1 else "s"
-        )
+        plural = "" if self.num_copied_files == 1 else "s"
+        return f"{self.num_copied_files} static file{plural} copied."
 
     def maybe_copy_file(self, args: Task) -> None:
         """Determine if file should be copied or not and handle exceptions."""
@@ -90,7 +89,7 @@ class Command(collectstatic.Command):
             self.strategy.pre_should_copy_hook()
 
             if not self.strategy.should_copy_file(path, prefixed_path, source_storage):
-                self.log("Skipping '%s'" % path)
+                self.log(f"Skipping '{path}'")
                 return
 
         self.num_copied_files += 1
@@ -113,12 +112,16 @@ class Command(collectstatic.Command):
         """Override delete_file to skip modified time and exists lookups."""
         if not self.collectfast_enabled:
             return super().delete_file(path, prefixed_path, source_storage)
-        if not self.dry_run:
-            try:
-                self.log("Deleting '%s' on remote storage" % path)
-                self.storage.delete(prefixed_path)
-            except self.strategy.delete_not_found_exception:
-                pass
-        else:
-            self.log("Pretending to delete '%s'" % path)
+
+        if self.dry_run:
+            self.log(f"Pretending to delete '{path}'")
+            return True
+
+        self.log(f"Deleting '{path}' on remote storage")
+
+        try:
+            self.storage.delete(prefixed_path)
+        except self.strategy.delete_not_found_exception:
+            pass
+
         return True
