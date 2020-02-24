@@ -25,7 +25,7 @@ cache_key_prefix: Final = _get_setting(
     str, "COLLECTFAST_CACHE_KEY_PREFIX", "collectfast06_asset_"
 )
 cache: Final = _get_setting(str, "COLLECTFAST_CACHE", "default")
-threads: Final = _get_setting(bool, "COLLECTFAST_THREADS", False)
+threads: Final = _get_setting(int, "COLLECTFAST_THREADS", 0)
 enabled: Final = _get_setting(bool, "COLLECTFAST_ENABLED", True)
 aws_is_gzipped: Final = _get_setting(bool, "AWS_IS_GZIPPED", False)
 gzip_content_types: Final[Container] = _get_setting(
