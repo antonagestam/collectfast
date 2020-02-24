@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.1
+
+- Fix and add regression test for #178 (wrong type for `COLLECTFAST_THREADS`)
+- Add tests for strictly typed settings (#182)
+
 ## 2.0.0
 
 - Drop support for Python 3.5.
