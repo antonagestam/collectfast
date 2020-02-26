@@ -10,12 +10,10 @@ jobs:
     name: Test Python ${{ matrix.python-version }} Django ${{ matrix.django-version }}
     steps:
       - uses: actions/checkout@v2
-      - name: Setup Python
-        uses: actions/setup-python@v1
+      - uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
-      - name: pip cache
-        uses: actions/cache@v1
+      - uses: actions/cache@v1
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('setup.cfg') }}
@@ -37,53 +35,35 @@ jobs:
           SKIP_LIVE_TESTS: true
         if: github.event_name != 'push' || github.repository != 'antonagestam/collectfast'
         run: coverage run -m pytest
-      - run: coverage xml
-      - name: Coveralls
-        # See https://github.com/coverallsapp/github-action/pull/25
-        uses: ly-cultureiq/github-action@support-cobertura
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          parallel: true
-          path-to-file: coverage.xml
-          coverage-format: cobertura
-  lint:
-    name: Static analysis
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.8
-      - name: pip cache
-        uses: actions/cache@v1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('setup.cfg') }}
-          restore-keys: ${{ runner.os }}-pip
-      - name: Install dependencies
+      - name: Install Code Climate Test Reporter
         run: |
-          pip install --upgrade 'django>=3.0,<3.1'
-          pip install --upgrade -r test-requirements.txt
-          pip install --upgrade -r lint-requirements.txt
-          pip install .
-      - name: mypy cache
-        uses: actions/cache@v1
+          curl -vsL https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          chmod +x ./cc-test-reporter
+      - name: Format coverage
+        run: |
+          filename='coverage-py${{ matrix.python-version }}-dj'$(python -c 'import django;print(django.__version__)')'.json'
+          coverage xml
+          ./cc-test-reporter format-coverage -o "$filename"
+          echo "##[set-output name=filename;]${filename}"
+        id: format_coverage
+      - uses: actions/upload-artifact@v1
         with:
-          path: .mypy_cache
-          key: ${{ runner.os }}-mypy
-          restore-keys: ${{ runner.os }}-mypy
-      - run: flake8
-      - run: PYTHONPATH=. sorti --check .
-      - run: black --check .
-      - run: mypy
-  finish:
-    name: Send collected statistics
+          name: coverage
+          path: ${{ steps.format_coverage.outputs.filename }}
+  report-coverage:
+    name: Send Code Climate Coverage
     runs-on: ubuntu-latest
-    needs: [test, lint]
+    needs: [test]
     steps:
-      - name: Send "parallel finished" to Coveralls
-        uses: ly-cultureiq/github-action@support-cobertura
+      - name: Install Code Climate Test Reporter
+        run: |
+          curl -vsL https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          chmod +x ./cc-test-reporter
+      - uses: actions/download-artifact@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          parallel-finished: true
+          name: coverage
+      - env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        run: |
+          ./cc-test-reporter sum-coverage --output - coverage/coverage-*.json \
+            | ./cc-test-reporter upload-coverage --debug --input -
