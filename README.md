@@ -3,7 +3,7 @@
 A faster collectstatic command.
 
 [![Test Suite](https://github.com/antonagestam/collectfast/workflows/Test%20Suite/badge.svg)](https://github.com/antonagestam/collectfast/actions?query=workflow%3A%22Test+Suite%22+branch%3Amaster)
-[![Coverage Status](https://coveralls.io/repos/github/antonagestam/collectfast/badge.svg?branch=master)](https://coveralls.io/github/antonagestam/collectfast?branch=master)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/ae25f7543fea0bbccb01/test_coverage)](https://codeclimate.com/github/antonagestam/collectfast/test_coverage)
 [![Maintainability](https://api.codeclimate.com/v1/badges/ae25f7543fea0bbccb01/maintainability)](https://codeclimate.com/github/antonagestam/collectfast/maintainability)
 
 **Features**
