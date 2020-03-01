@@ -1,4 +1,4 @@
-from multiprocessing.dummy import Pool
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 from typing import Dict
 from typing import List
@@ -70,7 +70,8 @@ class Command(collectstatic.Command):
         if not self.collectfast_enabled:
             return ret
         if settings.threads:
-            Pool(settings.threads).map(self.maybe_copy_file, self.tasks)
+            with ThreadPoolExecutor(settings.threads) as pool:
+                pool.map(self.maybe_copy_file, self.tasks)
         return ret
 
     def handle(self, *args: Any, **options: Any) -> Optional[str]:

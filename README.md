@@ -110,7 +110,8 @@ than 300 static files, see [#47][issue-47].
 ### Enable Parallel Uploads
 
 The parallelization feature enables parallel file uploads using Python's
-multiprocessing module. Enable it by setting the `COLLECTFAST_THREADS` setting.
+`concurrent.futures` module. Enable it by setting the `COLLECTFAST_THREADS`
+setting.
 
 To enable parallel uploads, a dedicated cache backend must be setup and it must
 use a backend that is thread-safe, i.e. something other than Django's default
