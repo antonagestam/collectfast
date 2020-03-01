@@ -24,7 +24,7 @@ def test_calls_post_process_with_collected_files() -> None:
     path = create_static_file()
 
     cmd = Command()
-    cmd.run_from_argv(("manage.py", "collectstatic", "--noinput"))
+    cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
     cmd.storage.post_process.assert_called_once_with(
         {path.name: (mock.ANY, path.name)}, dry_run=False
     )
