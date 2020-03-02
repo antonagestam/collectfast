@@ -3,7 +3,8 @@
 ## 2.1.0
 
 - Use `concurrent.futures.ThreadPoolExecutor` instead of
-  `multiprocessing.dummy.Pool` for parallel uploads.
+  `multiprocessing.dummy.Pool` for parallel uploads. (#187)
+- Support `post_process()` (#188)
 
 ## 2.0.1
 
