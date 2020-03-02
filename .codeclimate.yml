@@ -1,0 +1,14 @@
+version: "2"
+plugins:
+  duplication:
+    enabled: true
+    config:
+      languages:
+        python:
+          python_version: 3
+  sonar-python:
+    enabled: true
+  radon:
+    enabled: true
+    config:
+      python_version: 3

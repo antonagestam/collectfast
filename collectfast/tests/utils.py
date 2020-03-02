@@ -64,12 +64,11 @@ def test_many(**mutations: Callable[[F], F]) -> Callable[[F], Type[unittest.Test
     return test
 
 
-def create_static_file() -> None:
+def create_static_file() -> pathlib.Path:
     """Write random characters to a file in the static directory."""
-    filename = "%s.txt" % uuid.uuid4().hex
-    with (static_dir / filename).open("w+") as file_:
-        for _ in range(500):
-            file_.write(chr(int(random.random() * 64)))
+    path = static_dir / f"{uuid.uuid4().hex}.txt"
+    path.write_text("".join(chr(random.randint(0, 64)) for _ in range(500)))
+    return path
 
 
 def clean_static_dir() -> None:
