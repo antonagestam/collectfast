@@ -13,9 +13,7 @@ from collectfast.tests.utils import make_test
 from collectfast.tests.utils import override_setting
 
 
-class BaseTestStrategy(HashStrategy[FileSystemStorage]):
-    _should_copy_file = None
-    
+class TrueTestStrategy(HashStrategy[FileSystemStorage]):
     def __init__(self):
         super().__init__(FileSystemStorage())
         self.post_copy_hook = mock.MagicMock()
@@ -23,16 +21,19 @@ class BaseTestStrategy(HashStrategy[FileSystemStorage]):
     def should_copy_file(
         self, path, prefixed_path, local_storage
     ):
-        return self._should_copy_file
+        return True
 
 
-class TrueTestStrategy(BaseTestStrategy):
-    _should_copy_file = True
-
-
-class FalseTestStrategy(BaseTestStrategy):
-    _should_copy_file = False
+class FalseTestStrategy(HashStrategy[FileSystemStorage]):
+    def __init__(self):
+        super().__init__(FileSystemStorage())
+        self.post_copy_hook = mock.MagicMock()
     
+    def should_copy_file(
+        self, path, prefixed_path, local_storage
+    ):
+        return False
+
 
 @make_test
 @override_django_settings(
