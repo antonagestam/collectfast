@@ -1,7 +1,6 @@
 from unittest import mock
 from unittest import TestCase
 
-from django.core.files.storage import Storage
 from django.test import override_settings as override_django_settings
 
 from collectfast.management.commands.collectstatic import Command
@@ -20,8 +19,8 @@ class BaseTestStrategy(Strategy):
         self.post_copy_hook = mock.MagicMock()
     
     def should_copy_file(
-        self, path: str, prefixed_path: str, local_storage: Storage
-    ) -> bool:
+        self, path, prefixed_path, local_storage
+    ):
         return self._should_copy_file
 
 
