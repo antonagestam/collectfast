@@ -54,7 +54,7 @@ def test_calls_post_copy_hook_true(case: TestCase) -> None:
 
 @make_test
 @override_django_settings(
-    COLLECTFAST_STRATEGY="collectfast.tests.command.test_post_copy_hook.FaleTestStrategy"
+    COLLECTFAST_STRATEGY="collectfast.tests.command.test_post_copy_hook.FalseTestStrategy"
 )
 def test_calls_post_copy_hook_false(case: TestCase) -> None:
     clean_static_dir()
