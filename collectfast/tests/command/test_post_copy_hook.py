@@ -39,7 +39,8 @@ class FalseTestStrategy(BaseTestStrategy):
 
 @make_test
 @override_django_settings(
-    COLLECTFAST_STRATEGY="collectfast.tests.command.test_post_copy_hook.TrueTestStrategy"
+    COLLECTFAST_STRATEGY="collectfast.tests.command.test_post_copy_hook.TrueTestStrategy",
+    STATICFILES_STORAGE="django.core.files.storage.FileSystemStorage",
 )
 def test_calls_post_copy_hook_true(case: TestCase) -> None:
     clean_static_dir()
@@ -57,7 +58,8 @@ def test_calls_post_copy_hook_true(case: TestCase) -> None:
 
 @make_test
 @override_django_settings(
-    COLLECTFAST_STRATEGY="collectfast.tests.command.test_post_copy_hook.FalseTestStrategy"
+    COLLECTFAST_STRATEGY="collectfast.tests.command.test_post_copy_hook.FalseTestStrategy",
+    STATICFILES_STORAGE="django.core.files.storage.FileSystemStorage",
 )
 def test_calls_post_copy_hook_false(case: TestCase) -> None:
     clean_static_dir()
