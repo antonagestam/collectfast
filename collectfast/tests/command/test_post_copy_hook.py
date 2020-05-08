@@ -1,23 +1,23 @@
-import abc
 from unittest import mock
 from unittest import TestCase
 
+from django.core.files.storage import FileSystemStorage
 from django.test import override_settings as override_django_settings
 
 from collectfast.management.commands.collectstatic import Command
 from collectfast.strategies.base import _RemoteStorage
-from collectfast.strategies.base import Strategy
+from collectfast.strategies.base import HashStrategy
 from collectfast.tests.utils import clean_static_dir
 from collectfast.tests.utils import create_static_file
 from collectfast.tests.utils import make_test
 from collectfast.tests.utils import override_setting
 
 
-class BaseTestStrategy(Strategy[_RemoteStorage], abc.ABC):
+class BaseTestStrategy(HashStrategy[FileSystemStorage]):
     _should_copy_file = None
     
-    def __init__(self, remote_storage):
-        super().__init__(remote_storage)
+    def __init__(self):
+        super().__init__(FileSystemStorage())
         self.post_copy_hook = mock.MagicMock()
     
     def should_copy_file(
