@@ -69,4 +69,9 @@ def test_calls_post_copy_hook_false(case: TestCase) -> None:
     cmd = Command()
     cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
     
-    cmd.strategy.post_copy_hook.assert_not_called()
+    cmd.strategy.post_copy_hook.assert_called_once_with(
+        mock.ANY,
+        mock.ANY,
+        mock.ANY,
+        False,
+    )
