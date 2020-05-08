@@ -10,8 +10,8 @@ from collectfast.tests.utils import clean_static_dir
 from collectfast.tests.utils import create_static_file
 from collectfast.tests.utils import make_test
 
-from .test_command import make_test_all_backends
 from .test_command import live_test
+from .test_command import make_test_all_backends
 
 
 class BaseTestStrategy(Strategy[FileSystemStorage]):
