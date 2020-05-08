@@ -48,8 +48,8 @@ def test_calls_post_copy_hook_true(case: TestCase) -> None:
     cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
 
     cmd.strategy.post_copy_hook.assert_called_once_with(
-        mock.ANY,
-        mock.ANY,
+        path.name,
+        path.name,
         mock.ANY,
         True,
     )
@@ -57,8 +57,8 @@ def test_calls_post_copy_hook_true(case: TestCase) -> None:
     cmd.strategy.post_copy_hook.reset_mock()
     cmd.collect()
     cmd.strategy.post_copy_hook.assert_called_once_with(
-        mock.ANY,
-        mock.ANY,
+        path.name,
+        path.name,
         mock.ANY,
         False,
     )
@@ -77,8 +77,8 @@ def test_calls_post_copy_hook_false(case: TestCase) -> None:
     cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
 
     cmd.strategy.post_copy_hook.assert_called_once_with(
-        str(path),
-        mock.ANY,
+        path.name,
+        path.name,
         mock.ANY,
         False,
     )
@@ -94,8 +94,8 @@ def test_all_calls_post_copy_hook(case: TestCase) -> None:
     cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
 
     cmd.strategy.post_copy_hook.assert_called_once_with(
-        str(path),
-        mock.ANY,
+        path.name,
+        path.name,
         mock.ANY,
         True,
     )
@@ -103,8 +103,8 @@ def test_all_calls_post_copy_hook(case: TestCase) -> None:
     cmd.strategy.post_copy_hook.reset_mock()
     cmd.collect()
     cmd.strategy.post_copy_hook.assert_called_once_with(
-        str(path),
-        mock.ANY,
+        path.name,
+        path.name,
         mock.ANY,
         False,
     )
