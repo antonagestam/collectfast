@@ -1,9 +1,11 @@
+import abc
 from unittest import mock
 from unittest import TestCase
 
 from django.test import override_settings as override_django_settings
 
 from collectfast.management.commands.collectstatic import Command
+from collectfast.strategies.base import _RemoteStorage
 from collectfast.strategies.base import Strategy
 from collectfast.tests.utils import clean_static_dir
 from collectfast.tests.utils import create_static_file
@@ -11,7 +13,7 @@ from collectfast.tests.utils import make_test
 from collectfast.tests.utils import override_setting
 
 
-class BaseTestStrategy(Strategy):
+class BaseTestStrategy(Strategy[_RemoteStorage], abc.ABC):
     _should_copy_file = None
     
     def __init__(self):
