@@ -1,6 +1,7 @@
 from unittest import mock
 from unittest import TestCase
 
+from django.core.files.storage import Storage
 from django.test import override_settings as override_django_settings
 
 from collectfast.management.commands.collectstatic import Command
