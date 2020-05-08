@@ -108,6 +108,7 @@ class Command(collectstatic.Command):
 
             if not self.strategy.should_copy_file(path, prefixed_path, source_storage):
                 self.log(f"Skipping '{path}'")
+                self.strategy.post_copy_hook(path, prefixed_path, source_storage, False)
                 return
 
         self.num_copied_files += 1
