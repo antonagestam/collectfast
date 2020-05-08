@@ -16,8 +16,8 @@ from collectfast.tests.utils import override_setting
 class BaseTestStrategy(Strategy[_RemoteStorage], abc.ABC):
     _should_copy_file = None
     
-    def __init__(self):
-        super().__init__()
+    def __init__(self, remote_storage):
+        super().__init__(remote_storage)
         self.post_copy_hook = mock.MagicMock()
     
     def should_copy_file(
