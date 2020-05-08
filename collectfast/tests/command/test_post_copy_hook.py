@@ -12,6 +12,9 @@ from collectfast.tests.utils import create_static_file
 from collectfast.tests.utils import make_test
 from collectfast.tests.utils import override_setting
 
+from .test_command import make_test_all_backends
+from .test_command import live_test
+
 
 class BaseTestStrategy(Strategy[FileSystemStorage]):
     _should_copy_file = None
@@ -75,6 +78,32 @@ def test_calls_post_copy_hook_false(case: TestCase) -> None:
     cmd = Command()
     cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
     
+    cmd.strategy.post_copy_hook.assert_called_once_with(
+        mock.ANY,
+        mock.ANY,
+        mock.ANY,
+        False,
+    )
+
+
+@make_test_all_backends
+@live_test
+def test_all_calls_post_copy_hook(case: TestCase) -> None:
+    clean_static_dir()
+    path = create_static_file()
+
+    cmd = Command()
+    cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
+    
+    cmd.strategy.post_copy_hook.assert_called_once_with(
+        mock.ANY,
+        mock.ANY,
+        mock.ANY,
+        True,
+    )
+
+    cmd.strategy.post_copy_hook.reset_mock()
+    cmd.collect()
     cmd.strategy.post_copy_hook.assert_called_once_with(
         mock.ANY,
         mock.ANY,
