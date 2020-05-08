@@ -16,8 +16,8 @@ from collectfast.tests.utils import override_setting
 class BaseTestStrategy(HashStrategy[FileSystemStorage]):
     _should_copy_file = None
     
-    def __init__(self):
-        super().__init__(FileSystemStorage())
+    def __init__(self, remote_storage):
+        super().__init__(remote_storage)
         self.post_copy_hook = mock.MagicMock()
     
     def get_remote_file_hash(self, prefixed_path):
