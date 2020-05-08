@@ -26,11 +26,11 @@ class BaseTestStrategy(Strategy[_RemoteStorage], abc.ABC):
         return self._should_copy_file
 
 
-class TrueTestStrategy(Strategy):
+class TrueTestStrategy(BaseTestStrategy):
     _should_copy_file = True
 
 
-class FalseTestStrategy(Strategy):
+class FalseTestStrategy(BaseTestStrategy):
     _should_copy_file = False
     
 
