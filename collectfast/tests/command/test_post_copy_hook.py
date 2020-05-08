@@ -50,7 +50,7 @@ def test_calls_post_copy_hook_true(case: TestCase) -> None:
     cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
     
     cmd.strategy.post_copy_hook.assert_called_once()
-    case.assertNotNone(cmd.strategy.post_copy_hook.call_args)
+    case.assertIsNotNone(cmd.strategy.post_copy_hook.call_args)
     case.assertIn('copied', cmd.strategy.post_copy_hook.call_args.kwargs)
     copied = cmd.strategy.post_copy_hook.call_args.kwargs['copied']
     case.assertTrue(copied)
@@ -69,7 +69,7 @@ def test_calls_post_copy_hook_false(case: TestCase) -> None:
     cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
     
     cmd.strategy.post_copy_hook.assert_called_once()
-    case.assertNotNone(cmd.strategy.post_copy_hook.call_args)
+    case.assertIsNotNone(cmd.strategy.post_copy_hook.call_args)
     case.assertIn('copied', cmd.strategy.post_copy_hook.call_args.kwargs)
     copied = cmd.strategy.post_copy_hook.call_args.kwargs['copied']
     case.assertFalse(copied)
