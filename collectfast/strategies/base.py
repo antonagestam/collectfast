@@ -54,6 +54,12 @@ class Strategy(abc.ABC, Generic[_RemoteStorage]):
         """Hook called before calling should_copy_file."""
         ...
 
+    def post_copy_hook(
+            self, path: str, prefixed_path: str, local_storage: Storage, copied: bool
+        ) -> None:
+        """Hook called after copy_file unless skipped."""
+        ...
+
 
 class HashStrategy(Strategy[_RemoteStorage], abc.ABC):
     use_gzip = False
