@@ -6,22 +6,19 @@ from django.test import override_settings as override_django_settings
 
 from collectfast.management.commands.collectstatic import Command
 from collectfast.strategies.base import _RemoteStorage
-from collectfast.strategies.base import HashStrategy
+from collectfast.strategies.base import Strategy
 from collectfast.tests.utils import clean_static_dir
 from collectfast.tests.utils import create_static_file
 from collectfast.tests.utils import make_test
 from collectfast.tests.utils import override_setting
 
 
-class BaseTestStrategy(HashStrategy[FileSystemStorage]):
+class BaseTestStrategy(Strategy[FileSystemStorage]):
     _should_copy_file = None
     
     def __init__(self, remote_storage):
         super().__init__(remote_storage)
         self.post_copy_hook = mock.MagicMock()
-    
-    def get_remote_file_hash(self, prefixed_path):
-        pass
 
     def should_copy_file(
         self, path, prefixed_path, local_storage
