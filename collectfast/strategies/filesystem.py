@@ -13,7 +13,10 @@ class FileSystemStrategy(HashStrategy[FileSystemStorage]):
             return None
 
 
-class CachingFileSystemStrategy(CachingHashStrategy[FileSystemStorage], FileSystemStrategy):
+class CachingFileSystemStrategy(
+        CachingHashStrategy[FileSystemStorage],
+        FileSystemStrategy,
+):
     def post_copy_hook(
             self, path: str, prefixed_path: str, local_storage: Storage, copied: bool
     ) -> None:
