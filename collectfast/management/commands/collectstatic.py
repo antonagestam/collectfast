@@ -111,7 +111,11 @@ class Command(collectstatic.Command):
                 return
 
         self.num_copied_files += 1
-        return super().copy_file(path, prefixed_path, source_storage)
+
+        existed = prefixed_path in self.copied_files
+        super().copy_file(path, prefixed_path, source_storage)
+        copied = not existed and prefixed_path in self.copied_files
+        self.strategy.post_copy_hook(path, prefixed_path, source_storage, copied)
 
     def copy_file(self, path: str, prefixed_path: str, source_storage: Storage) -> None:
         """
