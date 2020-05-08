@@ -56,6 +56,15 @@ def test_calls_post_copy_hook_true(case: TestCase) -> None:
         True,
     )
 
+    cmd.strategy.post_copy_hook.reset_mock()
+    cmd.collect()
+    cmd.strategy.post_copy_hook.assert_called_once_with(
+        mock.ANY,
+        mock.ANY,
+        mock.ANY,
+        False,
+    )
+
 
 @make_test
 @override_django_settings(
