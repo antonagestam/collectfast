@@ -20,6 +20,9 @@ class BaseTestStrategy(HashStrategy[FileSystemStorage]):
         super().__init__(FileSystemStorage())
         self.post_copy_hook = mock.MagicMock()
     
+    def get_remote_file_hash(self, prefixed_path):
+        pass
+
     def should_copy_file(
         self, path, prefixed_path, local_storage
     ):
