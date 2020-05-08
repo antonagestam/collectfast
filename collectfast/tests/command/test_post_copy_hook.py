@@ -52,7 +52,7 @@ def test_calls_post_copy_hook_true(case: TestCase) -> None:
     cmd.strategy.post_copy_hook.assert_called_once_with(
         mock.ANY,
         mock.ANY,
-        self.remote_storage,
+        cmd.strategy.remote_storage,
         True,
     )
 
