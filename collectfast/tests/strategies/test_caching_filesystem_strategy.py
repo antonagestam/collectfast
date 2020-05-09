@@ -52,5 +52,5 @@ def test_get_local_file_hash_memoization(case: TestCase, mocked_super_get_local_
     actual_hash = strategy.get_local_file_hash('bar', local_storage)
     case.assertEqual(actual_hash, bar_hash)
     
-    mocked_super_get_local_file_hash.assert_called_once_with('bar', local_storage)
+    mocked_super_get_local_file_hash.assert_called_with('bar', local_storage)
     case.assertEqual(mocked_super_get_local_file_hash.call_count, 2)
