@@ -2,6 +2,7 @@ from typing import Optional
 
 from django.core.files.storage import FileSystemStorage
 
+from .base import CachingHashStrategy
 from .base import HashStrategy
 
 
