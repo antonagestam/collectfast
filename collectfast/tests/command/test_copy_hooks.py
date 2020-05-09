@@ -20,6 +20,7 @@ class BaseTestStrategy(Strategy[FileSystemStorage]):
     def __init__(self, remote_storage):
         super().__init__(remote_storage)
         self.post_copy_hook = mock.MagicMock()
+        self.copy_skipped_hook = mock.MagicMock()
 
     def should_copy_file(
         self, path, prefixed_path, local_storage
@@ -51,16 +52,13 @@ def test_calls_post_copy_hook_true(case: TestCase) -> None:
         path.name,
         path.name,
         mock.ANY,
-        True,
     )
 
-    cmd.strategy.post_copy_hook.reset_mock()
     cmd.collect()
-    cmd.strategy.post_copy_hook.assert_called_once_with(
+    cmd.strategy.copy_skipped_hook.assert_called_once_with(
         path.name,
         path.name,
         mock.ANY,
-        False,
     )
 
 
@@ -76,11 +74,10 @@ def test_calls_post_copy_hook_false(case: TestCase) -> None:
     cmd = Command()
     cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
 
-    cmd.strategy.post_copy_hook.assert_called_once_with(
+    cmd.strategy.copy_skipped_hook.assert_called_once_with(
         path.name,
         path.name,
         mock.ANY,
-        False,
     )
 
 
@@ -97,14 +94,11 @@ def test_all_calls_post_copy_hook(case: TestCase) -> None:
         path.name,
         path.name,
         mock.ANY,
-        True,
     )
 
-    cmd.strategy.post_copy_hook.reset_mock()
     cmd.collect()
-    cmd.strategy.post_copy_hook.assert_called_once_with(
+    cmd.strategy.copy_skipped_hook.assert_called_once_with(
         path.name,
         path.name,
         mock.ANY,
-        False,
     )
