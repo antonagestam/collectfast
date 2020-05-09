@@ -19,9 +19,8 @@ class CachingFileSystemStrategy(
         FileSystemStrategy,
 ):
     def post_copy_hook(
-            self, path: str, prefixed_path: str, local_storage: Storage, copied: bool
+            self, path: str, prefixed_path: str, local_storage: Storage
     ) -> None:
-        if copied:
-            cache_key = self.get_cache_key(path)
-            hash_ = self.get_local_file_hash(path, local_storage)
-            cache.set(cache_key, hash_)
+        cache_key = self.get_cache_key(path)
+        hash_ = self.get_local_file_hash(path, local_storage)
+        cache.set(cache_key, hash_)
