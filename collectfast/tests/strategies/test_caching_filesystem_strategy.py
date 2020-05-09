@@ -1,4 +1,5 @@
 from unittest import mock
+from unittest import TestCase
 
 from django.core.files.storage import FileSystemStorage
 
