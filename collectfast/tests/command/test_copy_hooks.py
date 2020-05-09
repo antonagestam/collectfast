@@ -41,19 +41,28 @@ class FalseTestStrategy(BaseTestStrategy):
     COLLECTFAST_STRATEGY="collectfast.tests.command.test_post_copy_hook.TrueTestStrategy",  # noqa: E501
     STATICFILES_STORAGE="django.core.files.storage.FileSystemStorage",
 )
-def test_calls_post_copy_hook_true(case: TestCase) -> None:
+def test_calls_post_copy_hook_simple(case: TestCase) -> None:
     clean_static_dir()
     path = create_static_file()
-
     cmd = Command()
     cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
-
     cmd.strategy.post_copy_hook.assert_called_once_with(
         path.name,
         path.name,
         mock.ANY,
     )
 
+
+@make_test
+@override_django_settings(
+    COLLECTFAST_STRATEGY="collectfast.tests.command.test_post_copy_hook.TrueTestStrategy",  # noqa: E501
+    STATICFILES_STORAGE="django.core.files.storage.FileSystemStorage",
+)
+def test_calls_copy_skipped_hook_collectstatic(case: TestCase) -> None:
+    clean_static_dir()
+    path = create_static_file()
+    cmd = Command()
+    cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
     cmd.collect()
     cmd.strategy.copy_skipped_hook.assert_called_once_with(
         path.name,
@@ -67,13 +76,11 @@ def test_calls_post_copy_hook_true(case: TestCase) -> None:
     COLLECTFAST_STRATEGY="collectfast.tests.command.test_post_copy_hook.FalseTestStrategy",  # noqa: E501
     STATICFILES_STORAGE="django.core.files.storage.FileSystemStorage",
 )
-def test_calls_post_copy_hook_false(case: TestCase) -> None:
+def test_calls_copy_skipped_hook_collectfast(case: TestCase) -> None:
     clean_static_dir()
     path = create_static_file()
-
     cmd = Command()
     cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
-
     cmd.strategy.copy_skipped_hook.assert_called_once_with(
         path.name,
         path.name,
@@ -83,19 +90,25 @@ def test_calls_post_copy_hook_false(case: TestCase) -> None:
 
 @make_test_all_backends
 @live_test
-def test_all_calls_post_copy_hook(case: TestCase) -> None:
+def test_call_post_copy_hook_all_backends(case: TestCase) -> None:
     clean_static_dir()
     path = create_static_file()
-
     cmd = Command()
     cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
-
     cmd.strategy.post_copy_hook.assert_called_once_with(
         path.name,
         path.name,
         mock.ANY,
     )
 
+
+@make_test_all_backends
+@live_test
+def test_call_copy_skipped_hook_all_backends(case: TestCase) -> None:
+    clean_static_dir()
+    path = create_static_file()
+    cmd = Command()
+    cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
     cmd.collect()
     cmd.strategy.copy_skipped_hook.assert_called_once_with(
         path.name,
