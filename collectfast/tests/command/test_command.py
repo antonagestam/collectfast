@@ -20,16 +20,23 @@ aws_backend_confs = {
         COLLECTFAST_STRATEGY="collectfast.strategies.boto3.Boto3Strategy",
     ),
 }
+filesystem_backend_confs = {
+    "filesystem": override_django_settings(
+        STATICFILES_STORAGE="django.core.files.storage.FileSystemStorage",
+        COLLECTFAST_STRATEGY="collectfast.strategies.filesystem.FileSystemStrategy",
+    ),
+    "cachingfilesystem": override_django_settings(
+        STATICFILES_STORAGE="django.core.files.storage.FileSystemStorage",
+        COLLECTFAST_STRATEGY="collectfast.strategies.filesystem.CachingFileSystemStrategy",
+    ),
+}
 all_backend_confs = {
     **aws_backend_confs,
     "gcloud": override_django_settings(
         STATICFILES_STORAGE="storages.backends.gcloud.GoogleCloudStorage",
         COLLECTFAST_STRATEGY="collectfast.strategies.gcloud.GoogleCloudStrategy",
     ),
-    "filesystem": override_django_settings(
-        STATICFILES_STORAGE="django.core.files.storage.FileSystemStorage",
-        COLLECTFAST_STRATEGY="collectfast.strategies.filesystem.FileSystemStrategy",
-    ),
+    **filesystem_backend_confs,
 }
 
 make_test_aws_backends = test_many(**aws_backend_confs)
