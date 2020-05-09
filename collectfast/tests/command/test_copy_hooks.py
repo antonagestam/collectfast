@@ -38,7 +38,7 @@ class FalseTestStrategy(BaseTestStrategy):
 
 @make_test
 @override_django_settings(
-    COLLECTFAST_STRATEGY="collectfast.tests.command.test_post_copy_hook.TrueTestStrategy",  # noqa: E501
+    COLLECTFAST_STRATEGY="collectfast.tests.command.test_copy_hooks.TrueTestStrategy",  # noqa: E501
     STATICFILES_STORAGE="django.core.files.storage.FileSystemStorage",
 )
 def test_calls_post_copy_hook_simple(case: TestCase) -> None:
@@ -55,7 +55,7 @@ def test_calls_post_copy_hook_simple(case: TestCase) -> None:
 
 @make_test
 @override_django_settings(
-    COLLECTFAST_STRATEGY="collectfast.tests.command.test_post_copy_hook.TrueTestStrategy",  # noqa: E501
+    COLLECTFAST_STRATEGY="collectfast.tests.command.test_copy_hooks.TrueTestStrategy",  # noqa: E501
     STATICFILES_STORAGE="django.core.files.storage.FileSystemStorage",
 )
 def test_calls_copy_skipped_hook_collectstatic(case: TestCase) -> None:
@@ -73,7 +73,7 @@ def test_calls_copy_skipped_hook_collectstatic(case: TestCase) -> None:
 
 @make_test
 @override_django_settings(
-    COLLECTFAST_STRATEGY="collectfast.tests.command.test_post_copy_hook.FalseTestStrategy",  # noqa: E501
+    COLLECTFAST_STRATEGY="collectfast.tests.command.test_copy_hooks.FalseTestStrategy",  # noqa: E501
     STATICFILES_STORAGE="django.core.files.storage.FileSystemStorage",
 )
 def test_calls_copy_skipped_hook_collectfast(case: TestCase) -> None:
