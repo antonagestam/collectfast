@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.1
+
+- Added `post_copy_hook` and `copy_skipped_hook` to
+  `collectfast.strategies.base.Strategy`
+
+- Added `collectfast.strategies.filesystem.CachingFileSystemStrategy`
+
+
 ## 2.1.0
 
 - Use `concurrent.futures.ThreadPoolExecutor` instead of
