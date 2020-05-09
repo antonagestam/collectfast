@@ -3,6 +3,7 @@ from typing import Optional
 from django.core.files.storage import FileSystemStorage
 from django.core.files.storage import Storage
 
+from .base import cache
 from .base import CachingHashStrategy
 from .base import HashStrategy
 
