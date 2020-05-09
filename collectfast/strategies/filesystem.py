@@ -32,6 +32,10 @@ class CachingFileSystemStrategy(
     def post_copy_hook(
             self, path: str, prefixed_path: str, local_storage: Storage
     ) -> None:
+        '''
+        sets the cached hash from the local file that was just copied to avoid
+        reading the remote file which may be stored on a networked file system
+        '''
         key = self.get_cache_key(path)
         value = self.get_local_file_hash(path, local_storage)
         cache.set(key, value)
