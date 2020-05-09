@@ -17,8 +17,8 @@ def test_post_copy_hook_primes_cache(case: TestCase) -> None:
     local_storage = FileSystemStorage()
     remote_storage = FileSystemStorage()
     strategy = CachingFileSystemStrategy(remote_storage)
-    with patch.object(strategy, 'get_local_file_hash', return_value=expected_hash) as mock_get_local_file_hash:
-        with patch.object(strategy, 'get_remote_file_hash') as mock_get_remote_file_hash:
+    with mock.patch.object(strategy, 'get_local_file_hash', return_value=expected_hash) as mock_get_local_file_hash:
+        with mock.patch.object(strategy, 'get_remote_file_hash') as mock_get_remote_file_hash:
             strategy.post_copy_hook(path.name, path.name, local_storage)
             actual_hash = strategy.get_cached_remote_file_hash(path.name, path.name)
             mock_get_remote_file_hash.assert_not_called()
