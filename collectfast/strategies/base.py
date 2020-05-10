@@ -62,7 +62,7 @@ class Strategy(abc.ABC, Generic[_RemoteStorage]):
         """
         ...
 
-    def copy_skipped_hook(
+    def file_skipped_hook(
             self, path: str, prefixed_path: str, local_storage: Storage
     ) -> None:
         """
