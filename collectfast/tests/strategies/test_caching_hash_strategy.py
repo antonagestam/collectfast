@@ -6,6 +6,8 @@ from django.core.files.storage import FileSystemStorage
 
 from collectfast import settings
 from collectfast.strategies.base import CachingHashStrategy
+from collectfast.tests.utils import clean_static_dir
+from collectfast.tests.utils import create_static_file
 from collectfast.tests.utils import make_test
 
 
