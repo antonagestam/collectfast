@@ -20,7 +20,7 @@ class BaseTestStrategy(Strategy[FileSystemStorage]):
     def __init__(self, remote_storage):
         super().__init__(remote_storage)
         self.file_copied_hook = mock.MagicMock()
-        self.copy_skipped_hook = mock.MagicMock()
+        self.file_skipped_hook = mock.MagicMock()
 
     def should_copy_file(
         self, path, prefixed_path, local_storage
@@ -58,13 +58,13 @@ def test_calls_file_copied_hook_simple(case: TestCase) -> None:
     COLLECTFAST_STRATEGY="collectfast.tests.command.test_copy_hooks.TrueTestStrategy",  # noqa: E501
     STATICFILES_STORAGE="django.core.files.storage.FileSystemStorage",
 )
-def test_calls_copy_skipped_hook_collectstatic(case: TestCase) -> None:
+def test_calls_file_skipped_hook_collectstatic(case: TestCase) -> None:
     clean_static_dir()
     path = create_static_file()
     cmd = Command()
     cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
     cmd.collect()
-    cmd.strategy.copy_skipped_hook.assert_called_once_with(
+    cmd.strategy.file_skipped_hook.assert_called_once_with(
         path.name,
         path.name,
         mock.ANY,
@@ -76,12 +76,12 @@ def test_calls_copy_skipped_hook_collectstatic(case: TestCase) -> None:
     COLLECTFAST_STRATEGY="collectfast.tests.command.test_copy_hooks.FalseTestStrategy",  # noqa: E501
     STATICFILES_STORAGE="django.core.files.storage.FileSystemStorage",
 )
-def test_calls_copy_skipped_hook_collectfast(case: TestCase) -> None:
+def test_calls_file_skipped_hook_collectfast(case: TestCase) -> None:
     clean_static_dir()
     path = create_static_file()
     cmd = Command()
     cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
-    cmd.strategy.copy_skipped_hook.assert_called_once_with(
+    cmd.strategy.file_skipped_hook.assert_called_once_with(
         path.name,
         path.name,
         mock.ANY,
@@ -104,13 +104,13 @@ def test_call_file_copied_hook_all_backends(case: TestCase) -> None:
 
 @make_test_all_backends
 @live_test
-def test_call_copy_skipped_hook_all_backends(case: TestCase) -> None:
+def test_call_file_skipped_hook_all_backends(case: TestCase) -> None:
     clean_static_dir()
     path = create_static_file()
     cmd = Command()
     cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
     cmd.collect()
-    cmd.strategy.copy_skipped_hook.assert_called_once_with(
+    cmd.strategy.file_skipped_hook.assert_called_once_with(
         path.name,
         path.name,
         mock.ANY,
