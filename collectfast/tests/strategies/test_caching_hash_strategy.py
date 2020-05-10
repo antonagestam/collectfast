@@ -81,6 +81,7 @@ def test_get_local_file_hash_memoization(case: TestCase, mocked_super_get_local_
     mocked_super_get_local_file_hash.return_value = foo_hash
     strategy = Strategy()
     
+    local_storage = FileSystemStorage()
     actual_hash = strategy.get_local_file_hash('foo', local_storage)
     case.assertEqual(actual_hash, foo_hash)
     
