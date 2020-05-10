@@ -117,7 +117,7 @@ class Command(collectstatic.Command):
         super().copy_file(path, prefixed_path, source_storage)
         copied = not existed and prefixed_path in self.copied_files
         if copied:
-            self.strategy.post_copy_hook(path, prefixed_path, source_storage)
+            self.strategy.file_copied_hook(path, prefixed_path, source_storage)
         else:
             self.strategy.copy_skipped_hook(path, prefixed_path, source_storage)
 

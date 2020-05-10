@@ -54,7 +54,7 @@ class Strategy(abc.ABC, Generic[_RemoteStorage]):
         """Hook called before calling should_copy_file."""
         ...
 
-    def post_copy_hook(
+    def file_copied_hook(
             self, path: str, prefixed_path: str, local_storage: Storage
     ) -> None:
         """
@@ -157,14 +157,14 @@ class CachingHashStrategy(HashStrategy[_RemoteStorage], abc.ABC):
             cache.set(cache_key, file_hash)
         return str(file_hash)
 
-    def post_copy_hook(
+    def file_copied_hook(
             self, path: str, prefixed_path: str, local_storage: Storage
     ) -> None:
         '''
         sets the cached hash from the local file that was just copied to avoid
         reading the remote file which may be stored on a networked file system
         '''
-        super().post_copy_hook(path, prefixed_path, local_storage)
+        super().file_copied_hook(path, prefixed_path, local_storage)
         key = self.get_cache_key(path)
         value = self.get_local_file_hash(path, local_storage)
         cache.set(key, value)
