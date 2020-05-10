@@ -10,7 +10,7 @@ from collectfast.tests.utils import make_test
 
 
 @make_test
-def test_post_copy_hook_primes_cache(case: TestCase) -> None:
+def test_file_copied_hook_primes_cache(case: TestCase) -> None:
     clean_static_dir()
     path = create_static_file()
     expected_hash = 'abc123'
@@ -19,7 +19,7 @@ def test_post_copy_hook_primes_cache(case: TestCase) -> None:
     strategy = CachingFileSystemStrategy(remote_storage)
     with mock.patch.object(strategy, 'get_local_file_hash', return_value=expected_hash) as mock_get_local_file_hash:
         with mock.patch.object(strategy, 'get_remote_file_hash') as mock_get_remote_file_hash:
-            strategy.post_copy_hook(path.name, path.name, local_storage)
+            strategy.file_copied_hook(path.name, path.name, local_storage)
             actual_hash = strategy.get_cached_remote_file_hash(path.name, path.name)
             mock_get_remote_file_hash.assert_not_called()
             mock_get_local_file_hash.assert_called_once()

@@ -2,7 +2,7 @@
 
 ## 2.1.1
 
-- Added `post_copy_hook` and `copy_skipped_hook` to
+- Added `file_copied_hook` and `copy_skipped_hook` to
   `collectfast.strategies.base.Strategy`
 
 - Added `collectfast.strategies.filesystem.CachingFileSystemStrategy`
