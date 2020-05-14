@@ -69,7 +69,7 @@ class HashStrategy(Strategy[_RemoteStorage], abc.ABC):
         self, uncompressed_file_hash: str, path: str, contents: str
     ) -> str:
         buffer = BytesIO()
-        zf = gzip.GzipFile(mode="wb", compresslevel=6, fileobj=buffer, mtime=0.0)
+        zf = gzip.GzipFile(mode="wb", fileobj=buffer, mtime=0.0)
         zf.write(force_bytes(contents))
         zf.close()
         return hashlib.md5(buffer.getvalue()).hexdigest()
