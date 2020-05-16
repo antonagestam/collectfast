@@ -109,7 +109,7 @@ class CachingHashStrategy(HashStrategy[_RemoteStorage], abc.ABC):
         path_hash = hashlib.md5(path.encode()).hexdigest()
         return settings.cache_key_prefix + path_hash
 
-    @lru_cache()
+    @lru_cache(maxsize=None)
     def get_local_file_hash(self, *args, **kwargs):
         '''
         caches the local file hash in memory so the hash is only computed once
