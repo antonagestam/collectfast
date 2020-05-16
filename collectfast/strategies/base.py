@@ -76,7 +76,13 @@ class HashStrategy(Strategy[_RemoteStorage], abc.ABC):
 
     def get_local_file_hash(self, path: str, local_storage: Storage) -> str:
         """Create md5 hash from file contents."""
-        contents = local_storage.open(path).read()
+        # Read file contents and handle file closing
+        file = local_storage.open(path)
+        try:
+            contents = file.read()
+        finally:
+            file.close()
+
         file_hash = hashlib.md5(contents).hexdigest()
 
         # Check if content should be gzipped and hash gzipped content

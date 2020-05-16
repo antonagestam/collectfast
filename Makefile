@@ -27,3 +27,7 @@ lint:
 	sorti --check .
 	black --check .
 	mypy .
+
+format:
+	sorti .
+	black .
