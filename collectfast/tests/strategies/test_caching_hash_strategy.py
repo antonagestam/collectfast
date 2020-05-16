@@ -62,7 +62,7 @@ def test_gets_and_invalidates_hash(case: TestCase) -> None:
 
 
 @make_test
-def test_file_copied_hook_primes_cache(case: TestCase) -> None:
+def test_primes_cache(case: TestCase) -> None:
     clean_static_dir()
     path = create_static_file()
     expected_hash = 'abc123'
