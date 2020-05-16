@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.1.1
+## Unreleased
 
 - Added `file_copied_hook` and `file_skipped_hook` to
   `collectfast.strategies.base.Strategy`
