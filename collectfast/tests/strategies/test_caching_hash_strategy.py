@@ -70,7 +70,7 @@ def test_primes_cache(case: TestCase) -> None:
     local_storage = FileSystemStorage()
     with mock.patch.object(strategy, 'get_local_file_hash', return_value=expected_hash) as mock_get_local_file_hash:
         with mock.patch.object(strategy, 'get_remote_file_hash') as mock_get_remote_file_hash:
-            strategy.file_copied_hook(path.name, path.name, local_storage)
+            strategy.post_copy_hook(path.name, path.name, local_storage)
             actual_hash = strategy.get_cached_remote_file_hash(path.name, path.name)
             mock_get_remote_file_hash.assert_not_called()
             mock_get_local_file_hash.assert_called_once()
