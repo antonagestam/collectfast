@@ -60,7 +60,7 @@ class Strategy(abc.ABC, Generic[_RemoteStorage]):
         """Hook called after a file is copied."""
         ...
 
-    def file_skipped_hook(
+    def on_skip_hook(
             self, path: str, prefixed_path: str, local_storage: Storage
     ) -> None:
         """Hook called when a file copy is skipped."""
