@@ -63,7 +63,7 @@ def test_calls_file_skipped_hook_collectstatic(case: TestCase) -> None:
     path = create_static_file()
     cmd = Command()
     cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
-    cmd.collect()
+    cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
     cmd.strategy.file_skipped_hook.assert_called_once_with(
         path.name,
         path.name,
