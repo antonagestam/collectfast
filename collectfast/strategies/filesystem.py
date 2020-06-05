@@ -2,6 +2,7 @@ from typing import Optional
 
 from django.core.files.storage import FileSystemStorage
 
+from .base import CachingHashStrategy
 from .base import HashStrategy
 
 
@@ -11,3 +12,9 @@ class FileSystemStrategy(HashStrategy[FileSystemStorage]):
             return self.get_local_file_hash(prefixed_path, self.remote_storage)
         except FileNotFoundError:
             return None
+
+
+class CachingFileSystemStrategy(
+    CachingHashStrategy[FileSystemStorage], FileSystemStrategy,
+):
+    ...

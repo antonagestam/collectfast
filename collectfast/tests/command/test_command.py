@@ -1,3 +1,4 @@
+from unittest import mock
 from unittest import TestCase
 
 from django.core.exceptions import ImproperlyConfigured
@@ -29,6 +30,12 @@ all_backend_confs = {
     "filesystem": override_django_settings(
         STATICFILES_STORAGE="django.core.files.storage.FileSystemStorage",
         COLLECTFAST_STRATEGY="collectfast.strategies.filesystem.FileSystemStrategy",
+    ),
+    "cachingfilesystem": override_django_settings(
+        STATICFILES_STORAGE="django.core.files.storage.FileSystemStorage",
+        COLLECTFAST_STRATEGY=(
+            "collectfast.strategies.filesystem.CachingFileSystemStrategy"
+        ),
     ),
 }
 
@@ -87,3 +94,27 @@ def test_aws_is_gzipped(case: TestCase) -> None:
 def test_raises_for_no_configured_strategy(case: TestCase) -> None:
     with case.assertRaises(ImproperlyConfigured):
         Command._load_strategy()
+
+
+@make_test_all_backends
+@live_test
+@mock.patch("collectfast.strategies.base.Strategy.post_copy_hook", autospec=True)
+def test_calls_post_copy_hook(_case: TestCase, post_copy_hook: mock.MagicMock) -> None:
+    clean_static_dir()
+    path = create_static_file()
+    cmd = Command()
+    cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
+    post_copy_hook.assert_called_once_with(mock.ANY, path.name, path.name, mock.ANY)
+
+
+@make_test_all_backends
+@live_test
+@mock.patch("collectfast.strategies.base.Strategy.on_skip_hook", autospec=True)
+def test_calls_on_skip_hook(_case: TestCase, on_skip_hook: mock.MagicMock) -> None:
+    clean_static_dir()
+    path = create_static_file()
+    cmd = Command()
+    cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
+    on_skip_hook.assert_not_called()
+    cmd.run_from_argv(["manage.py", "collectstatic", "--noinput"])
+    on_skip_hook.assert_called_once_with(mock.ANY, path.name, path.name, mock.ANY)

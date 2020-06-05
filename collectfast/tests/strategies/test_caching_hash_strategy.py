@@ -57,3 +57,19 @@ def test_gets_and_invalidates_hash(case: TestCase) -> None:
     result_hash = strategy.get_cached_remote_file_hash("path", "prefixed_path")
     case.assertEqual(result_hash, expected_hash)
     mocked.assert_called_once_with("prefixed_path")
+
+
+@make_test
+def test_post_copy_hook_primes_cache(case: TestCase) -> None:
+    filename = "123abc"
+    expected_hash = "abc123"
+    strategy = Strategy()
+
+    with mock.patch.object(
+        strategy, "get_local_file_hash", return_value=expected_hash, autospec=True
+    ):
+        strategy.post_copy_hook(filename, filename, strategy.remote_storage)
+
+    case.assertEqual(
+        expected_hash, strategy.get_cached_remote_file_hash(filename, filename)
+    )

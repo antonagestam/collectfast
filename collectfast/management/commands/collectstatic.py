@@ -108,10 +108,18 @@ class Command(collectstatic.Command):
 
             if not self.strategy.should_copy_file(path, prefixed_path, source_storage):
                 self.log(f"Skipping '{path}'")
+                self.strategy.on_skip_hook(path, prefixed_path, source_storage)
                 return
 
         self.num_copied_files += 1
-        return super().copy_file(path, prefixed_path, source_storage)
+
+        existed = prefixed_path in self.copied_files
+        super().copy_file(path, prefixed_path, source_storage)
+        copied = not existed and prefixed_path in self.copied_files
+        if copied:
+            self.strategy.post_copy_hook(path, prefixed_path, source_storage)
+        else:
+            self.strategy.on_skip_hook(path, prefixed_path, source_storage)
 
     def copy_file(self, path: str, prefixed_path: str, source_storage: Storage) -> None:
         """
