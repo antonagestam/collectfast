@@ -1,10 +1,7 @@
-from functools import lru_cache
 from typing import Optional
 
 from django.core.files.storage import FileSystemStorage
-from django.core.files.storage import Storage
 
-from .base import cache
 from .base import CachingHashStrategy
 from .base import HashStrategy
 
@@ -18,7 +15,6 @@ class FileSystemStrategy(HashStrategy[FileSystemStorage]):
 
 
 class CachingFileSystemStrategy(
-        CachingHashStrategy[FileSystemStorage],
-        FileSystemStrategy,
-):  
+    CachingHashStrategy[FileSystemStorage], FileSystemStrategy,
+):
     ...

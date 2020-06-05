@@ -55,13 +55,13 @@ class Strategy(abc.ABC, Generic[_RemoteStorage]):
         ...
 
     def post_copy_hook(
-            self, path: str, prefixed_path: str, local_storage: Storage
+        self, path: str, prefixed_path: str, local_storage: Storage
     ) -> None:
         """Hook called after a file is copied."""
         ...
 
     def on_skip_hook(
-            self, path: str, prefixed_path: str, local_storage: Storage
+        self, path: str, prefixed_path: str, local_storage: Storage
     ) -> None:
         """Hook called when a file copy is skipped."""
         ...
@@ -86,6 +86,7 @@ class HashStrategy(Strategy[_RemoteStorage], abc.ABC):
         zf.close()
         return hashlib.md5(buffer.getvalue()).hexdigest()
 
+    @lru_cache(maxsize=None)
     def get_local_file_hash(self, path: str, local_storage: Storage) -> str:
         """Create md5 hash from file contents."""
         contents = local_storage.open(path).read()
@@ -104,17 +105,10 @@ class HashStrategy(Strategy[_RemoteStorage], abc.ABC):
 
 
 class CachingHashStrategy(HashStrategy[_RemoteStorage], abc.ABC):
-    @lru_cache()
+    @lru_cache(maxsize=None)
     def get_cache_key(self, path: str) -> str:
         path_hash = hashlib.md5(path.encode()).hexdigest()
         return settings.cache_key_prefix + path_hash
-
-    @lru_cache(maxsize=None)
-    def get_local_file_hash(self, *args, **kwargs):
-        '''
-        caches the local file hash in memory so the hash is only computed once
-        '''
-        return super().get_local_file_hash(*args, **kwargs)
 
     def invalidate_cached_hash(self, path: str) -> None:
         cache.delete(self.get_cache_key(path))
@@ -154,12 +148,9 @@ class CachingHashStrategy(HashStrategy[_RemoteStorage], abc.ABC):
         return str(file_hash)
 
     def post_copy_hook(
-            self, path: str, prefixed_path: str, local_storage: Storage
+        self, path: str, prefixed_path: str, local_storage: Storage
     ) -> None:
-        '''
-        sets the cached hash from the local file that was just copied to avoid
-        reading the remote file which may be stored on a networked file system
-        '''
+        """Cache the hash of the just copied local file."""
         super().post_copy_hook(path, prefixed_path, local_storage)
         key = self.get_cache_key(path)
         value = self.get_local_file_hash(path, local_storage)

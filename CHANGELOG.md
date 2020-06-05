@@ -2,22 +2,21 @@
 
 ## Unreleased
 
-- Added `post_copy_hook` and `on_skip_hook` to
-  `collectfast.strategies.base.Strategy`
-
-- Added `collectfast.strategies.filesystem.CachingFileSystemStrategy`
+- Add `post_copy_hook` and `on_skip_hook` to
+  `collectfast.strategies.base.Strategy`.
+- Add `collectfast.strategies.filesystem.CachingFileSystemStrategy`.
 
 
 ## 2.1.0
 
 - Use `concurrent.futures.ThreadPoolExecutor` instead of
-  `multiprocessing.dummy.Pool` for parallel uploads. (#187)
-- Support `post_process()` (#188)
+  `multiprocessing.dummy.Pool` for parallel uploads.
+- Support `post_process()`.
 
 ## 2.0.1
 
-- Fix and add regression test for #178 (wrong type for `COLLECTFAST_THREADS`)
-- Add tests for strictly typed settings (#182)
+- Fix and add regression test for #178 (wrong type for `COLLECTFAST_THREADS`).
+- Add tests for strictly typed settings.
 
 ## 2.0.0
 
