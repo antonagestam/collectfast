@@ -1,10 +1,12 @@
 # Changelog
 
-## Unreleased
+## 2.2.0
 
 - Add `post_copy_hook` and `on_skip_hook` to
   `collectfast.strategies.base.Strategy`.
 - Add `collectfast.strategies.filesystem.CachingFileSystemStrategy`.
+- Fix a bug where files weren't properly closed when read for hashing.
+- Fix a bug where gzip compression level was inconsistent with S3.
 
 
 ## 2.1.0
