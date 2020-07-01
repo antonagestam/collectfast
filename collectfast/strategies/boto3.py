@@ -4,10 +4,9 @@ from functools import lru_cache
 from typing import Optional
 
 import botocore.exceptions
+from django.core.files.storage import Storage
 from storages.backends.s3boto3 import S3Boto3Storage
 from storages.utils import safe_join
-
-from django.core.files.storage import Storage
 
 from .base import CachingHashStrategy
 from collectfast import settings
