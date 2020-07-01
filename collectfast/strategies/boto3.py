@@ -1,9 +1,13 @@
+import hashlib
 import logging
+from functools import lru_cache
 from typing import Optional
 
 import botocore.exceptions
 from storages.backends.s3boto3 import S3Boto3Storage
 from storages.utils import safe_join
+
+from django.core.files.storage import Storage
 
 from .base import CachingHashStrategy
 from collectfast import settings
@@ -28,6 +32,27 @@ class Boto3Strategy(CachingHashStrategy[S3Boto3Storage]):
             return None
         assert quoted_hash[0] == quoted_hash[-1] == '"'
         return quoted_hash[1:-1]
+
+    def get_local_multipart_hash(
+        self, path: str, local_storage: Storage, chunk_size: int
+    ) -> str:
+        """Calculate multipart hash using a given chunk size."""
+        md5s = []
+        with local_storage.open(path, "rb") as f:
+            for data in iter(lambda: f.read(chunk_size), b""):
+                md5s.append(hashlib.md5(data).digest())
+        m = hashlib.md5(b"".join(md5s))
+        return "{}-{}".format(m.hexdigest(), len(md5s))
+
+    @lru_cache(maxsize=None)
+    def get_local_file_hash(
+        self, path: str, local_storage: Storage, chunk_size: int = 8 * 1024 * 1024
+    ) -> str:
+        """Calculate large file hashes differently."""
+        file = local_storage.open(path)
+        if file.size > chunk_size:
+            return self.get_local_multipart_hash(path, local_storage, chunk_size)
+        return super().get_local_file_hash(path, local_storage)
 
     def get_remote_file_hash(self, prefixed_path: str) -> Optional[str]:
         normalized_path = self._normalize_path(prefixed_path)
