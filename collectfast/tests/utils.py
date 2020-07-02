@@ -1,7 +1,6 @@
 import functools
 import os
 import pathlib
-import random
 import unittest
 import uuid
 from typing import Any
@@ -67,7 +66,8 @@ def test_many(**mutations: Callable[[F], F]) -> Callable[[F], Type[unittest.Test
 def create_static_file(size: int = 500) -> pathlib.Path:
     """Write random characters to a file in the static directory."""
     path = static_dir / f"{uuid.uuid4().hex}.txt"
-    path.write_text("".join(chr(random.randint(0, 64)) for _ in range(size)))
+    with path.open("wb") as handle:
+        handle.write(os.urandom(size))
     return path
 
 
