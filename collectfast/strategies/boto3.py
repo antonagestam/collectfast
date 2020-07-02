@@ -38,13 +38,13 @@ class Boto3Strategy(CachingHashStrategy[S3Boto3Storage]):
         self, path: str, local_storage: Storage, chunk_size: int
     ) -> str:
         """Calculate multipart hash using a given chunk size."""
-        md5s = []
+        chunk_hashes = []
         with local_storage.open(path, "rb") as f:
             func: Callable[[], Any] = lambda: f.read(chunk_size)
             for data in iter(func, b""):
-                md5s.append(hashlib.md5(data).digest())
-        m = hashlib.md5(b"".join(md5s))
-        return "{}-{}".format(m.hexdigest(), len(md5s))
+                chunk_hashes.append(hashlib.md5(data).digest())
+        summed_hash = hashlib.md5(b"".join(chunk_hashes)).hexdigest()
+        return f"{summed_hash}-{len(chunk_hashes)}"
 
     @lru_cache(maxsize=None)
     def get_local_file_hash(
