@@ -99,6 +99,18 @@ def test_aws_is_gzipped(case: TestCase) -> None:
     case.assertIn("0 static files copied.", call_collectstatic())
 
 
+@make_test_aws_backends
+@live_test
+@override_storage_attr("gzip", True)
+@override_setting("aws_is_gzipped", True)
+def test_aws_large_file_is_gzipped(case: TestCase) -> None:
+    clean_static_dir()
+    create_static_file(size=10485760)
+    case.assertIn("1 static file copied.", call_collectstatic())
+    # file state should now be cached
+    case.assertIn("0 static files copied.", call_collectstatic())
+
+
 @make_test
 @override_django_settings(STATICFILES_STORAGE=None, COLLECTFAST_STRATEGY=None)
 def test_raises_for_no_configured_strategy(case: TestCase) -> None:
