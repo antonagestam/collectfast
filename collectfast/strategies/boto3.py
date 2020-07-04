@@ -86,12 +86,12 @@ class Boto3Strategy(CachingHashStrategy[S3Boto3Storage]):
             file_hash = self.get_aws_hash(f)
             if self.use_gzip and content_type in settings.gzip_content_types:
                 cache_key = self.get_cache_key("gzip_hash_%s" % file_hash)
-                file_hash = cache.get(cache_key, False)
-                if file_hash is False:
+                gzip_file_hash = cache.get(cache_key, False)
+                if gzip_file_hash is False:
                     f.seek(0)
-                    file_hash = self.get_gzipped_aws_hash(f)
+                    gzip_file_hash = self.get_gzipped_aws_hash(f)
                     cache.set(cache_key, file_hash)
-
+                return str(gzip_file_hash)
         return str(file_hash)
 
     def get_remote_file_hash(self, prefixed_path: str) -> Optional[str]:
