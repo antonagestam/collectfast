@@ -4,7 +4,6 @@ import logging
 import mimetypes
 from functools import lru_cache
 from io import BytesIO
-from typing import Final
 from typing import IO
 from typing import Optional
 
@@ -14,6 +13,7 @@ from django.core.files.storage import Storage
 from django.utils.encoding import force_bytes
 from storages.backends.s3boto3 import S3Boto3Storage
 from storages.utils import safe_join
+from typing_extensions import Final
 
 from .base import CachingHashStrategy
 from collectfast import settings
@@ -22,7 +22,7 @@ from collectfast import settings
 cache = caches[settings.cache]
 logger = logging.getLogger(__name__)
 
-multipart_chunksize: Final = 8 * 1024 * 1024
+multipart_chunksize: Final[int] = 8 * 1024 * 1024
 # AWS changes the way hashes are calculated when using multipart uploads,
 # which are enabled by default when file size exceeds 8388608 bytes.
 # Django-storages does not currently allow a user to override this default.
