@@ -1,8 +1,6 @@
 import hashlib
 import logging
 from functools import lru_cache
-from typing import Any
-from typing import Callable
 from typing import Optional
 
 import botocore.exceptions
@@ -40,8 +38,11 @@ class Boto3Strategy(CachingHashStrategy[S3Boto3Storage]):
         """Calculate multipart hash using a given chunk size."""
         chunk_hashes = []
         with local_storage.open(path, "rb") as f:
-            func: Callable[[], Any] = lambda: f.read(chunk_size)
-            for data in iter(func, b""):
+
+            def read_chunk():
+                return f.read(chunk_size)
+
+            for data in iter(read_chunk, b""):
                 chunk_hashes.append(hashlib.md5(data).digest())
         summed_hash = hashlib.md5(b"".join(chunk_hashes)).hexdigest()
         return f"{summed_hash}-{len(chunk_hashes)}"
