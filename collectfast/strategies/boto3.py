@@ -59,10 +59,10 @@ class Boto3Strategy(CachingHashStrategy[S3Boto3Storage]):
             chunk_hashes.append(hashlib.md5(data))
 
         if len(chunk_hashes) < 1:
-            return "{}".format(hashlib.md5().hexdigest())
+            return hashlib.md5().hexdigest()
 
         if len(chunk_hashes) == 1:
-            return "{}".format(chunk_hashes[0].hexdigest())
+            return chunk_hashes[0].hexdigest()
 
         digests = b"".join(m.digest() for m in chunk_hashes)
         digests_md5 = hashlib.md5(digests)
