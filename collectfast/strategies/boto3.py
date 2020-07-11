@@ -69,9 +69,9 @@ class Boto3Strategy(CachingHashStrategy[S3Boto3Storage]):
         if len(chunk_hashes) == 1:
             return chunk_hashes[0].hexdigest()
 
-        digests = b"".join(m.digest() for m in chunk_hashes)
-        digests_md5 = hashlib.md5(digests)
-        return "{}-{}".format(digests_md5.hexdigest(), len(chunk_hashes))
+        part_hashes = tuple(m.digest() for m in chunk_hashes)
+        overall_hash = hashlib.md5(b"".join(part_hashes)).hexdigest()
+        return f"{overall_hash}-{len(part_hashes)}"
 
     def get_gzipped_aws_hash(self, stream: IO) -> str:
         """Calculate multipart-friendly gzipped hash."""
