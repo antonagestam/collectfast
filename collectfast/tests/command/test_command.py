@@ -63,6 +63,16 @@ def test_aws_large_file(case: TestCase) -> None:
     case.assertIn("0 static files copied.", call_collectstatic())
 
 
+@make_test_aws_backends
+@live_test
+def test_aws_empty_file(case: TestCase) -> None:
+    clean_static_dir()
+    create_static_file(size=0)
+    case.assertIn("1 static file copied.", call_collectstatic())
+    # file state should now be cached
+    case.assertIn("0 static files copied.", call_collectstatic())
+
+
 @make_test_all_backends
 @live_test
 @override_setting("threads", 5)
