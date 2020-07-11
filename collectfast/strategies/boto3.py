@@ -87,16 +87,16 @@ class Boto3Strategy(CachingHashStrategy[S3Boto3Storage]):
         """Calculate large file hashes differently, if necessary."""
         content_type = mimetypes.guess_type(path)[0] or "application/octet-stream"
         with local_storage.open(path, "rb") as f:
-            file_hash = self.get_aws_hash(f)
-            if self.use_gzip and content_type in settings.gzip_content_types:
-                cache_key = self.get_cache_key(f"gzip_hash_{file_hash}")
-                gzip_file_hash = cache.get(cache_key, False)
-                if gzip_file_hash is False:
-                    f.seek(0)
-                    gzip_file_hash = self.get_gzipped_aws_hash(f)
-                    cache.set(cache_key, file_hash)
-                return str(gzip_file_hash)
-        return str(file_hash)
+            file_hash = str(self.get_aws_hash(f))
+            if not self.use_gzip or content_type not in settings.gzip_content_types:
+                return file_hash
+            cache_key = self.get_cache_key(f"gzip_hash_{file_hash}")
+            gzip_file_hash = cache.get(cache_key, False)
+            if gzip_file_hash is False:
+                f.seek(0)
+                gzip_file_hash = self.get_gzipped_aws_hash(f)
+                cache.set(cache_key, file_hash)
+            return str(gzip_file_hash)
 
     def get_remote_file_hash(self, prefixed_path: str) -> Optional[str]:
         normalized_path = self._normalize_path(prefixed_path)
