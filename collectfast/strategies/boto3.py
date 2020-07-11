@@ -53,7 +53,7 @@ class Boto3Strategy(CachingHashStrategy[S3Boto3Storage]):
     def get_aws_hash(self, stream: IO) -> str:
         """Calculate multipart-friendly hash using `multipart_chunksize` chunk size."""
 
-        def read_chunks(stream: IO, chunksize: int) -> Iterable[str]:
+        def read_chunks(stream: IO, chunksize: int) -> Iterable[bytes]:
             while True:
                 data = stream.read(chunksize)
                 if not data:
@@ -97,7 +97,7 @@ class Boto3Strategy(CachingHashStrategy[S3Boto3Storage]):
                 f.seek(0)
                 gzip_file_hash = self.get_gzipped_aws_hash(f)
                 cache.set(cache_key, file_hash)
-            return str(gzip_file_hash)
+        return str(gzip_file_hash)
 
     def get_remote_file_hash(self, prefixed_path: str) -> Optional[str]:
         normalized_path = self._normalize_path(prefixed_path)
