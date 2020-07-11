@@ -52,6 +52,7 @@ class Boto3Strategy(CachingHashStrategy[S3Boto3Storage]):
 
     def get_aws_hash(self, stream: IO) -> str:
         """Calculate multipart-friendly hash using `multipart_chunksize` chunk size."""
+
         def read_chunks(stream: IO, chunksize: int) -> Iterable[str]:
             while True:
                 data = stream.read(chunksize)
