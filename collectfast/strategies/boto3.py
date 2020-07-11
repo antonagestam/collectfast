@@ -5,12 +5,12 @@ import mimetypes
 from functools import lru_cache
 from io import BytesIO
 from typing import IO
+from typing import Iterable
 from typing import Optional
 
 import botocore.exceptions
 from django.core.cache import caches
 from django.core.files.storage import Storage
-from django.utils.encoding import force_bytes
 from storages.backends.s3boto3 import S3Boto3Storage
 from storages.utils import safe_join
 from typing_extensions import Final
@@ -50,14 +50,18 @@ class Boto3Strategy(CachingHashStrategy[S3Boto3Storage]):
         assert quoted_hash[0] == quoted_hash[-1] == '"'
         return quoted_hash[1:-1]
 
-    def get_aws_hash(self, open_handle: IO) -> str:
+    def get_aws_hash(self, stream: IO) -> str:
         """Calculate multipart-friendly hash using `multipart_chunksize` chunk size."""
-        chunk_hashes = []
-        while True:
-            data = open_handle.read(multipart_chunksize)
-            if not data:
-                break
-            chunk_hashes.append(hashlib.md5(data))
+        def read_chunks(stream: IO, chunksize: int) -> Iterable[str]:
+            while True:
+                data = stream.read(chunksize)
+                if not data:
+                    break
+                yield data
+
+        chunk_hashes = tuple(
+            hashlib.md5(chunk) for chunk in read_chunks(stream, multipart_chunksize)
+        )
 
         if len(chunk_hashes) < 1:
             return hashlib.md5().hexdigest()
@@ -69,11 +73,11 @@ class Boto3Strategy(CachingHashStrategy[S3Boto3Storage]):
         digests_md5 = hashlib.md5(digests)
         return "{}-{}".format(digests_md5.hexdigest(), len(chunk_hashes))
 
-    def get_gzipped_aws_hash(self, open_handle: IO) -> str:
+    def get_gzipped_aws_hash(self, stream: IO) -> str:
         """Calculate multipart-friendly gzipped hash."""
         buffer = BytesIO()
         zf = gzip.GzipFile(mode="wb", fileobj=buffer, mtime=0.0)
-        zf.write(force_bytes(open_handle.read()))
+        zf.write(stream.read())
         zf.close()
         buffer.seek(0)
         return self.get_aws_hash(buffer)
