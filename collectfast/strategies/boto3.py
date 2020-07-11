@@ -22,13 +22,14 @@ from collectfast import settings
 cache = caches[settings.cache]
 logger = logging.getLogger(__name__)
 
-multipart_chunksize: Final[int] = 8 * 1024 * 1024
+
 # AWS changes the way hashes are calculated when using multipart uploads,
 # which are enabled by default when file size exceeds 8388608 bytes.
 # Django-storages does not currently allow a user to override this default.
 # See also:
 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Object.upload_fileobj
 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/customizations/s3.html#boto3.s3.transfer.TransferConfig
+multipart_chunksize: Final[int] = 8 * 1024 * 1024
 
 
 class Boto3Strategy(CachingHashStrategy[S3Boto3Storage]):
@@ -80,12 +81,11 @@ class Boto3Strategy(CachingHashStrategy[S3Boto3Storage]):
     @lru_cache(maxsize=None)
     def get_local_file_hash(self, path: str, local_storage: Storage) -> str:
         """Calculate large file hashes differently, if necessary."""
-        # # Check if content should be gzipped and hash gzipped content
         content_type = mimetypes.guess_type(path)[0] or "application/octet-stream"
         with local_storage.open(path, "rb") as f:
             file_hash = self.get_aws_hash(f)
             if self.use_gzip and content_type in settings.gzip_content_types:
-                cache_key = self.get_cache_key("gzip_hash_%s" % file_hash)
+                cache_key = self.get_cache_key(f"gzip_hash_{file_hash}")
                 gzip_file_hash = cache.get(cache_key, False)
                 if gzip_file_hash is False:
                     f.seek(0)
