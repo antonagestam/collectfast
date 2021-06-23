@@ -28,6 +28,8 @@ cache: Final = _get_setting(str, "COLLECTFAST_CACHE", "default")
 threads: Final = _get_setting(int, "COLLECTFAST_THREADS", 0)
 enabled: Final = _get_setting(bool, "COLLECTFAST_ENABLED", True)
 aws_is_gzipped: Final = _get_setting(bool, "AWS_IS_GZIPPED", False)
+# Provide an override for storages that use a different gzip compression level.
+gzip_compresslevel: Final = _get_setting(int, "COLLECTFAST_GZIP_COMPRESSLEVEL", 9)
 gzip_content_types: Final[Container] = _get_setting(
     tuple,
     "GZIP_CONTENT_TYPES",

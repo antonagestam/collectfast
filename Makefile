@@ -1,7 +1,11 @@
 SHELL := /usr/bin/env bash
 
 test:
+ifdef mark
+	. storage-credentials && pytest -m "$(mark)"
+else
 	. storage-credentials && pytest
+endif
 
 test-skip-live:
 	SKIP_LIVE_TESTS=true pytest

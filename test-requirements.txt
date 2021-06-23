@@ -4,5 +4,6 @@ coveralls
 django-storages
 boto3
 google-cloud-storage
+django-storage-swift
 pytest
 pytest-django

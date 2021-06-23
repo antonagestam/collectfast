@@ -12,7 +12,6 @@ from typing import TypeVar
 
 import pytest
 from django.conf import settings as django_settings
-from django.utils.module_loading import import_string
 from typing_extensions import Final
 
 from collectfast import settings
@@ -41,29 +40,6 @@ def make_test(func: F) -> Type[unittest.TestCase]:
     return case
 
 
-def test_many(**mutations: Callable[[F], F]) -> Callable[[F], Type[unittest.TestCase]]:
-    def test(func: F) -> Type[unittest.TestCase]:
-        """
-        Creates a class that inherits from `unittest.TestCase` with the decorated
-        function as a method. Create tests like this:
-
-        >>> fn = lambda x: 1337
-        >>> @make_test
-        ... def test_fn(case):
-        ...     case.assertEqual(fn(), 1337)
-        """
-        case_dict = {
-            "test_%s" % mutation_name: mutation(func)
-            for mutation_name, mutation in mutations.items()
-        }
-
-        case = type(func.__name__, (unittest.TestCase,), case_dict)
-        case.__module__ = func.__module__
-        return case
-
-    return test
-
-
 def create_static_file() -> pathlib.Path:
     """Write random characters to a file in the static directory."""
     path = static_dir / f"{uuid.uuid4().hex}.txt"
@@ -88,23 +64,6 @@ def override_setting(name: str, value: Any) -> Callable[[F], F]:
                 return fn(*args, **kwargs)
             finally:
                 setattr(settings, name, original)
-
-        return cast(F, wrapper)
-
-    return decorator
-
-
-def override_storage_attr(name: str, value: Any) -> Callable[[F], F]:
-    def decorator(fn: F) -> F:
-        @functools.wraps(fn)
-        def wrapper(*args, **kwargs):
-            storage = import_string(django_settings.STATICFILES_STORAGE)
-            original = getattr(storage, name)
-            setattr(storage, name, value)
-            try:
-                return fn(*args, **kwargs)
-            finally:
-                setattr(storage, name, original)
 
         return cast(F, wrapper)
 

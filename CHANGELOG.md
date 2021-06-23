@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- Implement OpenStack Swift support.
+- Add `pre_collect_hook` to `collectfast.strategies.base.Strategy`.
+- Replace `test_many` test generator with pytest parametrize.
+- Add pytest marks for easy test selection.
+- Add pytest skip checks for storage settings and dependencies.
+- Add tests for `S3ManifestStaticStorage`.
+- Replace `override_storage_attr` with `mock.patch.object` to support
+  overriding instance attributes.
+
 ## 2.2.0
 
 - Add `post_copy_hook` and `on_skip_hook` to
