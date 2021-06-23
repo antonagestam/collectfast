@@ -1,6 +1,8 @@
 from unittest import mock
 from unittest import TestCase
 
+import pytest
+from django.conf import settings
 from django.test import override_settings as override_django_settings
 
 from .utils import call_collectstatic
@@ -23,6 +25,10 @@ def test_disable_collectfast_with_default_storage(case: TestCase) -> None:
 
 @make_test
 @live_test
+@pytest.mark.boto3  # default test storage is boto3
+@pytest.mark.skipif(
+    not settings.AWS_ACCESS_KEY_ID, reason="AWS credentials are not set"
+)
 def test_disable_collectfast(case: TestCase) -> None:
     clean_static_dir()
     create_static_file()

@@ -67,6 +67,9 @@ class Command(collectstatic.Command):
         Override collect to copy files concurrently. The tasks are populated by
         Command.copy_file() which is called by super().collect().
         """
+        if self.collectfast_enabled:
+            self.strategy.pre_collect_hook()
+
         if not self.collectfast_enabled or not settings.threads:
             return super().collect()
 
@@ -91,8 +94,9 @@ class Command(collectstatic.Command):
         ret = super().handle(**options)
         if not self.collectfast_enabled:
             return ret
-        plural = "" if self.num_copied_files == 1 else "s"
-        return f"{self.num_copied_files} static file{plural} copied."
+        if self.verbosity >= 1:
+            plural = "" if self.num_copied_files == 1 else "s"
+            return f"{self.num_copied_files} static file{plural} copied."
 
     def maybe_copy_file(self, args: Task) -> None:
         """Determine if file should be copied or not and handle exceptions."""

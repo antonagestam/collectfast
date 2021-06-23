@@ -14,9 +14,11 @@ A faster collectstatic command.
 
 **Supported Storage Backends**
 
-- `storages.backends.s3boto3.S3Boto3Storage`
+- `storages.backends.s3boto3.S3StaticStorage`
+- `storages.backends.s3boto3.S3ManifestStaticStorage`
 - `storages.backends.gcloud.GoogleCloudStorage`
 - `django.core.files.storage.FileSystemStorage`
+- `swift.storage.StaticSwiftStorage`
 
 Running Django's `collectstatic` command can become painfully slow as more and
 more files are added to a project, especially when heavy libraries such as
@@ -31,6 +33,12 @@ Install the app using pip:
 
 ```bash
 $ python3 -m pip install Collectfast
+```
+
+OpenStack Swift uses an optional dependency which you can install with the swift extra.
+
+```bash
+$ python3 -m pip install 'Collectfast[swift]'
 ```
 
 Make sure you have this in your settings file and add `'collectfast'` to your
@@ -57,9 +65,10 @@ to `True`, see [#30][issue-30].
 
 Collectfast Strategy|Storage Backend
 ---|---
-collectfast.strategies.boto3.Boto3Strategy|storages.backends.s3boto3.S3Boto3Storage
+collectfast.strategies.boto3.Boto3Strategy|storages.backends.s3boto3.S3StaticStorage
 collectfast.strategies.gcloud.GoogleCloudStrategy|storages.backends.gcloud.GoogleCloudStorage
 collectfast.strategies.filesystem.FileSystemStrategy|django.core.files.storage.FileSystemStorage
+collectfast.strategies.swift.OpenStackSwiftStrategy|swift.storage.StaticSwiftStorage
 
 Custom strategies can also be made for backends not listed above by
 implementing the `collectfast.strategies.Strategy` ABC.
@@ -136,16 +145,28 @@ open and welcome.
 
 ### Testing
 
-The test suite is built to run against live S3 and GCloud buckets. You can
-disable live tests by setting `SKIP_LIVE_TESTS=true` or running `make
-test-skip-live`. To run live tests locally you need to provide API credentials
-to test against. Add the credentials to a file named `storage-credentials` in
-the root of the project directory:
+The test suite is built to run against live S3, GCloud and OpenStack Swift
+buckets. You can disable live tests by setting `SKIP_LIVE_TESTS=true` or
+running `make test-skip-live`. Storage backends for which the settings are
+omitted will automatically be skipped. To run live tests locally you need to
+provide API credentials to test against. Add the credentials to a file named
+`storage-credentials` in the root of the project directory:
 
 ```bash
 export AWS_ACCESS_KEY_ID='...'
 export AWS_SECRET_ACCESS_KEY='...'
+
 export GCLOUD_CREDENTIALS='{...}'  # Google Cloud credentials as JSON
+
+export SWIFT_AUTH_URL='...'
+export SWIFT_PROJECT_ID='...'
+export SWIFT_PROJECT_NAME='...'
+export SWIFT_USER_DOMAIN_NAME='...'
+export SWIFT_PROJECT_DOMAIN_ID='...'
+export SWIFT_USERNAME='...'
+export SWIFT_PASSWORD='...'
+export SWIFT_REGION_NAME='...'
+export SWIFT_STATIC_CONTAINER_NAME='static'
 ```
 
 Install test dependencies and target Django version:
@@ -159,6 +180,12 @@ Run test suite:
 
 ```bash
 make test
+```
+
+Run test suite for a specific storage types use the `pytest --markers`:
+
+```bash
+make test mark="boto3 or filesystem or gcloud or swift"
 ```
 
 Code quality tools are broken out from test requirements because some of them

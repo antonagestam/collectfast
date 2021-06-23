@@ -50,6 +50,10 @@ class Strategy(abc.ABC, Generic[_RemoteStorage]):
         """
         ...
 
+    def pre_collect_hook(self) -> None:
+        """Hook called before running collect."""
+        ...
+
     def pre_should_copy_hook(self) -> None:
         """Hook called before calling should_copy_file."""
         ...
@@ -81,7 +85,12 @@ class HashStrategy(Strategy[_RemoteStorage], abc.ABC):
         self, uncompressed_file_hash: str, path: str, contents: str
     ) -> str:
         buffer = BytesIO()
-        zf = gzip.GzipFile(mode="wb", fileobj=buffer, mtime=0.0)
+        zf = gzip.GzipFile(
+            mode="wb",
+            fileobj=buffer,
+            mtime=0.0,
+            compresslevel=settings.gzip_compresslevel,
+        )
         zf.write(force_bytes(contents))
         zf.close()
         return hashlib.md5(buffer.getvalue()).hexdigest()

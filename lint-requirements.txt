@@ -1,6 +1,7 @@
 flake8
 flake8-bugbear
-black
+# sorti has been archived and requires an old black release.
+black==19.10b0
 sorti
 mypy>=0.761
 django-stubs>=1.4.0
