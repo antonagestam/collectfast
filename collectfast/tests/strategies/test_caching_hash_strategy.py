@@ -1,13 +1,12 @@
 import string
-from unittest import mock
 from unittest import TestCase
+from unittest import mock
 
 from django.core.files.storage import FileSystemStorage
 
 from collectfast import settings
 from collectfast.strategies.base import CachingHashStrategy
 from collectfast.tests.utils import make_test
-
 
 hash_characters = string.ascii_letters + string.digits
 

@@ -5,8 +5,9 @@ import botocore.exceptions
 from storages.backends.s3boto3 import S3Boto3Storage
 from storages.utils import safe_join
 
-from .base import CachingHashStrategy
 from collectfast import settings
+
+from .base import CachingHashStrategy
 
 logger = logging.getLogger(__name__)
 
