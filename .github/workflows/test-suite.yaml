@@ -50,7 +50,7 @@ jobs:
           ./cc-test-reporter format-coverage -o "$filename"
           echo "##[set-output name=filename;]${filename}"
         id: format_coverage
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v1
         with:
           name: coverage
           path: ${{ steps.format_coverage.outputs.filename }}
@@ -63,7 +63,7 @@ jobs:
         run: |
           curl -vsL https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
           chmod +x ./cc-test-reporter
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v1
         with:
           name: coverage
       - env:
