@@ -1,0 +1,28 @@
+name: Test unreleased Django
+on:
+  schedule:
+    - cron: '30 10 * * 1-5'
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test latest stable Python with unreleased Django
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('setup.cfg') }}
+          restore-keys: ${{ runner.os }}-pip
+      - name: Install dependencies
+        run: |
+          pip install --upgrade https://github.com/django/django/archive/main.tar.gz
+          pip install --upgrade -r test-requirements.txt
+          pip install .
+      - name: Run all tests
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          GCLOUD_CREDENTIALS: ${{ secrets.GCLOUD_CREDENTIALS }}
+        run: coverage run -m pytest
