@@ -41,7 +41,7 @@ STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 COLLECTFAST_STRATEGY = "collectfast.strategies.boto3.Boto3Strategy"
 INSTALLED_APPS = (
     # ...
-    'collectfast',
+    "collectfast",
 )
 ```
 
@@ -84,15 +84,15 @@ Configure your dedicated cache with the `COLLECTFAST_CACHE` setting:
 
 ```python
 CACHES = {
-    'default': {
+    "default": {
         # Your default cache
     },
-    'collectfast': {
+    "collectfast": {
         # Your dedicated Collectfast cache
     },
 }
 
-COLLECTFAST_CACHE = 'collectfast'
+COLLECTFAST_CACHE = "collectfast"
 ```
 
 If `COLLECTFAST_CACHE` isn't set, the `default` cache will be used.

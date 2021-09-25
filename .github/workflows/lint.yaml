@@ -3,30 +3,7 @@ on: [push, pull_request]
 jobs:
   lint:
     runs-on: ubuntu-latest
-    env:
-      PYTHONPATH: .
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v1
-        with:
-          python-version: 3.8
-      - uses: actions/cache@v1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('setup.cfg') }}
-          restore-keys: ${{ runner.os }}-pip
-      - name: Install dependencies
-        run: |
-          pip install --upgrade 'django>=3.0,<3.1'
-          pip install --upgrade -r test-requirements.txt
-          pip install --upgrade -r lint-requirements.txt
-          pip install .
-      - uses: actions/cache@v1
-        with:
-          path: .mypy_cache
-          key: ${{ runner.os }}-mypy
-          restore-keys: ${{ runner.os }}-mypy
-      - run: flake8
-      - run: sorti --check .
-      - run: black --check .
-      - run: mypy
+      - uses: actions/setup-python@v2
+      - uses: pre-commit/action@v2

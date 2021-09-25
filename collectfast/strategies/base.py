@@ -22,7 +22,6 @@ from django.utils.encoding import force_bytes
 
 from collectfast import settings
 
-
 _RemoteStorage = TypeVar("_RemoteStorage", bound=Storage)
 
 

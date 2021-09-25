@@ -6,9 +6,9 @@ import unittest
 import uuid
 from typing import Any
 from typing import Callable
-from typing import cast
 from typing import Type
 from typing import TypeVar
+from typing import cast
 
 import pytest
 from django.conf import settings as django_settings
