@@ -1,2 +1,11 @@
 include README.md
 include LICENSE
+include collectfast/py.typed
+exclude conftest.py
+exclude collectfast/tests/
+exclude Makefile
+exclude *.yml
+exclude *.yaml
+exclude CODE_OF_CONDUCT.md
+exclude CHANGELOG.md
+exclude test-requirements.txt

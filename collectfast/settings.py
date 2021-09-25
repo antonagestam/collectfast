@@ -5,7 +5,6 @@ from typing import TypeVar
 from django.conf import settings
 from typing_extensions import Final
 
-
 T = TypeVar("T")
 
 

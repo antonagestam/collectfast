@@ -15,9 +15,8 @@ from django.core.management.base import CommandParser
 from collectfast import __version__
 from collectfast import settings
 from collectfast.strategies import DisabledStrategy
-from collectfast.strategies import load_strategy
 from collectfast.strategies import Strategy
-
+from collectfast.strategies import load_strategy
 
 Task = Tuple[str, str, Storage]
 
@@ -171,7 +170,7 @@ class Command(collectstatic.Command):
                 raise processed
             if processed:
                 self.log(
-                    "Post-processed '%s' as '%s'" % (original_path, processed_path),
+                    f"Post-processed '{original_path}' as '{processed_path}'",
                     level=2,
                 )
                 self.post_processed_files.append(original_path)
