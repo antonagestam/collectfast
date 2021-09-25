@@ -10,10 +10,10 @@ jobs:
     name: Test Python ${{ matrix.python-version }} Django ${{ matrix.django-version }}
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v1
+      - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('setup.cfg') }}
@@ -46,7 +46,7 @@ jobs:
           ./cc-test-reporter format-coverage -o "$filename"
           echo "##[set-output name=filename;]${filename}"
         id: format_coverage
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v2
         with:
           name: coverage
           path: ${{ steps.format_coverage.outputs.filename }}
@@ -59,7 +59,7 @@ jobs:
         run: |
           curl -vsL https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
           chmod +x ./cc-test-reporter
-      - uses: actions/download-artifact@v1
+      - uses: actions/download-artifact@v2
         with:
           name: coverage
       - env:
