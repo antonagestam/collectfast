@@ -1,3 +1,11 @@
+Hi there 👋
+
+I am looking for a maintainer to take over this project. I am longer working
+with any project that uses the collectstatic framework and therefor can't be as
+invested as a maintainer of this project should preferably be.
+
+Please get in contact with me via issues if you are willing to take over.
+
 # Collectfast
 
 A faster collectstatic command.
