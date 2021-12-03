@@ -78,7 +78,12 @@ class Command(collectstatic.Command):
         return_value = super().collect()
 
         with ThreadPoolExecutor(settings.threads) as pool:
-            pool.map(self.maybe_copy_file, self.tasks)
+            result_futures = list(map(lambda x: pool.submit(self.maybe_copy_file, x), self.tasks))
+            for future in as_completed(result_futures):
+                try:
+                    future.result()
+                except Exception as e:
+                    raise(e)
 
         self.maybe_post_process(super_post_process)
         return_value["post_processed"] = self.post_processed_files
