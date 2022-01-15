@@ -2,6 +2,7 @@ from io import StringIO
 from typing import Any
 
 from django.core.management import call_command
+from moto import mock_s3
 
 
 def call_collectstatic(*args: Any, **kwargs: Any) -> str:

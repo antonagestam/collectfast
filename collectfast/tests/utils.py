@@ -10,6 +10,8 @@ from typing import Type
 from typing import TypeVar
 from typing import cast
 
+import boto3
+import moto
 import pytest
 from django.conf import settings as django_settings
 from django.utils.module_loading import import_string
@@ -38,6 +40,8 @@ def make_test(func: F) -> Type[unittest.TestCase]:
     """
     case = type(func.__name__, (unittest.TestCase,), {func.__name__: func})
     case.__module__ = func.__module__
+    case.setUp = setUp
+    case.tearDown = tearDown
     return case
 
 
@@ -59,6 +63,8 @@ def test_many(**mutations: Callable[[F], F]) -> Callable[[F], Type[unittest.Test
 
         case = type(func.__name__, (unittest.TestCase,), case_dict)
         case.__module__ = func.__module__
+        case.setUp = setUp
+        case.tearDown = tearDown
         return case
 
     return test
@@ -109,3 +115,30 @@ def override_storage_attr(name: str, value: Any) -> Callable[[F], F]:
         return cast(F, wrapper)
 
     return decorator
+
+
+def create_bucket() -> None:
+    s3 = boto3.client('s3', region_name=django_settings.AWS_S3_REGION_NAME)
+    location = {'LocationConstraint': django_settings.AWS_S3_REGION_NAME}
+    s3.create_bucket(
+        Bucket=django_settings.AWS_STORAGE_BUCKET_NAME,
+        CreateBucketConfiguration=location
+    )
+
+
+def delete_bucket() -> None:
+    s3 = boto3.resource('s3', region_name=django_settings.AWS_S3_REGION_NAME)
+    bucket = s3.Bucket(django_settings.AWS_STORAGE_BUCKET_NAME)
+    bucket.objects.delete()
+    bucket.delete()
+
+
+def setUp(klass: unittest.TestCase) -> None:
+    klass.mock_s3 = moto.mock_s3()
+    klass.mock_s3.start()
+    create_bucket()
+
+
+def tearDown(klass: unittest.TestCase) -> None:
+    delete_bucket()
+    klass.mock_s3.stop()

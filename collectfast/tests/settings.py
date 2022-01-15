@@ -37,14 +37,16 @@ GZIP_CONTENT_TYPES = ("text/plain",)
 AWS_PRELOAD_METADATA = True
 AWS_STORAGE_BUCKET_NAME = "collectfast"
 AWS_IS_GZIPPED = False
-AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "").strip()
-AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "").strip()
-AWS_S3_REGION_NAME = "eu-central-1"
+AWS_SECURITY_TOKEN = "testing"
+AWS_SESSION_TOKEN = "testing"
+AWS_ACCESS_KEY_ID = 'testing'
+AWS_SECRET_ACCESS_KEY = 'testing'
+AWS_S3_REGION_NAME = "ap-northeast-2"
 AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_QUERYSTRING_AUTH = False
 AWS_DEFAULT_ACL = None
 S3_USE_SIGV4 = True
-AWS_S3_HOST = "s3.eu-central-1.amazonaws.com"
+AWS_S3_HOST = "s3.ap-northeast-2.amazonaws.com"
 
 # Google Cloud
 gcloud_credentials_json = os.environ.get("GCLOUD_CREDENTIALS", "").strip()

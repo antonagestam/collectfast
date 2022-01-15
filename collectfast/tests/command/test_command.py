@@ -5,6 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import override_settings as override_django_settings
 
 from collectfast.management.commands.collectstatic import Command
+from collectfast.tests.command.utils import call_collectstatic
 from collectfast.tests.utils import clean_static_dir
 from collectfast.tests.utils import create_static_file
 from collectfast.tests.utils import live_test
@@ -12,8 +13,6 @@ from collectfast.tests.utils import make_test
 from collectfast.tests.utils import override_setting
 from collectfast.tests.utils import override_storage_attr
 from collectfast.tests.utils import test_many
-
-from .utils import call_collectstatic
 
 aws_backend_confs = {
     "boto3": override_django_settings(

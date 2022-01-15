@@ -9,7 +9,7 @@ from collectfast.tests.utils import live_test
 from collectfast.tests.utils import make_test
 from collectfast.tests.utils import override_setting
 
-from .utils import call_collectstatic
+from collectfast.tests.command.utils import call_collectstatic
 
 
 @make_test
