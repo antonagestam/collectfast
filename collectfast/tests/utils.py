@@ -6,12 +6,14 @@ import unittest.mock
 import uuid
 from typing import Any
 from typing import Callable
+from typing import Dict
 from typing import Type
 from typing import TypeVar
+from typing import Union
 from typing import cast
 
-import boto3
-import moto
+import boto3  # type: ignore
+import moto  # type: ignore
 import pytest
 from django.conf import settings as django_settings
 from django.utils.module_loading import import_string
@@ -28,6 +30,11 @@ static_dir: Final = pathlib.Path(django_settings.STATICFILES_DIRS[0])
 F = TypeVar("F", bound=Callable[..., Any])
 
 
+class CloudTestCase(unittest.TestCase):
+    mock_s3: Any
+    gc: Any
+
+
 def make_test(func: F) -> Type[unittest.TestCase]:
     """
     Creates a class that inherits from `unittest.TestCase` with the decorated
@@ -38,10 +45,12 @@ def make_test(func: F) -> Type[unittest.TestCase]:
     ... def test_fn(case):
     ...     case.assertEqual(fn(), 1337)
     """
-    case = type(func.__name__, (unittest.TestCase,), {func.__name__: func})
+    case = type(
+        func.__name__,
+        (unittest.TestCase,),
+        {func.__name__: func, "setUp": setUp, "tearDown": tearDown},
+    )
     case.__module__ = func.__module__
-    case.setUp = setUp
-    case.tearDown = tearDown
     return case
 
 
@@ -56,15 +65,15 @@ def test_many(**mutations: Callable[[F], F]) -> Callable[[F], Type[unittest.Test
         ... def test_fn(case):
         ...     case.assertEqual(fn(), 1337)
         """
-        case_dict = {
+        case_dict: Dict[str, Union[F, Callable]] = {
             "test_%s" % mutation_name: mutation(func)
             for mutation_name, mutation in mutations.items()
         }
+        case_dict["setUp"] = setUp
+        case_dict["tearDown"] = tearDown
 
         case = type(func.__name__, (unittest.TestCase,), case_dict)
         case.__module__ = func.__module__
-        case.setUp = setUp
-        case.tearDown = tearDown
         return case
 
     return test
@@ -118,32 +127,32 @@ def override_storage_attr(name: str, value: Any) -> Callable[[F], F]:
 
 
 def create_bucket() -> None:
-    s3 = boto3.client('s3', region_name=django_settings.AWS_S3_REGION_NAME)
-    location = {'LocationConstraint': django_settings.AWS_S3_REGION_NAME}
+    s3 = boto3.client("s3", region_name=django_settings.AWS_S3_REGION_NAME)
+    location = {"LocationConstraint": django_settings.AWS_S3_REGION_NAME}
     s3.create_bucket(
         Bucket=django_settings.AWS_STORAGE_BUCKET_NAME,
-        CreateBucketConfiguration=location
+        CreateBucketConfiguration=location,
     )
 
 
 def delete_bucket() -> None:
-    s3 = boto3.resource('s3', region_name=django_settings.AWS_S3_REGION_NAME)
+    s3 = boto3.resource("s3", region_name=django_settings.AWS_S3_REGION_NAME)
     bucket = s3.Bucket(django_settings.AWS_STORAGE_BUCKET_NAME)
     bucket.objects.delete()
     bucket.delete()
 
 
-def setUp(klass: unittest.TestCase) -> None:
-    klass.mock_s3 = moto.mock_s3()
-    klass.mock_s3.start()
+def setUp(case: CloudTestCase) -> None:
+    case.mock_s3 = moto.mock_s3()
+    case.mock_s3.start()
     create_bucket()
-    klass.gc = unittest.mock.patch('storages.backends.gcloud.GoogleCloudStorage')
-    klass.mock_instance = klass.gc.start().return_value  # type: ignore[assignment]
-    klass.mock_instance._bucket = unittest.mock.MagicMock()
-    klass.mock_instance.bucket.get_blob.return_value = None
+    case.gc = unittest.mock.patch("storages.backends.gcloud.GoogleCloudStorage")
+    mock_gcs = case.gc.start().return_value
+    mock_gcs._bucket = unittest.mock.MagicMock()
+    mock_gcs.bucket.get_blob.return_value = None
 
 
-def tearDown(klass: unittest.TestCase) -> None:
+def tearDown(case: CloudTestCase) -> None:
     delete_bucket()
-    klass.mock_s3.stop()
-    klass.gc.stop()
+    case.mock_s3.stop()
+    case.gc.stop()

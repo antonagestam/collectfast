@@ -62,6 +62,7 @@ repos:
           - django-storages
           - boto3
           - google-cloud-storage
+          - moto
   - repo: https://github.com/mgedmin/check-manifest
     rev: "0.47"
     hooks:
