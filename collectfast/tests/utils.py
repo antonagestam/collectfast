@@ -2,7 +2,7 @@ import functools
 import os
 import pathlib
 import random
-import unittest
+import unittest.mock
 import uuid
 from typing import Any
 from typing import Callable
@@ -137,8 +137,13 @@ def setUp(klass: unittest.TestCase) -> None:
     klass.mock_s3 = moto.mock_s3()
     klass.mock_s3.start()
     create_bucket()
+    klass.gc = unittest.mock.patch('storages.backends.gcloud.GoogleCloudStorage')
+    klass.mock_instance = klass.gc.start().return_value  # type: ignore[assignment]
+    klass.mock_instance._bucket = unittest.mock.MagicMock()
+    klass.mock_instance.bucket.get_blob.return_value = None
 
 
 def tearDown(klass: unittest.TestCase) -> None:
     delete_bucket()
     klass.mock_s3.stop()
+    klass.gc.stop()
