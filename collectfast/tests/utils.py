@@ -118,32 +118,32 @@ def override_storage_attr(name: str, value: Any) -> Callable[[F], F]:
 
 
 def create_bucket() -> None:
-    s3 = boto3.client('s3', region_name=django_settings.AWS_S3_REGION_NAME)
-    location = {'LocationConstraint': django_settings.AWS_S3_REGION_NAME}
+    s3 = boto3.client("s3", region_name=django_settings.AWS_S3_REGION_NAME)
+    location = {"LocationConstraint": django_settings.AWS_S3_REGION_NAME}
     s3.create_bucket(
         Bucket=django_settings.AWS_STORAGE_BUCKET_NAME,
-        CreateBucketConfiguration=location
+        CreateBucketConfiguration=location,
     )
 
 
 def delete_bucket() -> None:
-    s3 = boto3.resource('s3', region_name=django_settings.AWS_S3_REGION_NAME)
+    s3 = boto3.resource("s3", region_name=django_settings.AWS_S3_REGION_NAME)
     bucket = s3.Bucket(django_settings.AWS_STORAGE_BUCKET_NAME)
     bucket.objects.delete()
     bucket.delete()
 
 
-def setUp(klass: unittest.TestCase) -> None:
+def setUp(klass: Type[unittest.TestCase]) -> None:
     klass.mock_s3 = moto.mock_s3()
     klass.mock_s3.start()
     create_bucket()
-    klass.gc = unittest.mock.patch('storages.backends.gcloud.GoogleCloudStorage')
+    klass.gc = unittest.mock.patch("storages.backends.gcloud.GoogleCloudStorage")
     klass.mock_instance = klass.gc.start().return_value  # type: ignore[assignment]
     klass.mock_instance._bucket = unittest.mock.MagicMock()
     klass.mock_instance.bucket.get_blob.return_value = None
 
 
-def tearDown(klass: unittest.TestCase) -> None:
+def tearDown(klass: Type[unittest.TestCase]) -> None:
     delete_bucket()
     klass.mock_s3.stop()
     klass.gc.stop()
