@@ -12,8 +12,8 @@ from typing import TypeVar
 from typing import Union
 from typing import cast
 
-import boto3  # type: ignore
-import moto  # type: ignore
+import boto3
+import moto
 from django.conf import settings as django_settings
 from django.utils.module_loading import import_string
 from typing_extensions import Final
