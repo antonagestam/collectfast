@@ -34,11 +34,6 @@ jobs:
           GCLOUD_CREDENTIALS: ${{ secrets.GCLOUD_CREDENTIALS }}
         if: github.event_name == 'push' && github.repository == 'antonagestam/collectfast'
         run: coverage run -m pytest
-      - name: Run non-live tests
-        env:
-          SKIP_LIVE_TESTS: true
-        if: github.event_name != 'push' || github.repository != 'antonagestam/collectfast'
-        run: coverage run -m pytest
       - name: Install Code Climate Test Reporter
         run: |
           curl -vsL https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter

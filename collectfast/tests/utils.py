@@ -14,16 +14,11 @@ from typing import cast
 
 import boto3  # type: ignore
 import moto  # type: ignore
-import pytest
 from django.conf import settings as django_settings
 from django.utils.module_loading import import_string
 from typing_extensions import Final
 
 from collectfast import settings
-
-live_test = pytest.mark.skipif(
-    os.environ.get("SKIP_LIVE_TESTS") == "true", reason="not running live tests"
-)
 
 static_dir: Final = pathlib.Path(django_settings.STATICFILES_DIRS[0])
 

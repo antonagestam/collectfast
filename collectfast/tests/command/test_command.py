@@ -8,7 +8,6 @@ from collectfast.management.commands.collectstatic import Command
 from collectfast.tests.command.utils import call_collectstatic
 from collectfast.tests.utils import clean_static_dir
 from collectfast.tests.utils import create_static_file
-from collectfast.tests.utils import live_test
 from collectfast.tests.utils import make_test
 from collectfast.tests.utils import override_setting
 from collectfast.tests.utils import override_storage_attr
@@ -43,7 +42,6 @@ make_test_all_backends = test_many(**all_backend_confs)
 
 
 @make_test_all_backends
-@live_test
 def test_basics(case: TestCase) -> None:
     clean_static_dir()
     create_static_file()
@@ -53,7 +51,6 @@ def test_basics(case: TestCase) -> None:
 
 
 @make_test_all_backends
-@live_test
 @override_setting("threads", 5)
 def test_threads(case: TestCase) -> None:
     clean_static_dir()
@@ -77,7 +74,6 @@ def test_dry_run(case: TestCase) -> None:
 
 
 @make_test_aws_backends
-@live_test
 @override_storage_attr("gzip", True)
 @override_setting("aws_is_gzipped", True)
 def test_aws_is_gzipped(case: TestCase) -> None:
@@ -96,7 +92,6 @@ def test_raises_for_no_configured_strategy(case: TestCase) -> None:
 
 
 @make_test_all_backends
-@live_test
 @mock.patch("collectfast.strategies.base.Strategy.post_copy_hook", autospec=True)
 def test_calls_post_copy_hook(_case: TestCase, post_copy_hook: mock.MagicMock) -> None:
     clean_static_dir()
@@ -107,7 +102,6 @@ def test_calls_post_copy_hook(_case: TestCase, post_copy_hook: mock.MagicMock) -
 
 
 @make_test_all_backends
-@live_test
 @mock.patch("collectfast.strategies.base.Strategy.on_skip_hook", autospec=True)
 def test_calls_on_skip_hook(_case: TestCase, on_skip_hook: mock.MagicMock) -> None:
     clean_static_dir()
