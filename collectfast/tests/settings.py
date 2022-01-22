@@ -46,7 +46,7 @@ AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_QUERYSTRING_AUTH = False
 AWS_DEFAULT_ACL = None
 S3_USE_SIGV4 = True
-AWS_S3_HOST = "s3.ap-northeast-2.amazonaws.com"
+AWS_S3_HOST = "s3.eu-central-1.amazonaws.com"
 
 # Google Cloud
 gcloud_credentials_json = os.environ.get("GCLOUD_CREDENTIALS", "").strip()
