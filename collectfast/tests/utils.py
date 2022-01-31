@@ -18,11 +18,13 @@ import moto
 from django.conf import settings as django_settings
 from django.utils.module_loading import import_string
 from moto.core.models import MockAWS
+from storages.backends.gcloud import GoogleCloudFile
+from storages.backends.gcloud import GoogleCloudStorage
 from typing_extensions import Final
-from storages.backends.gcloud import GoogleCloudStorage, GoogleCloudFile
 
 from collectfast import settings
-from collectfast.tests.mock import GCloudClientMock, GoogleCloudStorageBlobMock
+from collectfast.tests.mock import GCloudClientMock
+from collectfast.tests.mock import GoogleCloudStorageBlobMock
 
 static_dir: Final = pathlib.Path(django_settings.STATICFILES_DIRS[0])
 
