@@ -1,10 +1,10 @@
 SHELL := /usr/bin/env bash
 
 test:
-	. storage-credentials && pytest
+	pytest .
 
 test-coverage:
-	. storage-credentials && coverage run --source collectfast -m pytest
+	coverage run --source collectfast -m pytest
 
 clean:
 	rm -rf Collectfast.egg-info __pycache__ build dist

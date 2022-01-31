@@ -28,10 +28,6 @@ jobs:
           pip install --upgrade -r test-requirements.txt
           pip install .
       - name: Run all tests
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          GCLOUD_CREDENTIALS: ${{ secrets.GCLOUD_CREDENTIALS }}
         if: github.event_name == 'push' && github.repository == 'antonagestam/collectfast'
         run: coverage run -m pytest
       - name: Install Code Climate Test Reporter
