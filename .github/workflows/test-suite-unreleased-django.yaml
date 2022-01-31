@@ -20,7 +20,5 @@ jobs:
           pip install --upgrade https://github.com/django/django/archive/main.tar.gz
           pip install --upgrade -r test-requirements.txt
           pip install .
-      - name: Run non-live tests
-        env:
-          SKIP_LIVE_TESTS: true
+      - name: Run tests
         run: coverage run -m pytest

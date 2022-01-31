@@ -144,17 +144,7 @@ open and welcome.
 
 ### Testing
 
-The test suite is built to run against live S3 and GCloud buckets. You can
-disable live tests by setting `SKIP_LIVE_TESTS=true` or running `make
-test-skip-live`. To run live tests locally you need to provide API credentials
-to test against. Add the credentials to a file named `storage-credentials` in
-the root of the project directory:
-
-```bash
-export AWS_ACCESS_KEY_ID='...'
-export AWS_SECRET_ACCESS_KEY='...'
-export GCLOUD_CREDENTIALS='{...}'  # Google Cloud credentials as JSON
-```
+The test suite is built to run against `moto` and GCloud Mock.
 
 Install test dependencies and target Django version:
 

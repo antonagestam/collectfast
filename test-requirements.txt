@@ -6,3 +6,4 @@ boto3
 google-cloud-storage
 pytest
 pytest-django
+moto[s3]
