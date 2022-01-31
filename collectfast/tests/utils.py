@@ -1,4 +1,5 @@
 import functools
+import mimetypes
 import os
 import pathlib
 import random
@@ -16,9 +17,12 @@ import boto3
 import moto
 from django.conf import settings as django_settings
 from django.utils.module_loading import import_string
+from moto.core.models import MockAWS
 from typing_extensions import Final
+from storages.backends.gcloud import GoogleCloudStorage, GoogleCloudFile
 
 from collectfast import settings
+from collectfast.tests.mock import GCloudClientMock, GoogleCloudStorageBlobMock
 
 static_dir: Final = pathlib.Path(django_settings.STATICFILES_DIRS[0])
 
@@ -26,8 +30,9 @@ F = TypeVar("F", bound=Callable[..., Any])
 
 
 class CloudTestCase(unittest.TestCase):
-    mock_s3: Any
-    gc: Any
+    mock_s3: MockAWS
+    gcloud_file_init: Any
+    gcloud_client: Any
 
 
 def make_test(func: F) -> Type[unittest.TestCase]:
@@ -138,16 +143,34 @@ def delete_bucket() -> None:
 
 
 def setUp(case: CloudTestCase) -> None:
+    def init_gcloud_file(self, name, mode, storage):
+        self.name = name
+        self.mime_type = mimetypes.guess_type(name)[0]
+        self._mode = mode
+        self._storage = storage
+        self.blob = storage.bucket.get_blob(name)
+        if not self.blob and "w" in mode:
+            self.blob = GoogleCloudStorageBlobMock(
+                self.name, storage.bucket, chunk_size=storage.blob_chunk_size
+            )
+        self._file = None
+        self._is_dirty = False
+
     case.mock_s3 = moto.mock_s3()
     case.mock_s3.start()
     create_bucket()
-    case.gc = unittest.mock.patch("storages.backends.gcloud.GoogleCloudStorage")
-    mock_gcs = case.gc.start().return_value
-    mock_gcs._bucket = unittest.mock.MagicMock()
-    mock_gcs.bucket.get_blob.return_value = None
+    case.gcloud_client = unittest.mock.patch.object(
+        GoogleCloudStorage, "client", GCloudClientMock()
+    )
+    case.gcloud_file_init = unittest.mock.patch.object(
+        GoogleCloudFile, "__init__", init_gcloud_file
+    )
+    case.gcloud_file_init.start()
+    case.gcloud_client.start()
 
 
 def tearDown(case: CloudTestCase) -> None:
     delete_bucket()
     case.mock_s3.stop()
-    case.gc.stop()
+    case.gcloud_file_init.stop()
+    case.gcloud_client.stop()

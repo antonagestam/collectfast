@@ -146,12 +146,6 @@ open and welcome.
 
 The test suite is built to run against `moto` and GCloud Mock.
 
-```bash
-export AWS_ACCESS_KEY_ID='...'
-export AWS_SECRET_ACCESS_KEY='...'
-export GCLOUD_CREDENTIALS='{...}'  # Google Cloud credentials as JSON
-```
-
 Install test dependencies and target Django version:
 
 ```bash
