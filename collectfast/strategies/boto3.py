@@ -40,7 +40,3 @@ class Boto3Strategy(CachingHashStrategy[S3Boto3Storage]):
             return None
         return self._clean_hash(hash_)
 
-    def pre_should_copy_hook(self) -> None:
-        if settings.threads:
-            logger.info("Resetting connection")
-            self.remote_storage._connection = None
